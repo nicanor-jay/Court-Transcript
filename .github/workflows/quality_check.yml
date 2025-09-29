@@ -51,3 +51,7 @@ jobs:
       - name: Run the tests
         run: |
           pytest *.py
+
+      - name: Run coverage
+        run: |
+          pytest --cov-fail-under=60
