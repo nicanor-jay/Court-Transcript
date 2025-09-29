@@ -1,2 +1,6 @@
 pylint
 pytest
+python-dotenv
+requests
+openai
+bs4
