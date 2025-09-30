@@ -1,3 +1,5 @@
+"""Module which roughly extracts heading sections out of hearing transcripts."""
+
 import re
 
 from lxml import etree
