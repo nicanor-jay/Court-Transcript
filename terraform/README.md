@@ -22,9 +22,11 @@ Make sure to add a `terraform.tfvars` file in this folder with your AWS access k
 ```
 ACCESS_KEY = "your_aws_access_key"
 SECRET_ACCESS_KEY = "your_aws_secret_key"
+REGION = "your_aws_region"
+DB_NAME = "your_db_name"
+DB_USERNAME = "your_db_username"
 DB_PASSWORD = "your_db_password"
 SUBNET_IDS = "[list_of_subnet_ids]"
-
 ```
 
 ## 🚀 How to run
