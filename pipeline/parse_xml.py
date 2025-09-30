@@ -77,7 +77,7 @@ def get_text_between_elements(
 
     It is an error for both `start_element` and `end_element` to be None.
     """
-    if not start_element and not end_element:
+    if start_element is None and end_element is None:
         raise TypeError("start_element and end_element cannot both be None")
 
     # decision is the tag which contains all of the judgement data
@@ -92,19 +92,19 @@ def get_text_between_elements(
     # whose immediate parent is the decision element
     # if either one is None, then we substitute with
     # the first or last element in decision accordingly
-    if start_element:
+    if start_element is not None:
         while start_element.getparent().tag != decision_tag_str:
             start_element = start_element.getparent()
         start_index = all_tags.index(start_element)
     else:
-        start_index = all_tags[0]
+        start_index = 0
 
-    if end_element:
+    if end_element is not None:
         while end_element.getparent().tag != decision_tag_str:
             end_element = end_element.getparent()
         end_index = all_tags.index(end_element)
     else:
-        end_index = all_tags[-1]
+        end_index = len(all_tags)-1
 
     text = ""
     # collect all of the text in the elements
