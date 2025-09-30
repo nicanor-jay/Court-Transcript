@@ -24,6 +24,20 @@ def get_headings_level_approach(root: "etree._ElementTree") -> list["etree._Elem
     return list(filter(ensure_lvl_attr, matched_elements))
 
 
+def get_headings_subparagraph_approach(root: "etree._ElementTree") -> list["etree._Element"]:
+    """
+    Finds headings in `root` by finding <subparagraph> tags which
+    do not contain any <num> elements as children. All elements in
+    `root` which match this criteria are assumed to be headings.
+    """
+    matched_elements = []
+    for element in root.iter(NAMESPACE + "subparagraph"):
+        if SUB_PATTERN.match("".join(element.itertext())):
+            matched_elements.append(element)
+
+    return list(filter(lambda e: e.find(NAMESPACE + "num") is None, matched_elements))
+
+
 def get_subheadings(filename: str) -> list:
     root = etree.parse(filename)
 
@@ -35,13 +49,9 @@ def get_subheadings(filename: str) -> list:
         element.getparent().remove(element)
 
     level_elements = get_headings_level_approach(root)
+    level_elements += get_headings_subparagraph_approach(root)
 
-    for element in root.iter("{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}subparagraph"):
-        if SUB_PATTERN.match("".join(element.itertext())):
-            level_elements.append(element)
-    subheadings = list(filter(lambda e: e.find(
-        "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}num") is None, level_elements))
-    return subheadings
+    return level_elements
 
 
 def get_text_of_subheadings(start_element, end_element) -> str:
