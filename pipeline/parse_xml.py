@@ -94,31 +94,3 @@ def get_text_between_elements(start_element, end_element) -> str:
     for i in range(start_index, end_index):
         text += "".join(all_tags[i].itertext())
     return text
-
-
-if __name__ == "__main__":
-    unhandled_xmls = []
-    all_subheadings = []
-    handled_xmls = []
-    for i in range(1, 1001):
-        subheadings = get_headings(f"xmls/data_{i}.xml")
-        if len(subheadings) == 0:
-            print(f"xmls/data_{i}.xml not parsed")
-            unhandled_xmls.append(f"xmls/data_{i}.xml")
-        else:
-            all_subheadings.append(subheadings)
-            handled_xmls.append(f"xmls/data_{i}.xml")
-    percentage_handled = (1000 - len(unhandled_xmls)) / 1000 * 100
-    print("\n============================\n")
-    subheadings_counts = [len(subheadings) for subheadings in all_subheadings]
-    avg_no_subheadings = sum(subheadings_counts) / len(all_subheadings)
-    print(f"Total files correctly parsed: {percentage_handled:.2f}")
-    print(f"Average No. subheadings per transcript: {avg_no_subheadings}")
-    # print(sorted(subheadings_counts, reverse=True))
-    # print(subheadings_counts.index(3))
-    # with open("temp.txt", "w", encoding="utf-8") as f:
-    #     for element in all_subheadings[14]:
-    #         line = "".join(element.itertext()) + "\n"
-    #         f.write(line)
-    s = all_subheadings[0]
-    # text = get_text_between_elements(s[0], s[1])
