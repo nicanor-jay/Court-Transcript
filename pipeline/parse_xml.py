@@ -6,6 +6,24 @@ from lxml import etree
 SUB_PATTERN = re.compile(r"^[A-Z].+")
 
 
+def get_headings_level_approach(root: "etree._ElementTree") -> list["etree._Element"]:
+    """
+    Finds headings in `root` by finding <level> tags which have an
+    attribute that matches `lvl_XX`. All elements in `root` which
+    match this criteria are assumed to contain headings.
+    """
+    def ensure_lvl_attr(e):
+        return "eId" in e.keys() and "lvl_" in e.get("eId")
+
+    matched_elements = []
+    for element in root.iter(
+            "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}level"):
+        if SUB_PATTERN.match("".join(element.itertext()).strip()):
+            matched_elements.append(element)
+
+    return list(filter(ensure_lvl_attr, matched_elements))
+
+
 def get_subheadings(filename: str) -> list:
     root = etree.parse(filename)
 
@@ -16,18 +34,12 @@ def get_subheadings(filename: str) -> list:
     for element in toc:
         element.getparent().remove(element)
 
-    level_elements = []
-    for element in root.iter(
-            "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}level"):
-        if SUB_PATTERN.match("".join(element.itertext()).strip()):
-            level_elements.append(element)
-    subheadings = list(filter(lambda e: "eId" in e.keys()
-                       and "lvl_" in e.get("eId"), level_elements))
+    level_elements = get_headings_level_approach(root)
 
     for element in root.iter("{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}subparagraph"):
         if SUB_PATTERN.match("".join(element.itertext())):
             level_elements.append(element)
-    subheadings += list(filter(lambda e: e.find(
+    subheadings = list(filter(lambda e: e.find(
         "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}num") is None, level_elements))
     return subheadings
 
