@@ -4,6 +4,7 @@ from lxml import etree
 
 # Create Regex to filter some false-positives
 SUB_PATTERN = re.compile(r"^[A-Z].+")
+# Common namespace for XML files from https://caselaw.nationalarchives.gov.uk/
 NAMESPACE = "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}"
 
 
@@ -14,11 +15,15 @@ def get_headings_level_approach(root: "etree._ElementTree") -> list["etree._Elem
     match this criteria are assumed to contain headings.
     """
     def ensure_lvl_attr(e):
+        # This is a filter function to ensure `e` has an
+        # `eId` attribute and that its value contains `lvl_`
         return "eId" in e.keys() and "lvl_" in e.get("eId")
 
     matched_elements = []
+    # look through every <level> element
     for element in root.iter(NAMESPACE + "level"):
         if SUB_PATTERN.match("".join(element.itertext()).strip()):
+            # element text matches filter regex
             matched_elements.append(element)
 
     return list(filter(ensure_lvl_attr, matched_elements))
