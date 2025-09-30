@@ -43,13 +43,12 @@ def get_headings_subparagraph_approach(root: "etree._ElementTree") -> list["etre
     return list(filter(lambda e: e.find(NAMESPACE + "num") is None, matched_elements))
 
 
-def get_headings(filename: str) -> list["etree._Element"]:
+def get_headings(root: "etree._ElementTree") -> list["etree._Element"]:
     """
     This function - through several methods - will attempt to extract
     headings from `filename` and return them as a list of their parent
     elements.
     """
-    root = etree.parse(filename)
 
     # We need to remove any <toc> (Table of Contents) tags since
     # this will lead to duplicates and may mess with text extraction
@@ -112,3 +111,38 @@ def get_text_between_elements(
     for i in range(start_index, end_index):
         text += "".join(all_tags[i].itertext())
     return text
+
+
+def get_label_text_dict(filename: str) -> dict[str, str]:
+    """
+    Returns a dictionary containing {label: key} pairs
+    corresponding to a heading in `filename` and the
+    raw text in that section. `filename` must be an XML file.
+    """
+    root = etree.parse(filename)
+
+    if not filename.endswith(".xml"):
+        raise ValueError("filename must be an .xml file")
+    headings = get_headings(root)
+    text_pairings = {}
+
+    # Get text up to first heading
+    # labeled as 'DOC_START'
+    raw_text = get_text_between_elements(root, end_element=headings[0])
+    text_pairings["DOC_START"] = raw_text
+
+    for i, heading in enumerate(headings):
+        if i >= len(headings)-1:
+            # skip the last element as there is
+            # no next heading to read up to
+            continue
+        header_text = "".join(heading.itertext())
+        raw_text = get_text_between_elements(root, headings[0], headings[1])
+        text_pairings[header_text] = raw_text
+
+    # Get from last heading til end
+    # labeled as 'DOC_END'
+    raw_text = get_text_between_elements(root, start_element=headings[-1])
+    text_pairings["DOC_END"] = raw_text
+
+    return text_pairings
