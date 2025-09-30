@@ -1,11 +1,31 @@
-from utilities import api_key, headers, Website
+from utilities import api_key
 from openai import OpenAI
 from dotenv import load_dotenv
 
 
 openai = OpenAI()
 
-system_prompt = """ You are a UK legal data extraction assistant. 
+extract_headings_system_prompt = """prompt to extract relevant headers from transcript"""
+
+# create/import function to retrieve headings/sub-headings from transcript
+
+def messages_for_heading_extraction():
+    """Prepare messages for GPT api call to find out relevant headings"""
+    return [
+        {"role": "system", "content": extract_headings_system_prompt},
+        {"role": "user", "content": "[FUNCTION CALL TO GET HEADINGS]"}
+    ]
+
+
+def extract_relevant_headings():
+    """Get all the relevant headings from a given transcript"""
+    response = openai.chat.completions.create(
+        model="gpt-4.1-nano",
+        messages=messages_for_heading_extraction()
+    )
+    return response.choices[0].message.content
+
+summarise_system_prompt = """ You are a UK legal data extraction assistant.
 I will provide you with the raw text or HTML content of a webpage containing information about a court hearing.
 Redact all personal information about the parties involved.
 Your task is to carefully extract and return the following fields:
@@ -21,10 +41,10 @@ Return your output strictly in this JSON format:
 }
 """
 
-# Function to generate a user prompt
-
-
-def user_prompt_for():
+# Currently hard-coded, will depend on web-scraping output
+# Would take the web-scraped output as an input
+def user_prompt_for_summary():
+    """Generate a user prompt to give as input to GPT-API"""
     user_prompt = """1.
 The Claimant challenges the Defendant’s failure to secure accommodation for him in breach of the duty under section 193(2) of the Housing Act 1996 (“the 1996 Act”). The Defendant accepts that it is in breach of that duty and the issue between the parties is what relief should follow.
 
@@ -409,26 +429,25 @@ Paragraph83.
 I accept the Defendant’s argument and conclude that the absence of a schedule of costs is a particularly relevant factor in assessing the appropriate percentage. In the exercise of my discretion, I will order the Defendant to pay 50% the Claimant’s costs on account under CPR r 44.2 (8) within 14 days of being provided with a schedule of costs."""
     return user_prompt
 
-# Function to prepare messages for the API call
 
-
-def messages_for():
+def messages_for_summary():
+    """Prepare messages for GPT api call to summarise a transcript"""
     return [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt_for()}
+        {"role": "system", "content": summarise_system_prompt},
+        {"role": "user", "content": user_prompt_for_summary()}
     ]
 
 
-# Function to summarize a given URL
-def summarize():
+def summarise_transcript():
+    """Create a summary for a given transcript"""
     response = openai.chat.completions.create(
         model="gpt-4.1-nano",
-        messages=messages_for()
+        messages=messages_for_summary()
     )
     return response.choices[0].message.content
 
 if __name__ == "__main__":
     load_dotenv()
 
-    summary = summarize()
+    summary = summarise_transcript()
     print(summary)
