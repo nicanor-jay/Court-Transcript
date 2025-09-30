@@ -4,6 +4,7 @@ from lxml import etree
 
 # Create Regex to filter some false-positives
 SUB_PATTERN = re.compile(r"^[A-Z].+")
+NAMESPACE = "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}"
 
 
 def get_headings_level_approach(root: "etree._ElementTree") -> list["etree._Element"]:
@@ -16,8 +17,7 @@ def get_headings_level_approach(root: "etree._ElementTree") -> list["etree._Elem
         return "eId" in e.keys() and "lvl_" in e.get("eId")
 
     matched_elements = []
-    for element in root.iter(
-            "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}level"):
+    for element in root.iter(NAMESPACE + "level"):
         if SUB_PATTERN.match("".join(element.itertext()).strip()):
             matched_elements.append(element)
 
