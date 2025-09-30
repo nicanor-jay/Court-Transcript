@@ -2,6 +2,15 @@ provider "aws" {
   region = var.aws_region
 }
 
+resource "aws_db_subnet_group" "c19_courts_db_subnet_group" {
+  name       = "c19-courts-db-subnet-group"
+  subnet_ids = var.subnet_ids
+
+  tags = {
+    Name = "c19-courts-db-subnet-group"
+  }
+}
+
 resource "aws_db_instance" "c19_courts_db" {
   identifier        = "c19-courts-db"
   engine            = "postgres"

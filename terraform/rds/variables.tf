@@ -20,5 +20,9 @@ variable "db_password" {
   description = "Master password for RDS"
   type        = string
   sensitive   = true
-  default     = "courtspassword"
+}
+
+variable "subnet_ids" {
+  description = "List of subnet IDs for the DB subnet group"
+  type        = list(string)
 }
