@@ -18,10 +18,13 @@ terraform {
 }
 ```
 
-Make sure to add a `terraform.tfvars` file in this folder as well as in the `phase-one/` and `phase-two/` folders with your AWS access key and secret access key in this format:
+Make sure to add a `terraform.tfvars` file in this folder with your AWS access key, AWS secret access key, DB password and DB subnet IDs in this format:
 ```
-ACCESS_KEY = "[your_aws_access_key]"
-SECRET_ACCESS_KEY = "[your_aws_secret_key]"
+ACCESS_KEY = "your_aws_access_key"
+SECRET_ACCESS_KEY = "your_aws_secret_key"
+DB_PASSWORD = "your_db_password"
+SUBNET_IDS = "[list_of_subnet_ids]"
+
 ```
 
 ## 🚀 How to run
