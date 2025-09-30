@@ -43,20 +43,24 @@ def get_headings_subparagraph_approach(root: "etree._ElementTree") -> list["etre
     return list(filter(lambda e: e.find(NAMESPACE + "num") is None, matched_elements))
 
 
-def get_subheadings(filename: str) -> list:
+def get_headings(filename: str) -> list["etree._Element"]:
+    """
+    This function - through several methods - will attempt to extract
+    headings from `filename` and return them as a list of their parent
+    elements.
+    """
     root = etree.parse(filename)
 
-    # remove any toc if present
-    toc = root.xpath(
-        "//n:toc",
-        namespaces={"n": "http://docs.oasis-open.org/legaldocml/ns/akn/3.0"})
-    for element in toc:
-        element.getparent().remove(element)
+    # We need to remove any <toc> (Table of Contents) tags since
+    # this will lead to duplicates and may mess with text extraction
+    toc_elements = root.xpath("//n:toc", namespaces={"n": NAMESPACE})
+    for toc in toc_elements:
+        toc.getparent().remove(toc)
 
-    level_elements = get_headings_level_approach(root)
-    level_elements += get_headings_subparagraph_approach(root)
+    headings = get_headings_level_approach(root)
+    headings += get_headings_subparagraph_approach(root)
 
-    return level_elements
+    return headings
 
 
 def get_text_of_subheadings(start_element, end_element) -> str:
@@ -84,7 +88,7 @@ if __name__ == "__main__":
     all_subheadings = []
     handled_xmls = []
     for i in range(1, 1001):
-        subheadings = get_subheadings(f"xmls/data_{i}.xml")
+        subheadings = get_headings(f"xmls/data_{i}.xml")
         if len(subheadings) == 0:
             print(f"xmls/data_{i}.xml not parsed")
             unhandled_xmls.append(f"xmls/data_{i}.xml")
