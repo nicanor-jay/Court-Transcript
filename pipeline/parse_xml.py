@@ -63,23 +63,36 @@ def get_headings(filename: str) -> list["etree._Element"]:
     return headings
 
 
-def get_text_of_subheadings(start_element, end_element) -> str:
-    while start_element.getparent().tag != "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}decision":
-        start_element = start_element.getparent()
+def get_text_between_elements(start_element, end_element) -> str:
+    """
+    Collects all raw text between `start_element` and `end_element`
+    in an XML document.
+    """
 
-    while end_element.getparent().tag != "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}decision":
+    # decision is the tag which contains all of the judgement data
+    # i.e. it is an ancestor of all the tags we care about
+    decision_tag_str = NAMESPACE + "decision"
+
+    # we find the ancestor of the start and end element
+    # whose immediate parent is the decision element
+    while start_element.getparent().tag != decision_tag_str:
+        start_element = start_element.getparent()
+    while end_element.getparent().tag != decision_tag_str:
         end_element = end_element.getparent()
 
-    judgmentChildren = list(start_element.getparent())
-    print(start_element.getparent())
-    print(judgmentChildren)
-    start_index = judgmentChildren.index(start_element)
-    end_index = judgmentChildren.index(end_element)
+    # we're using start_element.getparent() as a shortcut
+    # to the <decision> tag, which parents all tags
+    all_tags = list(start_element.getparent())
+
+    # find the index of start, and where we should go up to
+    start_index = all_tags.index(start_element)
+    end_index = all_tags.index(end_element)
 
     text = ""
+    # collect all of the text in the elements
+    # between start and end indexes
     for i in range(start_index, end_index):
-        print("doing stuff")
-        text += "".join(judgmentChildren[i].itertext())
+        text += "".join(all_tags[i].itertext())
     return text
 
 
@@ -108,4 +121,4 @@ if __name__ == "__main__":
     #         line = "".join(element.itertext()) + "\n"
     #         f.write(line)
     s = all_subheadings[0]
-    # text = get_text_of_subheadings(s[0], s[1])
+    # text = get_text_between_elements(s[0], s[1])
