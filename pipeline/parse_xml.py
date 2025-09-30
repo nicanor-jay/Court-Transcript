@@ -63,30 +63,48 @@ def get_headings(filename: str) -> list["etree._Element"]:
     return headings
 
 
-def get_text_between_elements(start_element, end_element) -> str:
+def get_text_between_elements(
+    root: etree._ElementTree,
+    start_element: etree._Element = None,
+    end_element: etree._Element = None
+) -> str:
     """
     Collects all raw text between `start_element` and `end_element`
     in an XML document.
+
+    If `start_element` is None, then begin from start of judgement body.
+    Similarly, if `end_element` is None, read until end of judgement body.
+
+    It is an error for both `start_element` and `end_element` to be None.
     """
+    if not start_element and not end_element:
+        raise TypeError("start_element and end_element cannot both be None")
 
     # decision is the tag which contains all of the judgement data
     # i.e. it is an ancestor of all the tags we care about
     decision_tag_str = NAMESPACE + "decision"
+    # find the <decision> element itself
+    # and then its children
+    decision_element = list(root.iter(decision_tag_str))[0]
+    all_tags = list(decision_element)
 
     # we find the ancestor of the start and end element
     # whose immediate parent is the decision element
-    while start_element.getparent().tag != decision_tag_str:
-        start_element = start_element.getparent()
-    while end_element.getparent().tag != decision_tag_str:
-        end_element = end_element.getparent()
+    # if either one is None, then we substitute with
+    # the first or last element in decision accordingly
+    if start_element:
+        while start_element.getparent().tag != decision_tag_str:
+            start_element = start_element.getparent()
+        start_index = all_tags.index(start_element)
+    else:
+        start_index = all_tags[0]
 
-    # we're using start_element.getparent() as a shortcut
-    # to the <decision> tag, which parents all tags
-    all_tags = list(start_element.getparent())
-
-    # find the index of start, and where we should go up to
-    start_index = all_tags.index(start_element)
-    end_index = all_tags.index(end_element)
+    if end_element:
+        while end_element.getparent().tag != decision_tag_str:
+            end_element = end_element.getparent()
+        end_index = all_tags.index(end_element)
+    else:
+        end_index = all_tags[-1]
 
     text = ""
     # collect all of the text in the elements
