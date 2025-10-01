@@ -1,3 +1,4 @@
+pytest_ignore_collect = True
 """
 Test suite for UK Judiciary Web Scraper
 Run with: pytest test_judge_scraping.py -v
