@@ -48,7 +48,7 @@ DASHBOARD_ECR_NAME={dashboard_ecr_name}
 
 ## Terraform Phases
 ### Phase One
-Run `phase-one` module of the terraform steps to create the initial, non-dependant resources up on AWS.
+Run [`phase-one`](terraform/readme.md) module of the terraform steps to create the initial, non-dependant resources up on AWS.
 
 ### Phase Two
 
@@ -58,4 +58,4 @@ Phase Two is dependant on the following steps having been completed
 - ECS Task container being uploaded to ECR.
 - Dashboard container being uploaded to ECR. 
 
-Once the above three steps are completed, you can run the `phase-two` module of the terraform steps.
+Once the above three steps are completed, you can run the [`phase-two`](terraform/readme.md) module of the terraform steps.
