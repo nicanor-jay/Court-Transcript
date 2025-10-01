@@ -68,8 +68,8 @@ def xml_natural_file() -> bytes:
     return XML_TEMPLATE.format(
         LEVEL_STYLE_HEADING,
         LEVEL_NON_HEADING,
-        SUB_NON_HEADING,
-        SUB_STYLE_HEADING
+        SUB_STYLE_HEADING,
+        SUB_NON_HEADING
     ).encode("utf-8")
 
 

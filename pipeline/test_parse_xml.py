@@ -9,7 +9,8 @@ from lxml import etree
 from parse_xml import (
     get_headings,
     get_headings_level_approach,
-    get_headings_subparagraph_approach
+    get_headings_subparagraph_approach,
+    get_text_between_elements
 )
 
 
@@ -79,3 +80,14 @@ def test_get_headings_subparagraph_approach_headings_only_correct_elements(xml_a
     # ensure that level style headings weren't grabbed
     assert "The facts" not in text
     assert "The legal framework:" in text
+
+
+def test_get_text_between_elements_correct_text(xml_natural_file):
+    # only two headings in natural file
+    # with one LEVEL_NON_HEADING between them
+    root = etree.fromstring(xml_natural_file)
+    headings = get_headings(root)
+    text = get_text_between_elements(root, headings[0], headings[1])
+    # ensure only level non heading is in text
+    assert "And if there has been an unjustified" in text
+    assert "Whether the payments by Mr" not in text
