@@ -16,7 +16,7 @@ A Python web scraper that extracts judge information from the UK Judiciary websi
 
 ### Prerequisites
 
-- Python 3.7 or higher
+- Python 3.9 or higher
 - pip (Python package manager)
 
 ### Setup
