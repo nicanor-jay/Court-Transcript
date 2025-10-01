@@ -1,3 +1,4 @@
+"""Script to summarise court transcripts using GPT-API."""
 from utilities import api_key
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -16,7 +17,7 @@ Anomalies: [whether anything irregular happened in the context of a normal court
 
 # create/import function to retrieve headings/sub-headings from transcript
 
-def messages_for_heading_extraction():
+def messages_for_heading_extraction() -> list[dict]:
     """Prepare messages for GPT api call to find out relevant headings"""
     return [
         {"role": "system", "content": extract_headings_system_prompt},
@@ -50,7 +51,7 @@ Return your output strictly in this JSON format:
 
 # Currently hard-coded, will depend on web-scraping output
 # Would take the web-scraped output as an input
-def user_prompt_for_summary():
+def user_prompt_for_summary() -> str:
     """Generate a user prompt to give as input to GPT-API"""
     user_prompt = """Decision: The appeal is dismissed.
 
@@ -329,7 +330,7 @@ Judge Armstrong-Holmes 17th September 2025"""
     return user_prompt
 
 
-def messages_for_summary():
+def messages_for_summary() -> list[dict]:
     """Prepare messages for GPT api call to summarise a transcript"""
     return [
         {"role": "system", "content": summarise_system_prompt},
@@ -348,7 +349,7 @@ def summarise_transcript():
 
 ## Batch processing functions
 
-def get_last_request_id(filename: str):
+def get_last_request_id(filename: str) -> int:
     """Get the id of the last request in the .jsonl file"""
     with open(filename, 'r') as file:
         last_request = ""
@@ -367,7 +368,7 @@ def create_batch_request(query_messages: list[dict], filename: str) -> dict:
     return {"custom_id": f"request-{get_last_request_id(filename) + 1}", "method": "POST", "url": "/v1/chat/completions", "body": {"model": "gpt-4.1-nano", "messages": query_messages}}
 
 
-def insert_request(request: str, filename: str):
+def insert_request(request: str, filename: str) -> None:
     """Insert a request into the .jsonl file for batch processing"""
     with open(filename, 'a') as file:
         json_request = json.dumps(request)
@@ -383,14 +384,30 @@ def upload_batch_file(filename: str):
     return batch_input_file
 
 
-def get_batch_summaries(batch_input_file):
+def run_batch_summary_requests(batch_input_file):
     """Summarise multiple court transcripts via batch processing."""
-    batch_input_file_id = batch_input_file.id
-    openai.batches.create(
-        input_file_id=batch_input_file_id,
+    batch = openai.batches.create(
+        input_file_id=batch_input_file.id,
         endpoint="/v1/chat/completions",
         completion_window="24h",
     )
+    return batch
+
+
+def get_batch_summaries(batch_id: str) -> list[dict]:
+    """Return the transcript summary responses from the GPT-API request"""
+    batch = openai.batches.retrieve(batch_id)
+
+    if not batch.output_file_id:
+        raise ValueError("Batch not finished processing yet or no output file detected.")
+    response = openai.files.content(batch.output_file_id)
+    summary_list = []
+    for line in response.text.splitlines():
+        response_obj = json.loads(line)
+        summary = response_obj.get("response", {}).get("body", {}).get(
+            "choices", [])[0].get("message", {}).get("content")
+        summary_list.append(summary)
+    return summary_list
 
 
 if __name__ == "__main__":
@@ -407,19 +424,13 @@ if __name__ == "__main__":
 
     # run batch summarise process
     # batch_input_file = upload_batch_file("requests.jsonl")
+
+    # batch = run_batch_summary_requests(batch_input_file)
     
-    # print(get_batch_summaries(batch_input_file))
+    # print(get_batch_summaries(batch.id))
 
-    response = openai.files.content("file-6r32gpKwvLCzgjSZ1LvNyN")
-    summary_list = []
-    for line in response.text.splitlines():
-        response_obj = json.loads(line)
-        summary = response_obj.get("response", {}).get("body", {}).get("choices", [])[0].get("message", {}).get("content")
-        summary_list.append(summary)
-
-    print(summary_list)
 
     # check how many batch requests there are
-    # print(openai.batches.list())
+    print(openai.batches.list(limit=1))
 
 
