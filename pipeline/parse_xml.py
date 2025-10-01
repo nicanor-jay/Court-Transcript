@@ -4,7 +4,26 @@ import re
 
 from lxml import etree
 
-# Create Regex to filter some false-positives
+# Some of the rules we have set up will still let
+# false-positives through; many of these are
+# mid-sentence fragments, or the start of a
+# paragraph (which is almost always preceded
+# by a number). See below for examples.
+#
+# A mid-sentence fragment may look like:
+# and the respondent claims that this was in error...
+#
+# Another common false-positive is with quotations:
+# "does not believe that [the act] was done in good faith."
+#
+# And, very often, the opening of a paragraph (preceded with a number):
+# 14 The existing regulations show that...
+#
+# The regex pattern below simply enforces that a heading must be
+# started with a capital letter. The justification for this is really
+# just that this is what we have seen to be true for most, if not
+# all headings. It is also a simple enough rule that it will not
+# 'over-correct' and create a lot of false-negatives.
 SUB_PATTERN = re.compile(r"^[A-Z].+")
 # Common namespace for XML files from https://caselaw.nationalarchives.gov.uk/
 NAMESPACE = "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}"
