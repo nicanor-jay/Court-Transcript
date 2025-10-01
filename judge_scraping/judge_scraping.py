@@ -20,10 +20,10 @@ TITLES = [
     "Judge", "HHJ", "DHJ",
 ]
 
-# Post-nominal titles to strip from the end
+# Postnominal titles to strip from the end
 POST_NOMINALS = ["KC", "QC", "CBE", "OBE", "MBE", "JP"]
 
-# Prefixes that indicate multi-word surnames
+# Prefixes that indicate multiword surnames
 SURNAME_PREFIXES = ["van", "van der", "van den", "de", "de la", "du", "von", "von der"]
 
 
@@ -58,7 +58,7 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
             full = full[len(title):].strip()
             break
 
-    # Strip post-nominals from the end
+    # Strip postnominals from the end
     for post_nom in POST_NOMINALS:
         if full.endswith(" " + post_nom):
             full = full[:-len(post_nom)].strip()
@@ -83,7 +83,7 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
             break
     
     if surname_start_idx is not None:
-        # We found a prefix - everything from there is the surname
+        # We found a prefix; everything from here is the surname
         if surname_start_idx == 0:
             # Surname prefix is at the start, no first name
             result["last_name"] = " ".join(parts[surname_start_idx:])
@@ -93,7 +93,7 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
                 result["middle_name"] = " ".join(parts[1:surname_start_idx])
             result["last_name"] = " ".join(parts[surname_start_idx:])
     else:
-        # No prefix found - standard parsing
+        # No prefix found; standard parsing
         if len(parts) == 2:
             result["first_name"], result["last_name"] = parts
         else:
