@@ -33,6 +33,12 @@ def test_get_headings_natural_xml_correct_elements(xml_natural_file):
     assert "Whether the payments by Mr" not in text
 
 
+def test_get_headings_no_headings_correct_length(xml_no_headings):
+    root = etree.fromstring(xml_no_headings)
+    headings = get_headings(root)
+    assert len(headings) == 0
+
+
 def test_get_headings_level_approach_headings_only_correct_length(xml_all_headings):
     root = etree.fromstring(xml_all_headings)
     headings = get_headings_level_approach(root)
