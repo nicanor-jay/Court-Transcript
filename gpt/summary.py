@@ -3,6 +3,7 @@ from utilities import api_key
 from openai import OpenAI
 from dotenv import load_dotenv
 import json
+import time
 
 
 openai = OpenAI()
@@ -376,7 +377,7 @@ def insert_request(request: str, filename: str) -> None:
 
 
 def upload_batch_file(filename: str):
-    """Upload files for BAtch API"""
+    """Upload files for Batch API"""
     batch_input_file = openai.files.create(
         file=open(filename, "rb"),
         purpose="batch"
@@ -394,9 +395,30 @@ def run_batch_summary_requests(batch_input_file):
     return batch
 
 
+def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
+    """Poll batch until processing has finished"""
+    waited = 0
+    while waited < timeout:
+        batch = openai.batches.retrieve(batch_id)
+
+        status = batch.status
+        print(f"[Batch {batch_id}] Status: {status} (waited {waited}s)")
+
+        if status == "completed":
+            return batch
+        elif status in ["failed", "cancelled", "expired"]:
+            raise RuntimeError(f"Batch {batch_id} ended with status: {status}")
+        
+        time.sleep(poll_interval)
+        waited += poll_interval
+    
+    raise TimeoutError(f"Batch {batch_id} did not complete within {timeout}s")
+
+
+
 def get_batch_summaries(batch_id: str) -> list[dict]:
     """Return the transcript summary responses from the GPT-API request"""
-    batch = openai.batches.retrieve(batch_id)
+    batch = wait_for_batch(batch_id)
 
     if not batch.output_file_id:
         raise ValueError("Batch not finished processing yet or no output file detected.")
@@ -423,14 +445,17 @@ if __name__ == "__main__":
     # insert_request(test_request, "requests.jsonl")
 
     # run batch summarise process
-    # batch_input_file = upload_batch_file("requests.jsonl")
 
-    # batch = run_batch_summary_requests(batch_input_file)
+    batch_input_file = upload_batch_file("requests.jsonl")
+
+    batch = run_batch_summary_requests(batch_input_file)
     
-    # print(get_batch_summaries(batch.id))
+    summaries = get_batch_summaries(batch.id)
+
+    print(summaries)
 
 
     # check how many batch requests there are
-    print(openai.batches.list(limit=1))
+    # print(openai.batches.list(limit=1))
 
 
