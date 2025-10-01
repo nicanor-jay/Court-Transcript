@@ -1,6 +1,6 @@
 # UK Judiciary Web Scraper
 
-A Python web scraper that extracts judge information from the UK Judiciary website (judiciary.uk) and outputs structured JSON data.
+A Python web scraper that extracts judge information from the UK Judiciary website ([judiciary.uk](https://www.judiciary.uk)) and outputs structured JSON data.
 
 ## Features
 
@@ -34,7 +34,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Install Playwright browsers:
+4. Install [Playwright](https://playwright.dev) browsers:
 ```bash
 playwright install chromium
 ```
@@ -48,7 +48,7 @@ python judge_scraping.py
 ```
 
 This will:
-1. Scrape all judge data from judiciary.uk
+1. Scrape all judge data from [judiciary.uk](https://www.judiciary.uk)
 2. Create `judges_data.json` with all judge records
 3. Create `titles_data.json` with normalised title data
 
@@ -139,8 +139,8 @@ Correctly handles multi-word surnames with prefixes:
 ├── test_judge_scraping.py     # Test suite
 ├── requirements.txt           # Python dependencies
 ├── README.md                  # This file
-├── judges_data.json          # Output: judge records (generated)
-└── titles_data.json          # Output: title records (generated)
+├── judges_data.json          # Output: judge records (generated but gitignored)
+└── titles_data.json          # Output: title records (generated but gitignored)
 ```
 
 ## Database Integration
@@ -194,7 +194,7 @@ To add support for new name patterns:
 
 ## Notes
 
-- The scraper respects the judiciary.uk website structure
+- The scraper respects the [judiciary.uk](https://www.judiciary.uk) website structure
 - Website structure changes may require updates to the scraper
 - Always review scraped data for accuracy before use
 - Consider rate limiting if running frequent scrapes
