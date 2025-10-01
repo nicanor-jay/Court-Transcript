@@ -32,24 +32,3 @@ def query_rds(con: connection, query: str) -> pd.DataFrame:
     """Function to query the RDS with a given query."""
     df = pd.read_sql(query, con)
     return df
-
-
-def get_total_hearing_count(con: connection) -> pd.DataFrame:
-    """Gets total court hearing count."""
-    query = """
-    SELECT
-        COUNT(*)
-    FROM
-        hearing;
-    """
-    return query_rds(con, query)
-
-
-if __name__ == "__main__":
-    load_dotenv()
-    conn = get_db_connection()
-
-    print(query_rds(conn, "select * from information_schema.tables"))
-    print(get_total_hearing_count(conn))
-
-    conn.close()
