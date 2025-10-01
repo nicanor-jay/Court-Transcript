@@ -84,10 +84,14 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
     
     if surname_start_idx is not None:
         # We found a prefix - everything from there is the surname
-        result["first_name"] = parts[0]
-        if surname_start_idx > 1:
-            result["middle_name"] = " ".join(parts[1:surname_start_idx])
-        result["last_name"] = " ".join(parts[surname_start_idx:])
+        if surname_start_idx == 0:
+            # Surname prefix is at the start, no first name
+            result["last_name"] = " ".join(parts[surname_start_idx:])
+        else:
+            result["first_name"] = parts[0]
+            if surname_start_idx > 1:
+                result["middle_name"] = " ".join(parts[1:surname_start_idx])
+            result["last_name"] = " ".join(parts[surname_start_idx:])
     else:
         # No prefix found - standard parsing
         if len(parts) == 2:
