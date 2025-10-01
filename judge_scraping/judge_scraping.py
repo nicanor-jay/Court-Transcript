@@ -59,10 +59,10 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
             full = full[len(title):].strip()
             break
 
-    # Strip postnominals from the end
+    # Strip postnominals (e.g., QC, CBE) from the end
     for post_nom in POST_NOMINALS:
         if full.endswith(" " + post_nom):
-            full = full[:-len(post_nom)].strip()
+            full = full[: -len(post_nom)].strip()
 
     parts = full.split()
     if not parts:
@@ -71,20 +71,24 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
         result["last_name"] = parts[0]
         return result
 
-    # Check for surname prefixes (longest match first)
+    # Detect surname prefixes (e.g. "van der", "de la", "von der")
+    # Check from longest to shortest to avoid partial matches
     surname_start_idx = None
     for prefix in sorted(SURNAME_PREFIXES, key=len, reverse=True):
         prefix_parts = prefix.split()
+        # Slide a window of same length as prefix_parts over the name parts
         for i in range(len(parts) - len(prefix_parts)):
             if " ".join(parts[i:i+len(prefix_parts)]).lower() == prefix:
+                # Found surname prefix (this marks where last_name begins)
                 surname_start_idx = i
                 break
         if surname_start_idx is not None:
             break
+
     if surname_start_idx is not None:
         # We found a prefix; everything from here is the surname
         if surname_start_idx == 0:
-            # Surname prefix is at the start, no first name
+            # Prefix is at the start, assume entire name is surname
             result["last_name"] = " ".join(parts[surname_start_idx:])
         else:
             result["first_name"] = parts[0]
@@ -92,7 +96,7 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
                 result["middle_name"] = " ".join(parts[1:surname_start_idx])
             result["last_name"] = " ".join(parts[surname_start_idx:])
     else:
-        # No prefix found; standard parsing
+        # Standard parsing (no surname prefix found)
         if len(parts) == 2:
             result["first_name"], result["last_name"] = parts
         else:
@@ -105,7 +109,8 @@ def looks_like_judge(text: str) -> bool:
     """Return True if text looks like a judge name (starts with known title)."""
     if not text:
         return False
-    return any(text.startswith(t + " ") for t in TITLES)
+    lowered = text.lower()
+    return any(lowered.startswith(t.lower() + " ") for t in TITLES)
 
 
 def scrape_page(page, url: str) -> List[Dict]:
@@ -113,16 +118,20 @@ def scrape_page(page, url: str) -> List[Dict]:
     judges = []
     page.goto(url, wait_until="domcontentloaded", timeout=20000)
 
+    # Find all <table> elements on the page
     for table in page.locator("table").all():
+        # Within each table, get all rows in the <tbody>
         for row in table.locator("tbody tr").all():
+            # Extract text from each <td> cell in the row
             cells = [c.inner_text().strip() for c in row.locator("td").all()]
             if not any(cells):
                 continue
 
             full_name = cells[0]
             if not looks_like_judge(full_name):
-                continue  # skip nonjudge entries
+                continue  # skip non-judge entries
 
+            # Look for a date value in later cells
             date_val = next((parse_date(c) for c in cells[1:] if parse_date(c)), None)
             parsed = parse_name(full_name)
             judges.append({
@@ -139,22 +148,9 @@ def scrape_page(page, url: str) -> List[Dict]:
 
 def extract_titles(judges: List[Dict]) -> List[Dict]:
     """Extract unique titles from judges and create title records."""
-    seen_titles = set()
-    titles = []
-    for judge in judges:
-        title_name = judge.get("title")
-        if title_name and title_name not in seen_titles:
-            seen_titles.add(title_name)
-            titles.append({
-                "title_id": len(titles) + 1,
-                "title_name": title_name
-            })
-    # Sort alphabetically for consistency
-    titles.sort(key=lambda x: x["title_name"])
-    # Reassign IDs after sorting
-    for idx, title in enumerate(titles, start=1):
-        title["title_id"] = idx
-    return titles
+    seen_titles = {judge["title"] for judge in judges if judge.get("title")}
+    sorted_titles = sorted(seen_titles)  # alphabetical consistency
+    return [{"title_id": idx, "title_name": title} for idx, title in enumerate(sorted_titles, start=1)]
 
 
 def add_title_ids(judges: List[Dict], titles: List[Dict]) -> None:
@@ -166,9 +162,11 @@ def add_title_ids(judges: List[Dict], titles: List[Dict]) -> None:
 
 
 def main():
-    """Main script for file. """
-    base_url = "https://www.judiciary.uk/about-the-judiciary/who-are-the-judiciary/\
-        list-of-members-of-the-judiciary/"
+    """Main script for file."""
+    base_url = (
+        "https://www.judiciary.uk/about-the-judiciary/who-are-the-judiciary/"
+        "list-of-members-of-the-judiciary/"
+    )
     all_judges: List[Dict] = []
 
     with sync_playwright() as p:
@@ -176,10 +174,9 @@ def main():
         page = browser.new_page()
         page.goto(base_url, wait_until="domcontentloaded", timeout=20000)
 
-        # Collect sublinks
+        # Collect sublinks (all list-of-members pages)
         links = [a.get_attribute("href") for a in page.locator('a[href*="list-of-members"]').all()]
-        links = [f"https://www.judiciary.uk{l}" if l and \
-                 l.startswith("/") else l for l in links if l]
+        links = [f"https://www.judiciary.uk{l}" if l and l.startswith("/") else l for l in links if l]
 
         if links:
             for link in links:
@@ -189,7 +186,7 @@ def main():
 
         browser.close()
 
-    # Extract and normalize titles
+    # Extract and normalise titles
     titles = extract_titles(all_judges)
     add_title_ids(all_judges, titles)
 
