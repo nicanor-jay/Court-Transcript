@@ -169,7 +169,7 @@ def get_label_text_dict(filename: str) -> dict[str, str] | None:
             # skip the last element as there is
             # no next heading to read up to
             continue
-        header_text = "".join(heading.itertext())
+        header_text = "".join(heading.itertext()).strip()
         raw_text = get_text_between_elements(root, headings[0], headings[1])
         text_pairings[header_text] = raw_text
 
