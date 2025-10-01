@@ -61,6 +61,14 @@ def get_headings(root: "etree._ElementTree") -> list["etree._Element"]:
     headings = get_headings_level_approach(root)
     headings += get_headings_subparagraph_approach(root)
 
+    # headings may be out of order with respect to the original XML doc
+    # first grab the parent of the judgement text
+    decision_element = list(root.iter(NAMESPACE + "decision"))[0]
+    # then its children elements
+    all_tags = list(decision_element)
+    # sort heading elements according to their occurrence in all_tags
+    headings.sort(key=all_tags.index)
+
     return headings
 
 
