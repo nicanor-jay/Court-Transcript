@@ -28,7 +28,7 @@ jobs:
 
       - name: Run pylint
         run: |
-          pylint --fail-under=9.0 *.py
+          find . -type f -name "*.py" -maxdepth 2 | xargs pylint --disable=I1101 --fail-under=9
           
   test:
     name: "Python Tests Check"
@@ -50,7 +50,7 @@ jobs:
 
       - name: Run the tests
         run: |
-          pytest *.py
+          pytest .
 
       - name: Run coverage
         run: |
