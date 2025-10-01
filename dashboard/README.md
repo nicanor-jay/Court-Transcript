@@ -7,7 +7,7 @@ This folder contains all the python scripts used to create and run the Courts Tr
 This script is the main entrypoint of the dashboard, and is what will give the Streamlit UI the structure and layout.
 
 ### `charts.py`
-This file will hold all of the function to create and return Altair charts which will be shown on the dashboard pages.
+This file will hold all of the functions to create and return Altair charts which will be shown on the dashboard pages.
 
 ### `data_cache.py`
 This script will hold all functions used to query the RDS which will return the output as Pandas DataFrames. The outputs of each function in this script will also be cached with the `@st.cache_data` decorator to improve efficiency.
