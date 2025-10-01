@@ -8,51 +8,38 @@ import time
 
 openai = OpenAI()
 
-extract_headings_system_prompt = """You are a UK legal data extraction assistant.
-You will be given a list of headers from a court transcript.
-You must return a list of headers that you believe will contain the necessary information in the transcript to deduce the following:
-Summary: [a concise description of what the hearing was about, maximum 1000 characters]
-Ruling: [which party the court ruled in favour of (one word answer e.g. Defendant)]
-Anomalies: [whether anything irregular happened in the context of a normal court hearing]
-"""
-
-# create/import function to retrieve headings/sub-headings from transcript
-
-def messages_for_heading_extraction() -> list[dict]:
-    """Prepare messages for GPT api call to find out relevant headings"""
-    return [
-        {"role": "system", "content": extract_headings_system_prompt},
-        {"role": "user", "content": "[FUNCTION CALL TO GET HEADINGS]"}
-    ]
+def get_extract_headings_prompt() -> str:
+    return """You are a UK legal data extraction assistant.
+    You will be given a list of headers from a court transcript.
+    You must return a list of headers that you believe will contain the necessary information in the transcript to deduce the following:
+    Summary: [a concise description of what the hearing was about, maximum 1000 characters]
+    Ruling: [which party the court ruled in favour of (one word answer e.g. Defendant)]
+    Anomalies: [whether anything irregular happened in the context of a normal court hearing]
+    """
 
 
-def extract_relevant_headings():
-    """Get all the relevant headings from a given transcript"""
-    response = openai.chat.completions.create(
-        model="gpt-4.1-nano",
-        messages=messages_for_heading_extraction()
-    )
-    return response.choices[0].message.content
+def get_summarise_prompt() -> str:
+    return """ You are a UK legal data extraction assistant.
+    I will provide you with the raw text or HTML content of a webpage containing information about a court hearing.
+    Redact all personal information about the parties involved.
+    Your task is to carefully extract and return the following fields:
+    Summary: [a concise description of what the hearing was about, maximum 1000 characters]
+    Ruling: [which party the court ruled in favour of (one word answer e.g. Defendant)]
+    Anomalies: [whether anything irregular happened in the context of a normal court hearing]
+    If any field is missing, write "Not Found".
+    Return your output strictly in this JSON format:
+    {
+    "summary": "...",
+    "ruling": "...",
+    "anomaly": "..."
+    }
+    """
 
-summarise_system_prompt = """ You are a UK legal data extraction assistant.
-I will provide you with the raw text or HTML content of a webpage containing information about a court hearing.
-Redact all personal information about the parties involved.
-Your task is to carefully extract and return the following fields:
-Summary: [a concise description of what the hearing was about, maximum 1000 characters]
-Ruling: [which party the court ruled in favour of (one word answer e.g. Defendant)]
-Anomalies: [whether anything irregular happened in the context of a normal court hearing]
-If any field is missing, write "Not Found".
-Return your output strictly in this JSON format:
-{
-  "summary": "...",
-  "ruling": "...",
-  "anomaly": "..."
-}
-"""
 
 # Currently hard-coded, will depend on web-scraping output
 # Would take the web-scraped output as an input
-def user_prompt_for_summary() -> str:
+
+def get_user_prompt() -> str:
     """Generate a user prompt to give as input to GPT-API"""
     user_prompt = """Decision: The appeal is dismissed.
 
@@ -331,19 +318,21 @@ Judge Armstrong-Holmes 17th September 2025"""
     return user_prompt
 
 
-def messages_for_summary() -> list[dict]:
-    """Prepare messages for GPT api call to summarise a transcript"""
+# create/import function to retrieve headings/sub-headings from transcript
+
+def create_query_messages(system_prompt: str, user_prompt: str) -> list[dict]:
+    """create messages to make a request to GPT-API"""
     return [
-        {"role": "system", "content": summarise_system_prompt},
-        {"role": "user", "content": user_prompt_for_summary()}
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt}
     ]
 
 
-def summarise_transcript():
-    """Create a summary for a given transcript"""
+def get_query_results(query_messages: list[dict]):
+    """Get the results from the query request made to GPT-API"""
     response = openai.chat.completions.create(
-        model="gpt-4.1-nano",
-        messages=messages_for_summary()
+        model = "gpt-4.1-nano",
+        messages = query_messages
     )
     return response.choices[0].message.content
 
@@ -365,9 +354,10 @@ def get_last_request_id(filename: str) -> int:
 
 
 def create_batch_request(query_messages: list[dict], filename: str) -> dict:
-    """Create a gpt api request for batch processing"""
+    """Create a GPT-API request for batch processing"""
     return {"custom_id": f"request-{get_last_request_id(filename) + 1}", "method": "POST", "url": "/v1/chat/completions", "body": {"model": "gpt-4.1-nano", "messages": query_messages}}
 
+# Change custom id to be unique to the specific court hearing (case id/reference number ideally)
 
 def insert_request(request: str, filename: str) -> None:
     """Insert a request into the .jsonl file for batch processing"""
@@ -416,35 +406,57 @@ def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
 
 
 
-def get_batch_summaries(batch_id: str) -> list[dict]:
+def get_batch_summaries(batch_id: str) -> dict:
     """Return the transcript summary responses from the GPT-API request"""
     batch = wait_for_batch(batch_id)
 
     if not batch.output_file_id:
         raise ValueError("Batch not finished processing yet or no output file detected.")
     response = openai.files.content(batch.output_file_id)
-    summary_list = []
+    summary_dict = {}
     for line in response.text.splitlines():
         response_obj = json.loads(line)
+
+        custom_id = response_obj.get("custom_id")
         summary = response_obj.get("response", {}).get("body", {}).get(
             "choices", [])[0].get("message", {}).get("content")
-        summary_list.append(summary)
-    return summary_list
+        
+        # Ensure summary is a dict (parse it to be JSON-like if text)
+        if isinstance(summary, str):
+            try:
+                summary = json.loads(summary)
+            except json.JSONDecodeError:
+                summary = {"summary": summary}
+
+        summary_dict[custom_id] = {
+            "summary": summary.get("summary"),
+            "ruling": summary.get("ruling"),
+            "anomaly": summary.get("anomaly")
+        }
+    
+    return summary_dict
 
 
 if __name__ == "__main__":
     load_dotenv()
 
-    # summarise a single transcript
-    # summary = summarise_transcript()
-    # print(summary)
+    # For a given list of transcript headers:
+        # create an extract header query message
+        # create a batch request with that query message
+        # insert batch request into jsonl file
 
-    # create summarise requests to batch process
-    # test_messages = messages_for_summary()
-    # test_request = create_batch_request(test_messages, "requests.jsonl")
-    # insert_request(test_request, "requests.jsonl")
+    # repeat above for each transcript
+    # run batch process
+    # give output back to Arshin
 
-    # run batch summarise process
+    # For each each block of transcript text:
+        # Create a summarise query message
+        # create a batch request with that query message
+        # insert batch request into jsonl file
+
+    # repeat above for each transcript
+    # run batch process
+    # list of summarised transcripts
 
     batch_input_file = upload_batch_file("requests.jsonl")
 
