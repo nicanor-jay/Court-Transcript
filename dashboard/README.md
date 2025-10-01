@@ -2,6 +2,22 @@
 
 This folder contains all the python scripts used to create and run the Courts Transcripts Dashboard, as well as a helper `build_push_dockerfile.sh` to build and upload the image to AWS ECR.
 
+## Scripts
+### `dashboard.py`
+This script is the main entrypoint of the dashboard, and is what will give the Streamlit UI the structure and layout.
+
+### `charts.py`
+This file will hold all of the function to create and return Altair charts which will be shown on the dashboard pages.
+
+### `data_cache.py`
+This script will hold all functions used to query the RDS which will return the output as Pandas DataFrames. The outputs of each function in this script will also be cached with the `@st.cache_data` decorator to improve efficiency.
+
+### `rds_utils.py`
+This RDS utility script holds all functions used to connect and send queries to the RDS.
+
+### `utils.py`
+This utility script holds helper functions, such as a function to setup the logging used for the dashboard code.
+
 ## Requirements
 1. A root level `.env` file formatted as stated in the [project level readme](../README.md).
 
