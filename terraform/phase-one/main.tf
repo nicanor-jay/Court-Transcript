@@ -35,3 +35,9 @@ resource "aws_ecr_repository" "ecs-ecr" {
   name                 = "c19-courts-ecs-task"
   image_tag_mutability = "MUTABLE"
 }
+
+# ECR to host the ECS Dashboard
+resource "aws_ecr_repository" "dashboard-ecr" {
+  name                 = "c19-courts-dashboard-service"
+  image_tag_mutability = "MUTABLE"
+}
