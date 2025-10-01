@@ -39,6 +39,14 @@ def test_get_headings_no_headings_correct_length(xml_no_headings):
     assert len(headings) == 0
 
 
+def test_get_headings_reverse_headings_correct_order(xml_reverse_order):
+    root = etree.fromstring(xml_reverse_order)
+    headings = get_headings(root)
+    assert len(headings) == 2
+    assert headings[0].tag == "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}subparagraph"
+    assert headings[1].tag == "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}level"
+
+
 def test_get_headings_level_approach_headings_only_correct_length(xml_all_headings):
     root = etree.fromstring(xml_all_headings)
     headings = get_headings_level_approach(root)

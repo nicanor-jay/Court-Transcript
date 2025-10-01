@@ -84,6 +84,7 @@ def xml_no_headings() -> bytes:
     ).encode("utf-8")
 
 
+@pytest.fixture
 def xml_reverse_order() -> bytes:
     """
     Returns XML string with SUB headings occurring before LEVEL headings.
