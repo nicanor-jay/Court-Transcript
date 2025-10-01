@@ -123,7 +123,7 @@ def get_text_between_elements(
     return text
 
 
-def get_label_text_dict(filename: str) -> dict[str, str]:
+def get_label_text_dict(filename: str) -> dict[str, str] | None:
     """
     Returns a dictionary containing {label: key} pairs
     corresponding to a heading in `filename` and the
@@ -134,12 +134,16 @@ def get_label_text_dict(filename: str) -> dict[str, str]:
     if not filename.endswith(".xml"):
         raise ValueError("filename must be an .xml file")
     headings = get_headings(root)
-    text_pairings = {}
 
+    if len(headings) == 0:
+        return None
+
+    text_pairings = {}
     # Get text up to first heading
     # labeled as 'DOC_START'
     raw_text = get_text_between_elements(root, end_element=headings[0])
-    text_pairings["DOC_START"] = raw_text
+    if raw_text != "":
+        text_pairings["DOC_START"] = raw_text
 
     for i, heading in enumerate(headings):
         if i >= len(headings)-1:
@@ -153,6 +157,7 @@ def get_label_text_dict(filename: str) -> dict[str, str]:
     # Get from last heading til end
     # labeled as 'DOC_END'
     raw_text = get_text_between_elements(root, start_element=headings[-1])
-    text_pairings["DOC_END"] = raw_text
+    if raw_text != "":
+        text_pairings["DOC_END"] = raw_text
 
     return text_pairings

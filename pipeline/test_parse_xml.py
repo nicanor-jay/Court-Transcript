@@ -4,18 +4,19 @@
 
 from unittest.mock import Mock
 
+import pytest
 from lxml import etree
 
 from parse_xml import (
     get_headings,
     get_headings_level_approach,
     get_headings_subparagraph_approach,
-    get_text_between_elements
+    get_text_between_elements,
+    get_label_text_dict
 )
 
 
 def test_get_headings_natural_xml_correct_length(xml_natural_file):
-    # etree.parse = Mock(return_value=etree.fromstring(xml_natural_file))
     root = etree.fromstring(xml_natural_file)
     headings = get_headings(root)
     assert len(headings) == 2
@@ -91,3 +92,28 @@ def test_get_text_between_elements_correct_text(xml_natural_file):
     # ensure only level non heading is in text
     assert "And if there has been an unjustified" in text
     assert "Whether the payments by Mr" not in text
+
+
+def test_get_label_text_dict_correct_length(xml_natural_file):
+    etree.parse = Mock(return_value=etree.fromstring(xml_natural_file))
+    label_dict = get_label_text_dict("dummy.xml")
+    assert len(label_dict) == 2
+
+
+def test_get_label_text_dict_correct_keys(xml_natural_file):
+    etree.parse = Mock(return_value=etree.fromstring(xml_natural_file))
+    label_dict = get_label_text_dict("dummy.xml")
+    assert any("The facts" in k for k in label_dict.keys())
+    assert any("DOC_END" in k for k in label_dict.keys())
+
+
+def test_get_label_text_dict_rejects_bad_filename():
+    with pytest.raises(ValueError) as exc_info:
+        get_label_text_dict("bad_file.csv")
+        assert "filename must be an .xml file" in exc_info.value
+
+
+def test_get_label_text_dict_no_headings_is_none(xml_no_headings):
+    etree.parse = Mock(return_value=etree.fromstring(xml_no_headings))
+    label_dict = get_label_text_dict("dummy.xml")
+    assert label_dict is None
