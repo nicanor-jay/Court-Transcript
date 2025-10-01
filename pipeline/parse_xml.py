@@ -29,7 +29,7 @@ SUB_PATTERN = re.compile(r"^[A-Z].+")
 NAMESPACE = "{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}"
 
 
-def get_headings_level_approach(root: "etree._ElementTree") -> list["etree._Element"]:
+def find_headings_level_rule(root: "etree._ElementTree") -> list["etree._Element"]:
     """
     Finds headings in `root` by finding <level> tags which have an
     attribute that matches `lvl_XX`. All elements in `root` which
@@ -50,7 +50,7 @@ def get_headings_level_approach(root: "etree._ElementTree") -> list["etree._Elem
     return list(filter(ensure_lvl_attr, matched_elements))
 
 
-def get_headings_subparagraph_approach(root: "etree._ElementTree") -> list["etree._Element"]:
+def find_headings_subparagraph_rule(root: "etree._ElementTree") -> list["etree._Element"]:
     """
     Finds headings in `root` by finding <subparagraph> tags which
     do not contain any <num> elements as children. All elements in
@@ -77,8 +77,8 @@ def get_headings(root: "etree._ElementTree") -> list["etree._Element"]:
     for toc in toc_elements:
         toc.getparent().remove(toc)
 
-    headings = get_headings_level_approach(root)
-    headings += get_headings_subparagraph_approach(root)
+    headings = find_headings_level_rule(root)
+    headings += find_headings_subparagraph_rule(root)
 
     # headings may be out of order with respect to the original XML doc
     # first grab the parent of the judgement text

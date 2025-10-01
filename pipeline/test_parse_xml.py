@@ -9,8 +9,8 @@ from lxml import etree
 
 from parse_xml import (
     get_headings,
-    get_headings_level_approach,
-    get_headings_subparagraph_approach,
+    find_headings_level_rule,
+    find_headings_subparagraph_rule,
     get_text_between_elements,
     get_label_text_dict
 )
@@ -51,13 +51,13 @@ def test_get_headings_reverse_headings_correct_order(xml_reverse_order):
 
 def test_get_headings_level_approach_headings_only_correct_length(xml_all_headings):
     root = etree.fromstring(xml_all_headings)
-    headings = get_headings_level_approach(root)
+    headings = find_headings_level_rule(root)
     assert len(headings) == 2
 
 
 def test_get_headings_level_approach_headings_only_correct_elements(xml_all_headings):
     root = etree.fromstring(xml_all_headings)
-    headings = get_headings_level_approach(root)
+    headings = find_headings_level_rule(root)
     text = ""
     for element in headings:
         text += "".join(element.itertext())
@@ -68,13 +68,13 @@ def test_get_headings_level_approach_headings_only_correct_elements(xml_all_head
 
 def test_get_headings_subparagraph_approach_headings_only_correct_length(xml_all_headings):
     root = etree.fromstring(xml_all_headings)
-    headings = get_headings_subparagraph_approach(root)
+    headings = find_headings_subparagraph_rule(root)
     assert len(headings) == 2
 
 
 def test_get_headings_subparagraph_approach_headings_only_correct_elements(xml_all_headings):
     root = etree.fromstring(xml_all_headings)
-    headings = get_headings_subparagraph_approach(root)
+    headings = find_headings_subparagraph_rule(root)
     text = ""
     for element in headings:
         text += "".join(element.itertext())
