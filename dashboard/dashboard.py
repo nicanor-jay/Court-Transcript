@@ -10,3 +10,9 @@ setup_logging()
 
 logging.info("Running dashboard.")
 st.title('Court Transcript Dashboard')
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    # Placeholder until RDS is live
+    st.metric("Total Court Hearings", 100, border=True)
