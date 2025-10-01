@@ -39,7 +39,7 @@ def get_headings_subparagraph_approach(root: "etree._ElementTree") -> list["etre
     """
     matched_elements = []
     for element in root.iter(NAMESPACE + "subparagraph"):
-        if SUB_PATTERN.match("".join(element.itertext())):
+        if SUB_PATTERN.match("".join(element.itertext()).strip()):
             matched_elements.append(element)
 
     return list(filter(lambda e: e.find(NAMESPACE + "num") is None, matched_elements))
