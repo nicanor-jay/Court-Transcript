@@ -7,7 +7,9 @@ from unittest.mock import Mock
 from lxml import etree
 
 from parse_xml import (
-    get_headings
+    get_headings,
+    get_headings_level_approach,
+    get_headings_subparagraph_approach
 )
 
 
@@ -29,3 +31,37 @@ def test_get_headings_natural_xml_correct_elements(xml_natural_file):
     assert "The legal framework:" in text
     assert "And if there has been an unjustified" not in text
     assert "Whether the payments by Mr" not in text
+
+
+def test_get_headings_level_approach_headings_only_correct_length(xml_all_headings):
+    root = etree.fromstring(xml_all_headings)
+    headings = get_headings_level_approach(root)
+    assert len(headings) == 2
+
+
+def test_get_headings_level_approach_headings_only_correct_elements(xml_all_headings):
+    root = etree.fromstring(xml_all_headings)
+    headings = get_headings_level_approach(root)
+    text = ""
+    for element in headings:
+        text += "".join(element.itertext())
+    # ensure that sub style headings weren't grabbed
+    assert "The facts" in text
+    assert "The legal framework:" not in text
+
+
+def test_get_headings_subparagraph_approach_headings_only_correct_length(xml_all_headings):
+    root = etree.fromstring(xml_all_headings)
+    headings = get_headings_subparagraph_approach(root)
+    assert len(headings) == 2
+
+
+def test_get_headings_subparagraph_approach_headings_only_correct_elements(xml_all_headings):
+    root = etree.fromstring(xml_all_headings)
+    headings = get_headings_subparagraph_approach(root)
+    text = ""
+    for element in headings:
+        text += "".join(element.itertext())
+    # ensure that level style headings weren't grabbed
+    assert "The facts" not in text
+    assert "The legal framework:" in text
