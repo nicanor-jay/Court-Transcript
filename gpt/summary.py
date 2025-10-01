@@ -375,8 +375,8 @@ def upload_batch_file(filename: str):
     return batch_input_file
 
 
-def run_batch_summary_requests(batch_input_file):
-    """Summarise multiple court transcripts via batch processing."""
+def run_batch_requests(batch_input_file):
+    """Run requests in input file via batch processing."""
     batch = openai.batches.create(
         input_file_id=batch_input_file.id,
         endpoint="/v1/chat/completions",
@@ -404,6 +404,26 @@ def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
     
     raise TimeoutError(f"Batch {batch_id} did not complete within {timeout}s")
 
+
+def get_batch_meaningful_headers(batch_id: str) -> dict:
+    """Return the meaningful headers responses from the GPT-API request"""
+    batch = wait_for_batch(batch_id)
+
+    if not batch.output_file_id:
+        raise ValueError(
+            "Batch not finished processing yet or no output file detected.")
+    response = openai.files.content(batch.output_file_id)
+    headers_dict = {}
+    for line in response.text.splitlines():
+        response_obj = json.loads(line)
+
+        custom_id = response_obj.get("custom_id")
+        headers_list = response_obj.get("response", {}).get("body", {}).get(
+            "choices", [])[0].get("message", {}).get("content")
+        
+        headers_dict[custom_id] = headers_list
+
+    return headers_dict
 
 
 def get_batch_summaries(batch_id: str) -> dict:
@@ -436,6 +456,39 @@ def get_batch_summaries(batch_id: str) -> dict:
     
     return summary_dict
 
+def extract_meaningful_headers(headers: list, filename: str):
+    """Return necessary headers needed to summarise each court transcript"""
+
+    # Setup .jsonl file with individual requests
+    for header_list in headers:
+        query_message = create_query_messages(
+            get_extract_headings_prompt(), header_list)
+        request = create_batch_request(query_message, filename)
+        insert_request(request, filename)
+
+    # Upload batch file to openai and run the batch process.
+    batch_input_file = upload_batch_file(filename)
+    batch = run_batch_requests(batch_input_file)
+
+    return get_batch_meaningful_headers(batch.id)
+
+
+def summarise(transcript_text: list[dict], filename: str):
+    """Return necessary headers needed to summarise each court transcript"""
+
+    # Setup .jsonl file with individual requests
+    for text in transcript_text: # for loop logic is currently a placeholder, will be fixed once I have the webscraped output in-hand
+        query_message = create_query_messages(
+            get_summarise_prompt(), text)
+        request = create_batch_request(query_message, filename)
+        insert_request(request, filename)
+
+    # Upload batch file to openai and run the batch process.
+    batch_input_file = upload_batch_file(filename)
+    batch = run_batch_requests(batch_input_file)
+
+    return get_batch_summaries(batch.id)
+
 
 if __name__ == "__main__":
     load_dotenv()
@@ -460,7 +513,7 @@ if __name__ == "__main__":
 
     batch_input_file = upload_batch_file("requests.jsonl")
 
-    batch = run_batch_summary_requests(batch_input_file)
+    batch = run_batch_requests(batch_input_file)
     
     summaries = get_batch_summaries(batch.id)
 
