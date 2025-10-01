@@ -1,0 +1,5 @@
+streamlit
+pylint
+pytest
+altair
+pandas
