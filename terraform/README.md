@@ -26,6 +26,7 @@ REGION = "your_aws_region"
 DB_NAME = "your_db_name"
 DB_USERNAME = "your_db_username"
 DB_PASSWORD = "your_db_password"
+VPC_ID = "your_vpc_id"
 SUBNET_IDS = "[list_of_subnet_ids]"
 ```
 

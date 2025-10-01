@@ -8,6 +8,21 @@ resource "aws_db_subnet_group" "c19_courts_db_subnet_group" {
   }
 }
 
+# Security group
+resource "aws_security_group" "courts_rds_security_group" {
+    name = "c19-courts-rds-sg"
+    description = "Allow inbound traffic to an RDS instance"
+    vpc_id = var.VPC_ID
+
+    ingress {
+        description = "Postgres access from the internet"
+        from_port = 5432
+        to_port = 5432
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+
 # DB instance
 resource "aws_db_instance" "c19_courts_db" {
   identifier        = "c19-courts-db"
@@ -19,6 +34,7 @@ resource "aws_db_instance" "c19_courts_db" {
   username  = var.DB_USERNAME
   password  = var.DB_PASSWORD
 
+  vpc_security_group_ids = [aws_security_group.courts_rds_security_group.id]
   db_subnet_group_name = aws_db_subnet_group.c19_courts_db_subnet_group.name
   publicly_accessible  = true
   skip_final_snapshot  = true

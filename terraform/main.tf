@@ -6,6 +6,7 @@ module "phase-one" {
     DB_NAME = var.DB_NAME
     DB_USERNAME = var.DB_USERNAME
     DB_PASSWORD = var.DB_PASSWORD
+    VPC_ID = var.VPC_ID
     SUBNET_IDS = var.SUBNET_IDS
 }
 
@@ -17,5 +18,6 @@ module "phase-two" {
     DB_NAME = var.DB_NAME
     DB_USERNAME = var.DB_USERNAME
     DB_PASSWORD = var.DB_PASSWORD
+    VPC_ID = var.VPC_ID
     SUBNET_IDS = var.SUBNET_IDS
 }

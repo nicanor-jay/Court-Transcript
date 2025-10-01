@@ -29,6 +29,11 @@ variable "DB_PASSWORD" {
   sensitive   = true
 }
 
+variable "VPC_ID" {
+  description = "VPC ID for the RDS instance"
+  type = string
+}
+
 variable "SUBNET_IDS" {
   description = "List of subnet IDs for the DB subnet group"
   type        = list(string)
