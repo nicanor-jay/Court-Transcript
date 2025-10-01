@@ -1,3 +1,4 @@
+#pylint: disable=use-dict-literal, too-many-branches
 """
 UK Judiciary Web Scraper - Judges Only
 Scrapes judiciary.uk and extracts *only* real judges.
@@ -66,11 +67,10 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
     parts = full.split()
     if not parts:
         return result
-    
     if len(parts) == 1:
         result["last_name"] = parts[0]
         return result
-    
+
     # Check for surname prefixes (longest match first)
     surname_start_idx = None
     for prefix in sorted(SURNAME_PREFIXES, key=len, reverse=True):
@@ -81,7 +81,6 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
                 break
         if surname_start_idx is not None:
             break
-    
     if surname_start_idx is not None:
         # We found a prefix; everything from here is the surname
         if surname_start_idx == 0:
@@ -99,7 +98,6 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
         else:
             result["first_name"], result["last_name"] = parts[0], parts[-1]
             result["middle_name"] = " ".join(parts[1:-1])
-    
     return result
 
 
@@ -143,7 +141,6 @@ def extract_titles(judges: List[Dict]) -> List[Dict]:
     """Extract unique titles from judges and create title records."""
     seen_titles = set()
     titles = []
-    
     for judge in judges:
         title_name = judge.get("title")
         if title_name and title_name not in seen_titles:
@@ -152,28 +149,26 @@ def extract_titles(judges: List[Dict]) -> List[Dict]:
                 "title_id": len(titles) + 1,
                 "title_name": title_name
             })
-    
     # Sort alphabetically for consistency
     titles.sort(key=lambda x: x["title_name"])
-    
     # Reassign IDs after sorting
     for idx, title in enumerate(titles, start=1):
         title["title_id"] = idx
-    
     return titles
 
 
 def add_title_ids(judges: List[Dict], titles: List[Dict]) -> None:
     """Add title_id to each judge based on the titles lookup."""
     title_map = {t["title_name"]: t["title_id"] for t in titles}
-    
     for judge in judges:
         title_name = judge.get("title")
         judge["title_id"] = title_map.get(title_name) if title_name else None
 
 
 def main():
-    base_url = "https://www.judiciary.uk/about-the-judiciary/who-are-the-judiciary/list-of-members-of-the-judiciary/"
+    """Main script for file. """
+    base_url = "https://www.judiciary.uk/about-the-judiciary/who-are-the-judiciary/\
+        list-of-members-of-the-judiciary/"
     all_judges: List[Dict] = []
 
     with sync_playwright() as p:
@@ -183,7 +178,8 @@ def main():
 
         # Collect sublinks
         links = [a.get_attribute("href") for a in page.locator('a[href*="list-of-members"]').all()]
-        links = [f"https://www.judiciary.uk{l}" if l and l.startswith("/") else l for l in links if l]
+        links = [f"https://www.judiciary.uk{l}" if l and \
+                 l.startswith("/") else l for l in links if l]
 
         if links:
             for link in links:
