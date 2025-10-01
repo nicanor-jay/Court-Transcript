@@ -209,3 +209,6 @@ __marimo__/
 # Terraform
 terraform.tfvars
 .terraform*
+
+# Data Files
+*.json
