@@ -39,4 +39,23 @@ DB_PORT={db_port}
 DB_NAME={db_name}
 DB_USERNAME={db_username}
 DB_PASSWORD={db_password}
+
+# Dashboard folder env vars for build_dockerfile.sh
+AWS_ACCOUNT_ID={aws_account_id}
+APP_NAME={app_name}
+DASHBOARD_ECR_NAME={dashboard_ecr_name}
 ```
+
+## Terraform Phases
+### Phase One
+Run `phase-one` module of the terraform steps to create the initial, non-dependant resources up on AWS.
+
+### Phase Two
+
+Phase Two is dependant on the following steps having been completed
+
+- Pipeline container being uploaded to ECR.
+- ECS Task container being uploaded to ECR.
+- Dashboard container being uploaded to ECR. 
+
+Once the above three steps are completed, you can run the `phase-two` module of the terraform steps.
