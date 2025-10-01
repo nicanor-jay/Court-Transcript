@@ -150,7 +150,8 @@ def extract_titles(judges: List[Dict]) -> List[Dict]:
     """Extract unique titles from judges and create title records."""
     seen_titles = {judge["title"] for judge in judges if judge.get("title")}
     sorted_titles = sorted(seen_titles)  # alphabetical consistency
-    return [{"title_id": idx, "title_name": title} for idx, title in enumerate(sorted_titles, start=1)]
+    return [{"title_id": idx, "title_name": title} for idx, \
+            title in enumerate(sorted_titles, start=1)]
 
 
 def add_title_ids(judges: List[Dict], titles: List[Dict]) -> None:
@@ -176,7 +177,8 @@ def main():
 
         # Collect sublinks (all list-of-members pages)
         links = [a.get_attribute("href") for a in page.locator('a[href*="list-of-members"]').all()]
-        links = [f"https://www.judiciary.uk{l}" if l and l.startswith("/") else l for l in links if l]
+        links = [f"https://www.judiciary.uk{l}" \
+                 if l and l.startswith("/") else l for l in links if l]
 
         if links:
             for link in links:

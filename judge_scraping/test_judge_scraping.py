@@ -168,10 +168,12 @@ class TestLooksLikeJudge:
         assert looks_like_judge("123 Main Street") is False
         assert looks_like_judge("") is False
 
-    def test_case_sensitivity(self):
-        """Should be case-sensitive when matching titles."""
+    def test_case_insensitivity(self):
+        """Should accept titles regardless of case."""
         assert looks_like_judge("Judge Smith") is True
-        assert looks_like_judge("judge Smith") is False
+        assert looks_like_judge("judge Smith") is True
+        assert looks_like_judge("sir John Smith") is True
+        assert looks_like_judge("DISTRICT JUDGE Jones") is True
 
 
 class TestExtractTitles:
