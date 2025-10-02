@@ -44,7 +44,7 @@ def get_court_name(meta: "etree._Element") -> str:
     """Returns the name of the institution/court where the hearing took place."""
     xpath = "//n:TLCOrganization"
     org_element = meta.xpath(xpath, namespaces=NS_MAPPING)
-    # tnc (The National Archives) is also listed as an org, so we need to filter it
+    # tna (The National Archives) is also listed as an org, so we need to filter it
     org_element = list(filter(lambda e: e.get("eId") != "tna", org_element))[0]
     return org_element.get("showAs")
 
