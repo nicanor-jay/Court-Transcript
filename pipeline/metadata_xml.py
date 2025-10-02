@@ -16,14 +16,23 @@ NS_MAPPING = {
 def get_case_url(meta: "etree._Element") -> str:
     """Returns case hearing URL from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRthis"
-    url_element = meta.xpath(xpath, namespaces=NS_MAPPING)[0]
+    url_element = meta.xpath(xpath, namespaces=NS_MAPPING)
+    if url_element:
+        url_element = url_element[0]
+    else:
+        # return None if metadata can't be found
+        return None
     return url_element.get("value")
 
 
 def get_case_judgement_date(meta: "etree._Element") -> datetime:
     """Returns the date when judgement was handed down from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRdate"
-    date_element = meta.xpath(xpath, namespaces=NS_MAPPING)[0]
+    date_element = meta.xpath(xpath, namespaces=NS_MAPPING)
+    if date_element:
+        date_element = date_element[0]
+    else:
+        return None
     date_str = date_element.get("date")
     return datetime.strptime(date_str, "%Y-%m-%d")
 
@@ -31,14 +40,22 @@ def get_case_judgement_date(meta: "etree._Element") -> datetime:
 def get_case_citation(meta: "etree._Element") -> str:
     """Returns the neutral citation, which can be used as a unique identifier."""
     xpath = "//nuk:cite"
-    cite_element = meta.xpath(xpath, namespaces=NS_MAPPING)[0]
+    cite_element = meta.xpath(xpath, namespaces=NS_MAPPING)
+    if cite_element:
+        cite_element = cite_element[0]
+    else:
+        return None
     return cite_element.text
 
 
 def get_case_name(meta: "etree._Element") -> str:
     """Returns the title given to the case hearing."""
     xpath = "//n:FRBRWork//n:FRBRname"
-    name_element = meta.xpath(xpath, namespaces=NS_MAPPING)[0]
+    name_element = meta.xpath(xpath, namespaces=NS_MAPPING)
+    if name_element:
+        name_element = name_element[0]
+    else:
+        return None
     return name_element.get("value")
 
 
@@ -66,7 +83,10 @@ def get_metadata(filename: str) -> dict:
         raise ValueError("filename must be a .xml file")
 
     root = etree.parse(filename)
-    meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
+    try:
+        meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
+    except IndexError as e:
+        raise KeyError(f"{filename} has no meta element") from e
 
     metadata = {
         "title": get_case_name(meta),
