@@ -30,6 +30,7 @@ VPC_ID = "your_vpc_id"
 SUBNET_IDS = "[list_of_subnet_ids]"
 DASHBOARD_IMAGE_URI = "your_dashboard_image_uri"
 RDS_ENDPOINT = "your_rds_endpoint"
+ECS_CLUSTER = "your-ecs-cluster"
 ```
 
 ## 🚀 How to run
