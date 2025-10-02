@@ -1,6 +1,6 @@
 # ECS task definition (dashboard)
-resource "aws_ecs_task_definition" "c19-courts-dashboard-td" {
-  family = "c19-courts-dashboard-td"
+resource "aws_ecs_task_definition" "courts-dashboard-td" {
+  family = var.DASHBOARD_TASK_DEFINITION_NAME
   requires_compatibilities = ["FARGATE"]
   network_mode = "awsvpc"
   cpu = 1024
@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "c19-courts-dashboard-td" {
   execution_role_arn = "arn:aws:iam::129033205317:role/ecsTaskExecutionRole"
   container_definitions = jsonencode([
     {
-        name = "pipeline"
+        name = "dashboard"
         image = var.DASHBOARD_IMAGE_URI
         memory = 128
         environment = [
@@ -36,7 +36,7 @@ resource "aws_ecs_task_definition" "c19-courts-dashboard-td" {
 
 # Security group (dashboard)
 resource "aws_security_group" "courts_dashboard_security_group" {
-    name = "c19-courts-dashboard-sg"
+    name = var.DASHBOARD_SECURITY_GROUP_NAME
     description = "Allow inbound traffic to an RDS instance"
     vpc_id = var.VPC_ID
 
@@ -56,10 +56,10 @@ resource "aws_security_group" "courts_dashboard_security_group" {
 }
 
 # ECS service (dashboard)
-resource "aws_ecs_service" "c19-courts-dashboard-service" {
-  name = "c19-courts-dashboard-service"
+resource "aws_ecs_service" "courts-dashboard-service" {
+  name = var.DASHBOARD_ECS_SERVICE_NAME
   cluster = var.ECS_CLUSTER
-  task_definition = aws_ecs_task_definition.c19-courts-dashboard-td.arn
+  task_definition = aws_ecs_task_definition.courts-dashboard-td.arn
   desired_count = 1
   launch_type = "FARGATE"
   network_configuration {

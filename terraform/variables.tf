@@ -95,3 +95,18 @@ variable "ECS_CLUSTER" {
   description = "ARN of ECS cluster to use for the dashboard ECS service"
   type        = string
 }
+
+variable "DASHBOARD_TASK_DEFINITION_NAME" {
+  description = "Name for the dashboard's task definition resource"
+  type        = string
+}
+
+variable "DASHBOARD_SECURITY_GROUP_NAME" {
+  description = "Name for the dashboard's security group resource"
+  type        = string
+}
+
+variable "DASHBOARD_ECS_SERVICE_NAME" {
+  description = "Name for the dashboard's ECS service resource"
+  type        = string
+}
