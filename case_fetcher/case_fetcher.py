@@ -1,9 +1,10 @@
-import requests
+"""National Archive XML Fetcher. """
 import xml.etree.ElementTree as ET
 from pathlib import Path
 import re
 from typing import List, Tuple, Optional, Dict
 import argparse
+import requests
 
 BASE_FEED_URL = "https://caselaw.nationalarchives.gov.uk/atom.xml"
 NAMESPACES = {
@@ -23,7 +24,7 @@ def slugify(text: str) -> str:
 def fetch_feed(per_page: int = 10) -> ET.Element:
     """Fetch the Atom feed with the specified batch size."""
     url = f"{BASE_FEED_URL}?per_page={per_page}"
-    r = requests.get(url)
+    r = requests.get(url, timeout=1000)
     r.raise_for_status()
     return ET.fromstring(r.content)
 
@@ -48,22 +49,43 @@ def load_single_xml(entry: Tuple[str, str, Optional[str]], xml_dict: Dict[str, s
     Fetch XML for a single entry and store in xml_dict.
     Key = slugified title, Value = raw XML string.
     """
-    pass
+    title, uri, href = entry
+    if href:
+        try:
+            resp = requests.get(href, timeout=1000)
+            resp.raise_for_status()
+            xml_dict[slugify(title)] = resp.text
+        except (requests.exceptions.RequestException, TimeoutError) as e:
+            print(f"Failed to load {title} ({href}): {e}")
+    else:
+        print(f"No XML for: {title} ({uri})")
 
 
 def load_all_xml(entries: List[Tuple[str, str, Optional[str]]]) -> Dict[str, str]:
     """Load XMLs for all entries into a dictionary."""
-    pass
+    xml_dict = {}
+    for entry in entries:
+        load_single_xml(entry, xml_dict)
+    return xml_dict
 
 
 def download_from_dict(xml_dict: Dict[str, str]) -> None:
     """Write XMLs from xml_dict to disk."""
-    pass
+    for slug, xml_str in xml_dict.items():
+        filepath = out_dir / f"{slug}.xml"
+        try:
+            filepath.write_text(xml_str, encoding="utf-8")
+            print(f"Saved: {filepath}")
+        except OSError as e:  # catch all file write errors
+            print(f"Failed to save {slug}: {e}")
+
 
 
 def main():
+    """Main Function; handles argparse. """
     parser = argparse.ArgumentParser(description="Fetch National Archives court XMLs.")
-    parser.add_argument("--per-page", type=int, default=10, help="Number of cases to fetch (default 10).")
+    parser.add_argument("--per-page", type=int, \
+                        default=10, help="Number of cases to fetch (default 10).")
     parser.add_argument("--download", action="store_true", help="Save XMLs to disk as files.")
     args = parser.parse_args()
 
