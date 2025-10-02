@@ -478,7 +478,7 @@ def extract_meaningful_headers(headers: list, filename: str):
 
 
 def summarise(transcript_text: list[dict], filename: str):
-    """Return necessary headers needed to summarise each court transcript"""
+    """Return necessary headers needed to summarise each court transcript."""
 
     # Setup .jsonl file with individual requests
     for text in transcript_text: # for loop logic is currently a placeholder, will be fixed once I have the finalised webscraped output
