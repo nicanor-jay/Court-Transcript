@@ -5,4 +5,4 @@ pytest-cov
 python-dotenv
 requests
 openai
-bs4
+
