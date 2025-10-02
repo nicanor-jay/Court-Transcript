@@ -38,3 +38,13 @@ variable "SUBNET_IDS" {
   description = "List of subnet IDs for the DB subnet group"
   type        = list(string)
 }
+
+variable "DASHBOARD_IMAGE_URI" {
+  description = "URI for the dashboard image"
+  type        = string
+}
+
+variable "RDS_ENDPOINT" {
+  description = "Endpoint of our RDS instance"
+  type        = string
+}

@@ -20,4 +20,6 @@ module "phase-two" {
     DB_PASSWORD = var.DB_PASSWORD
     VPC_ID = var.VPC_ID
     SUBNET_IDS = var.SUBNET_IDS
+    RDS_ENDPOINT = var.RDS_ENDPOINT
+    DASHBOARD_IMAGE_URI = var.DASHBOARD_IMAGE_URI
 }
