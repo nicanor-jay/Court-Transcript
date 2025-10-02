@@ -48,3 +48,8 @@ variable "RDS_ENDPOINT" {
   description = "Endpoint of our RDS instance"
   type        = string
 }
+
+variable "ECS_CLUSTER" {
+  description = "ARN of ECS cluster to use for the dashboard ECS service"
+  type        = string
+}
