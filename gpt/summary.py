@@ -461,7 +461,7 @@ def get_batch_summaries(batch_id: str) -> dict:
     return summary_dict
 
 def extract_meaningful_headers(headers: list, filename: str):
-    """Return necessary headers needed to summarise each court transcript"""
+    """Return necessary headers needed to summarise each court transcript."""
 
     # Setup .jsonl file with individual requests
     for header_list in headers:
