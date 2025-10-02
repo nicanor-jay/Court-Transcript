@@ -73,7 +73,8 @@ def get_headings(root: "etree._ElementTree") -> list["etree._Element"]:
 
     # We need to remove any <toc> (Table of Contents) tags since
     # this will lead to duplicates and may mess with text extraction
-    toc_elements = root.xpath("//n:toc", namespaces={"n": NAMESPACE})
+    # NAMESPACE[1:-1] is used to remove the {} brackets
+    toc_elements = root.xpath("//n:toc", namespaces={"n": NAMESPACE[1:-1]})
     for toc in toc_elements:
         toc.getparent().remove(toc)
 
