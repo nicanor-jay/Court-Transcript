@@ -26,10 +26,11 @@ REGION = "your_aws_region"
 DB_NAME = "your_db_name"
 DB_USERNAME = "your_db_username"
 DB_PASSWORD = "your_db_password"
+DB_PORT = "your_db_port"
+DB_HOST = "your_rds_endpoint"
 VPC_ID = "your_vpc_id"
 SUBNET_IDS = "[list_of_subnet_ids]"
 DASHBOARD_IMAGE_URI = "your_dashboard_image_uri"
-RDS_ENDPOINT = "your_rds_endpoint"
 ECS_CLUSTER = "your-ecs-cluster"
 ```
 
