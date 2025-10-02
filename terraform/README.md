@@ -18,7 +18,7 @@ terraform {
 }
 ```
 
-Make sure to add a `terraform.tfvars` file in this folder with your AWS access key, AWS secret access key, DB password and DB subnet IDs in this format:
+Make sure to add a `terraform.tfvars` file in this folder with this format:
 ```
 ACCESS_KEY = "your_aws_access_key"
 SECRET_ACCESS_KEY = "your_aws_secret_key"
@@ -28,6 +28,8 @@ DB_USERNAME = "your_db_username"
 DB_PASSWORD = "your_db_password"
 VPC_ID = "your_vpc_id"
 SUBNET_IDS = "[list_of_subnet_ids]"
+DASHBOARD_IMAGE_URI = "your_dashboard_image_uri"
+RDS_ENDPOINT = "your_rds_endpoint"
 ```
 
 ## 🚀 How to run

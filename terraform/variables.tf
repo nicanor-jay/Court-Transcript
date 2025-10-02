@@ -41,7 +41,7 @@ variable "SUBNET_IDS" {
 
 variable "DASHBOARD_IMAGE_URI" {
   description = "URI for the dashboard image"
-  type        = list(string)
+  type        = string
 }
 
 variable "RDS_ENDPOINT" {

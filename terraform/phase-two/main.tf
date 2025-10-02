@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "c19-courts-dashboard-td" {
   container_definitions = jsonencode([
     {
         name = "pipeline"
-        image = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/c19-courts-dashboard-service:latest"
+        image = var.DASHBOARD_IMAGE_URI
         memory = 128
         environment = [
             {name = "ACCESS_KEY", value = var.ACCESS_KEY},
