@@ -15,6 +15,7 @@ def get_extract_headings_prompt() -> str:
     Summary: [a concise description of what the hearing was about, maximum 1000 characters]
     Ruling: [which party the court ruled in favour of (one word answer e.g. Defendant)]
     Anomalies: [whether anything irregular happened in the context of a normal court hearing]
+    Give the list in the following format: "'heading1','heading2','heading3'"
     """
 
 
