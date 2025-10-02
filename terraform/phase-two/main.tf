@@ -18,7 +18,16 @@ resource "aws_ecs_task_definition" "c19-courts-dashboard-td" {
             {name = "DB_USERNAME", value = var.DB_USERNAME},
             {name = "DB_PASSWORD", value = var.DB_PASSWORD},
             {name = "DB_NAME", value = var.DB_NAME}
-        ]
+        ],
+        logConfiguration = {
+            logDriver = "awslogs"
+            options = {
+                "awslogs-group" = "/ecs/"
+                "awslogs-region" = var.REGION
+                "awslogs-stream-prefix" = "ecs"
+                "awslogs-create-group" = "true"
+            }
+        }
     }
 
   ])
