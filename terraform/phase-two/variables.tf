@@ -29,6 +29,16 @@ variable "DB_PASSWORD" {
   sensitive   = true
 }
 
+variable "DB_PORT" {
+  description = "Port for our DB"
+  type        = string
+}
+
+variable "DB_HOST" {
+  description = "Endpoint of our RDS instance"
+  type        = string
+}
+
 variable "VPC_ID" {
   description = "VPC ID for the RDS instance"
   type = string
@@ -41,11 +51,6 @@ variable "SUBNET_IDS" {
 
 variable "DASHBOARD_IMAGE_URI" {
   description = "URI for the dashboard image"
-  type        = string
-}
-
-variable "RDS_ENDPOINT" {
-  description = "Endpoint of our RDS instance"
   type        = string
 }
 

@@ -14,7 +14,8 @@ resource "aws_ecs_task_definition" "c19-courts-dashboard-td" {
         environment = [
             {name = "ACCESS_KEY", value = var.ACCESS_KEY},
             {name = "SECRET_ACCESS_KEY", value = var.SECRET_ACCESS_KEY},
-            {name = "RDS_ENDPOINT", value = var.RDS_ENDPOINT},
+            {name = "DB_PORT", value = var.DB_PORT},
+            {name = "DB_HOST", value = var.DB_HOST},
             {name = "DB_USERNAME", value = var.DB_USERNAME},
             {name = "DB_PASSWORD", value = var.DB_PASSWORD},
             {name = "DB_NAME", value = var.DB_NAME}

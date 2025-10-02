@@ -18,9 +18,10 @@ module "phase-two" {
     DB_NAME = var.DB_NAME
     DB_USERNAME = var.DB_USERNAME
     DB_PASSWORD = var.DB_PASSWORD
+    DB_HOST = var.DB_HOST
+    DB_PORT = var.DB_PORT
     VPC_ID = var.VPC_ID
     SUBNET_IDS = var.SUBNET_IDS
-    RDS_ENDPOINT = var.RDS_ENDPOINT
     DASHBOARD_IMAGE_URI = var.DASHBOARD_IMAGE_URI
     ECS_CLUSTER = var.ECS_CLUSTER
 }
