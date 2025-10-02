@@ -6,7 +6,7 @@
 
 A script that is designed to _roughly_ detect headings within a XML court transcript from the [National Archives](https://caselaw.nationalarchives.gov.uk/) and its corresponding text.
 
-### Use
+### Usage
 
 This script is intended to be imported as a module by other scripts (it has no "standalone" functionality). To use this script, simply import it as:
 
