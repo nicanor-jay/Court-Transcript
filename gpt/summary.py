@@ -414,9 +414,6 @@ def get_batch_meaningful_headers(batch_id: str) -> dict:
     """Return the meaningful headers responses from the GPT-API request."""
     batch = wait_for_batch(batch_id)
 
-    if not batch.output_file_id:
-        raise ValueError(
-            "Batch not finished processing yet or no output file detected.")
     response = openai.files.content(batch.output_file_id)
     headers_dict = {}
     for line in response.text.splitlines():
