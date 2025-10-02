@@ -1,6 +1,5 @@
 # Contents
 1. [`summary.py`](#summarypy)
-2. [`test_summary.py](#test_summarypy)
 
 ## `summary.py`
 
@@ -35,5 +34,17 @@ The `extract_meaningful_headers` method will take a *list of dicts, may change o
 
 The `summarise` method will take a *list of dicts, may change once webscraping functionality implemented* and return a `{identifier: {transcript_summary}}` dictionary where:
 - `identifier` is the unique identifier for a specific court transcript
+- `{transcript_summary}` is a dictionary storing the summary data which will be in the form:
+```
+{
+    "summary": [a concise description of what the hearing was about, maximum 1000 characters],
+    "ruling": [which party the court ruled in favour of (one word answer e.g. Defendant)],
+    "anomaly": [whether anything irregular happened in the context of a normal court hearing]
+}
+```
 
-## `test_summary.py`
+Make sure you have a .env file containing your openai api key for the script to run.
+
+```
+OPENAI_API_KEY=
+```
