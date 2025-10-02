@@ -1,5 +1,6 @@
 # Contents
-1. `parse_xml.py`
+1. [`parse_xml.py`](#parse_xmlpy)
+2. [`metadata_xml.py`](#metadata_xmlpy)
 
 ## `parse_xml.py`
 
@@ -12,7 +13,7 @@ This script is intended to be imported as a module by other scripts (it has no "
 ```python
 """ Your module. """
 
-from parse_xml.py import get_label_text_dict
+from parse_xml import get_label_text_dict
 
 ...
 ```
@@ -22,3 +23,47 @@ This method will take a filepath to an `.xml` file, and return a `{label:text}` 
 - `text` is the raw text under that heading
 
 Note that two special headings may be added - `DOC_START` and `DOC_END` - for raw text which does not have a heading at the head/tail of the XML file.
+
+## `metadata_xml.py`
+
+A script which will extract metadata contained in a XML court transcript from the [National Archives](https://caselaw.nationalarchives.gov.uk/).
+
+### Use
+
+This script is intended to be imported as a module by other scripts - however, it can also be used standalone.
+
+#### As a module
+
+For use as a module, import like so:
+
+```python
+""" Your module. """
+
+from metadata_xml import get_metadata
+
+...
+```
+
+`get_metadata()` takes a filepath to an `.xml` file, and returns a dictionary containing metadata about that file.
+
+Specifically, the data returned is:
+- `title` (`str`): The title of the hearing.
+- `citation` (`str`): Neutral citation; can be used as unique identifier.
+- `verdict_date` (`datetime`): The date when judgement was handed down.
+- `court` (`str`): The name of the court where the hearing took place.
+- `url` (`str`): A URL to the hearing transcript page.
+
+#### As a script
+
+For use as a script, you must call the script like so:
+
+```bash
+$ python metadata_xml.py -f <filename.xml>
+```
+
+The script accepts two CLI arguments:
+
+- `-f`: path to XML file to extract from; mandatory.
+- `-o`: a flag to indicate if metadata should be output as JSON.
+
+You can also call the script with `-h` to view a summary of the arguments listed above.
