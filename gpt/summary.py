@@ -431,7 +431,7 @@ def get_batch_meaningful_headers(batch_id: str) -> dict:
 
 
 def get_batch_summaries(batch_id: str) -> dict:
-    """Return the transcript summary responses from the GPT-API request"""
+    """Return the transcript summary responses from the GPT-API request."""
     batch = wait_for_batch(batch_id)
 
     if not batch.output_file_id:
