@@ -16,7 +16,7 @@ def get_case_url(meta: "etree._Element") -> str:
     return url_element.get("value")
 
 
-def get_case_judgement_data(meta: "etree._Element") -> str:
+def get_case_judgement_date(meta: "etree._Element") -> str:
     """Returns the date when judgement was handed down from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRdate"
     date_element = meta.xpath(xpath, namespaces=NS_MAPPING)[0]
@@ -46,11 +46,33 @@ def get_court_name(meta: "etree._Element") -> str:
     return org_element.get("showAs")
 
 
-if __name__ == "__main__":
-    root = etree.parse("xmls/data_1.xml")
+def get_metadata(filename: str) -> dict:
+    """
+    Extracts metadata from `filename` and returns it as a dictionary.
+    Structure of the returned dictionary:
+
+    `title` (`str`): The title of the hearing.
+    `citation` (`str`): Neutral citation; can be used as unique identifier.
+    `verdict_date` (`datetime`): The date when judgement was handed down.
+    `court` (`str`): The name of the court where the hearing took place.
+    `url` (`str`): A URL to the hearing transcript page.
+    """
+    if not filename.endswith(".xml"):
+        raise ValueError("filename must be a .xml file")
+
+    root = etree.parse(filename)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
-    url = get_case_url(meta)
-    date = get_case_judgement_data(meta)
-    cite = get_case_citation(meta)
-    name = get_case_name(meta)
-    court_name = get_court_name(meta)
+
+    metadata = {
+        "title": get_case_name(meta),
+        "citation": get_case_citation(meta),
+        "verdict_date": get_case_judgement_date(meta),
+        "court": get_court_name(meta),
+        "url": get_case_url(meta)
+    }
+
+    return metadata
+
+
+if __name__ == "__main__":
+    data = get_metadata("xmls/data_1.xml")
