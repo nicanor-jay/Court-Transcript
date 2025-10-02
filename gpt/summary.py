@@ -410,7 +410,7 @@ def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
 
 
 def get_batch_meaningful_headers(batch_id: str) -> dict:
-    """Return the meaningful headers responses from the GPT-API request"""
+    """Return the meaningful headers responses from the GPT-API request."""
     batch = wait_for_batch(batch_id)
 
     if not batch.output_file_id:
