@@ -28,7 +28,7 @@ Note that two special headings may be added - `DOC_START` and `DOC_END` - for ra
 
 A script which will extract metadata contained in a XML court transcript from the [National Archives](https://caselaw.nationalarchives.gov.uk/).
 
-### Use
+### Usage
 
 This script is intended to be imported as a module by other scripts - however, it can also be used standalone.
 
