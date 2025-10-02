@@ -321,7 +321,7 @@ Judge Armstrong-Holmes 17th September 2025"""
 # create/import function to retrieve headings/sub-headings from transcript
 
 def create_query_messages(system_prompt: str, user_prompt: str) -> list[dict]:
-    """create messages to make a request to GPT-API"""
+    """Create messages to make a request to GPT-API."""
     if not (isinstance(system_prompt, str) and isinstance(user_prompt, str)):
         raise TypeError("Both system and user prompts must be of type string.")
     return [
