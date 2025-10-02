@@ -322,6 +322,8 @@ Judge Armstrong-Holmes 17th September 2025"""
 
 def create_query_messages(system_prompt: str, user_prompt: str) -> list[dict]:
     """create messages to make a request to GPT-API"""
+    if not (isinstance(system_prompt, str) and isinstance(user_prompt, str)):
+        raise TypeError("Both system and user prompts must be of type string.")
     return [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt}
@@ -338,6 +340,8 @@ def get_query_results(query_messages: list[dict]):
 
 
 ## Batch processing functions
+
+# Function will be removed once unique hearing identifier is given from metadata
 
 def get_last_request_id(filename: str) -> int:
     """Get the id of the last request in the .jsonl file"""
@@ -477,7 +481,7 @@ def summarise(transcript_text: list[dict], filename: str):
     """Return necessary headers needed to summarise each court transcript"""
 
     # Setup .jsonl file with individual requests
-    for text in transcript_text: # for loop logic is currently a placeholder, will be fixed once I have the webscraped output in-hand
+    for text in transcript_text: # for loop logic is currently a placeholder, will be fixed once I have the finalised webscraped output
         query_message = create_query_messages(
             get_summarise_prompt(), text)
         request = create_batch_request(query_message, filename)
@@ -521,6 +525,7 @@ if __name__ == "__main__":
 
 
     # check how many batch requests there are
+
     # print(openai.batches.list(limit=1))
 
 
