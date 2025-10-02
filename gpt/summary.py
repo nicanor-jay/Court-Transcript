@@ -331,7 +331,7 @@ def create_query_messages(system_prompt: str, user_prompt: str) -> list[dict]:
 
 
 def get_query_results(query_messages: list[dict]):
-    """Get the results from the query request made to GPT-API"""
+    """Get the results from the query request made to GPT-API."""
     response = openai.chat.completions.create(
         model = "gpt-4.1-nano",
         messages = query_messages
