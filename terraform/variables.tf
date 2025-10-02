@@ -1,3 +1,5 @@
+# Common to both modules
+
 variable "REGION" {
   description = "AWS region to deploy resources into"
   type = string
@@ -39,12 +41,72 @@ variable "SUBNET_IDS" {
   type        = list(string)
 }
 
+
+# Specific to phase one
+
+variable "DB_SUBNET_GROUP_NAME" {
+  description = "Name for the RDS subnet resource"
+}
+
+variable "RDS_SECURITY_GROUP_NAME" {
+  description = "Name for the RDS security group resource"
+  type = string
+}
+
+variable "COURTS_RDS_NAME" {
+  description = "Name for the courts RDS resource"
+  type = string
+}
+
+variable "ECR_FOR_LAMBDA_NAME" {
+  description = "Name for the ECR hosting our lambda image"
+  type = string
+}
+
+variable "ECR_FOR_ECS_NAME" {
+  description = "Name for the ECR hosting our ECS task"
+  type = string
+}
+
+variable "ECR_FOR_DASHBOARD_NAME" {
+  description = "Name for the ECR hosting our dashboard image"
+  type = string
+}
+
+
+# Specific to phase two
+
+variable "DB_PORT" {
+  description = "Port for our DB"
+  type        = string
+}
+
+variable "DB_HOST" {
+  description = "Endpoint of our RDS instance"
+  type        = string
+}
+
 variable "DASHBOARD_IMAGE_URI" {
   description = "URI for the dashboard image"
   type        = string
 }
 
-variable "RDS_ENDPOINT" {
-  description = "Endpoint of our RDS instance"
+variable "ECS_CLUSTER" {
+  description = "ARN of ECS cluster to use for the dashboard ECS service"
+  type        = string
+}
+
+variable "DASHBOARD_TASK_DEFINITION_NAME" {
+  description = "Name for the dashboard's task definition resource"
+  type        = string
+}
+
+variable "DASHBOARD_SECURITY_GROUP_NAME" {
+  description = "Name for the dashboard's security group resource"
+  type        = string
+}
+
+variable "DASHBOARD_ECS_SERVICE_NAME" {
+  description = "Name for the dashboard's ECS service resource"
   type        = string
 }
