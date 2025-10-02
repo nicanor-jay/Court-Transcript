@@ -1,5 +1,7 @@
 """Extract metadata from hearing transcripts."""
 
+from datetime import datetime
+
 from lxml import etree
 
 # Common namespaces for XML files from https://caselaw.nationalarchives.gov.uk/
@@ -16,11 +18,12 @@ def get_case_url(meta: "etree._Element") -> str:
     return url_element.get("value")
 
 
-def get_case_judgement_date(meta: "etree._Element") -> str:
+def get_case_judgement_date(meta: "etree._Element") -> datetime:
     """Returns the date when judgement was handed down from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRdate"
     date_element = meta.xpath(xpath, namespaces=NS_MAPPING)[0]
-    return date_element.get("date")
+    date_str = date_element.get("date")
+    return datetime.strptime(date_str, "%Y-%m-%d")
 
 
 def get_case_citation(meta: "etree._Element") -> str:
