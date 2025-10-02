@@ -344,7 +344,7 @@ def get_query_results(query_messages: list[dict]):
 # Function will be removed once unique hearing identifier is given from metadata
 
 def get_last_request_id(filename: str) -> int:
-    """Get the id of the last request in the .jsonl file"""
+    """Get the id of the last request in the .jsonl file."""
     with open(filename, 'r') as file:
         last_request = ""
         for line in file:
