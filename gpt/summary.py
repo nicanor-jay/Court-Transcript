@@ -1,11 +1,11 @@
 """Script to summarise court transcripts using GPT-API."""
-from utilities import api_key
 from openai import OpenAI
 from dotenv import load_dotenv
 import json
 import time
 
 
+load_dotenv()
 openai = OpenAI()
 
 def get_extract_headings_prompt() -> str:

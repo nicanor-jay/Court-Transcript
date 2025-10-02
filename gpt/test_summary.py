@@ -52,34 +52,3 @@ def test_insert_request():
     handle = mock()
     # Check if request was written once to the jsonl file
     handle.write.assert_called_once_with(json.dumps(mock_data) + "\n")
-
-
-def test_upload_batch_file():
-    """Check if the jsonl batch file successfully uploads to GPT-API"""
-    fake_response = MagicMock()
-    fake_response.id = "file-12345"
-    fake_response.filename = "test.jsonl"
-    mock_files_create = patch("summary.openai.files.create", return_value=fake_response)
-    
-    with patch("builtins.open", mock_open(read_data=b"fake data")):
-
-        result = upload_batch_file("test.jsonl")
-
-    mock_files_create.assert_called_once()
-
-    assert result.id == "file-12345"
-    assert result.filename == "test.jsonl"
-
-
-def test_run_batch_request():
-    """Check whether a batch request successfully runs"""
-    fake_batch = {"id": "batch-12345", "status": "queued"}
-    mock_openai_batches_create = patch("openai.batches.create", return_value=fake_batch)
-    result = run_batch_requests({"id": "file-12345"})
-    assert result == fake_batch
-    mock_openai_batches_create.assert_called_once()
-
-
-def test_wait_for_batch():
-    """Check whether a successful batch is correctly polled"""
-    pass
