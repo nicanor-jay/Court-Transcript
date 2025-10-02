@@ -5,7 +5,7 @@
 import pytest
 import json
 import io
-from unittest.mock import mock_open, patch
+from unittest.mock import mock_open, patch, MagicMock
 
 from summary import create_query_messages, create_batch_request, insert_request, upload_batch_file, run_batch_requests
 
@@ -56,20 +56,19 @@ def test_insert_request():
 
 def test_upload_batch_file():
     """Check if the jsonl batch file successfully uploads to GPT-API"""
-    fake_file = {"id": "file-12345"}
-    # Mock the files.create api call
-    fake_handle = io.BytesIO(b"fake data")
-    m = mock_open(read_data=b"fake data")
-    with patch("builtins.open", return_value=fake_handle), patch("openai.files.create",
-                                          return_value=fake_file) as mock_openai_files_create:
+    fake_response = MagicMock()
+    fake_response.id = "file-12345"
+    fake_response.filename = "test.jsonl"
+    mock_files_create = patch("summary.openai.files.create", return_value=fake_response)
+    
+    with patch("builtins.open", mock_open(read_data=b"fake data")):
+
         result = upload_batch_file("test.jsonl")
 
-    assert result == fake_file
+    mock_files_create.assert_called_once()
 
-    # m.assert_called_once_with("test.jsonl", "rb")
-
-    # file_handle = m()
-    # mock_openai_files_create.assert_called_once_with(file=file_handle, purpose="batch")
+    assert result.id == "file-12345"
+    assert result.filename == "test.jsonl"
 
 
 def test_run_batch_request():
