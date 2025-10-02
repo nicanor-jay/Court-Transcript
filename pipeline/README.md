@@ -53,6 +53,12 @@ Specifically, the data returned is:
 - `court` (`str`): The name of the court where the hearing took place.
 - `url` (`str`): A URL to the hearing transcript page.
 
+> **NOTE**:
+>
+> If a _field of metadata_ is not found, then it will be |**returned as `None`**.
+>
+> If the XML file is _missing a `<meta>` element entirely_, the script **will raise a `KeyError`**.
+
 #### As a script
 
 For use as a script, you must call the script like so:
