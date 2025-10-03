@@ -21,7 +21,7 @@ def get_extract_headings_prompt() -> str:
 
 
 def get_summarise_prompt() -> str:
-    """Return the summarise system prompt."""
+    """Return the system prompt for the 'summarise' function requests."""
     return """ You are a UK legal data extraction assistant.
     You will be given a python-style dictionary where headings will be mapped to their corresponding content for a single transcript.
     Redact all personal information about the parties involved.
