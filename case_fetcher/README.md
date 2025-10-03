@@ -134,7 +134,7 @@ slugify("Case [2024] UKSC/1")  # → "Case_2024_UKSC_1"
 
 ### Missing XML Files
 
-Some entries in the Atom feed may not include a link to the Akoma Ntoso XML file. These cases are skipped and a message is printed:
+Some entries in the Atom feed may not include a link to the Akoma Ntoso XML file. These cases are skipped and a message is logged:
 
 ```
 No XML for: No XML Case [2024] EWHC 50 (https://caselaw.nationalarchives.gov.uk/id/ewhc/2024/50)
