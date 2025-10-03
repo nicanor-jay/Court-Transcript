@@ -117,10 +117,6 @@ def output_metadata(filename: str, metadata: dict) -> None:
     if not filename.endswith(".json"):
         raise ValueError("filename must be a .json file")
 
-    # datetime can't be serialized, so convert into string
-    date_str = datetime.strftime(metadata["verdict_date"], "%Y-%m-%d")
-    metadata["verdict_date"] = date_str
-
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=4)
 
@@ -133,18 +129,21 @@ def set_up_args() -> argparse.Namespace:
         type=str, required=True,
         help="XML file to process")
     parser.add_argument(
-        "-o", "--output", action="store_true",
+        "-o", "--output",
         help="If given, will output a JSON file of the same name")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = set_up_args()
-    data = get_metadata(args.file)
+    with open(args.file, encoding="utf-8") as f:
+        xml_raw_string = f.read()
+    data = get_metadata(xml_raw_string)
+
+    # datetime can't be serialized, so convert into string
+    date_str = datetime.strftime(data["verdict_date"], "%Y-%m-%d")
+    data["verdict_date"] = date_str
+
+    print(json.dumps(data, indent=4))
     if args.output:
-        # change filename extension
-        output_file = args.file.replace(".xml", ".json")
-        # get base of path
-        base_start = output_file.rfind('/')+1
-        output_file = output_file[base_start:] if base_start >= 0 else output_file
-        output_metadata(output_file, data)
+        output_metadata(args.output, data)
