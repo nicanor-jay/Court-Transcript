@@ -1,4 +1,5 @@
-lxml
-types-lxml
 pytest
 pylint
+lxml
+types-lxml
+requests
