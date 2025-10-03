@@ -116,20 +116,18 @@ def test_get_judges_correct_name(xml_metadata):
     assert judges == real_judges
 
 
-def test_get_metadata_rejects_bad_filename():
-    with pytest.raises(ValueError) as exc_info:
-        get_metadata("bad_file.csv")
-        assert "filename must be a .xml file" in exc_info.value
+def test_get_metadata_rejects_bad_xml_string_type():
+    with pytest.raises(TypeError) as exc_info:
+        get_metadata(101)
+        assert "xml_string must be a str type" in exc_info.value
 
 
 def test_get_metadata_returns_dict(xml_metadata):
-    etree.parse = Mock(return_value=etree.fromstring(xml_metadata))
-    metadata = get_metadata("dummy.xml")
+    metadata = get_metadata(xml_metadata.decode("utf-8"))
     assert isinstance(metadata, dict)
 
 
 def test_get_metadata_dict_has_correct_keys(xml_metadata):
-    etree.parse = Mock(return_value=etree.fromstring(xml_metadata))
-    metadata = get_metadata("dummy.xml")
-    assert list(metadata.keys()) == ['title', 'citation',
-                                     'verdict_date', 'court', 'url']
+    metadata = get_metadata(xml_metadata.decode("utf-8"))
+    assert list(metadata.keys()) == ['title', 'citation', 'verdict_date',
+                                     'court', 'url', 'judges']
