@@ -391,7 +391,7 @@ def run_batch_requests(batch_input_file):
 
 
 def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
-    """Poll batch until processing has finished"""
+    """Poll batch until processing has finished."""
     waited = 0
     while waited < timeout:
         batch = openai.batches.retrieve(batch_id)
