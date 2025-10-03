@@ -97,4 +97,7 @@ terraform.tfstate.backup
 *.json
 *.xml
 *.csv
+
+#coverage
+*.coverage
 *.jsonl
