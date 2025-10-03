@@ -68,6 +68,14 @@ def get_court_name(meta: "etree._Element") -> str:
     return org_element.get("showAs")
 
 
+def get_judges(root: etree._Element) -> list[str] | None:
+    """Returns a list of the judges who sat the hearing."""
+    people = root.xpath("//n:TLCPerson", namespaces=NS_MAPPING)
+    judges = [person.get("showAs")
+              for person in people if person.get("href") != ""]
+    return judges if judges else None
+
+
 def get_metadata(filename: str) -> dict:
     """
     Extracts metadata from `filename` and returns it as a dictionary.
@@ -78,6 +86,7 @@ def get_metadata(filename: str) -> dict:
     `verdict_date` (`datetime`): The date when judgement was handed down.
     `court` (`str`): The name of the court where the hearing took place.
     `url` (`str`): A URL to the hearing transcript page.
+    `judges` (`list[str]`): List of judges who sat the hearing.
     """
     if not filename.endswith(".xml"):
         raise ValueError("filename must be a .xml file")
