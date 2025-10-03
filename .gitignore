@@ -56,6 +56,7 @@ node_modules/
 
 # testing
 /coverage
+.coverage
 
 # production
 /build
@@ -96,3 +97,4 @@ terraform.tfstate.backup
 *.json
 *.xml
 *.csv
+*.jsonl
