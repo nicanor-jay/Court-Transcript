@@ -25,6 +25,11 @@ CREATE TABLE judge (
     )
 );
 
+CREATE UNIQUE INDEX judge_unique_idx
+ON
+judge (title_id, first_name, middle_name, last_name, appointment_date)
+NULLS NOT DISTINCT;
+
 CREATE TABLE judgement (
     judgement_id BIGSERIAL PRIMARY KEY,
     judgement_favour VARCHAR(30)
