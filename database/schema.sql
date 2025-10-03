@@ -40,6 +40,7 @@ CREATE TABLE hearing (
     hearing_title VARCHAR(50),
     hearing_date TIMESTAMP,
     hearing_description VARCHAR(1000),
+    hearing_anomaly VARCHAR(1000),
     hearing_url VARCHAR(100)
 );
 
