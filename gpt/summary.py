@@ -359,7 +359,7 @@ def get_last_request_id(filename: str) -> int:
 
 
 def create_batch_request(query_messages: list[dict], filename: str) -> dict:
-    """Create a GPT-API request for batch processing"""
+    """Create a GPT-API request for batch processing."""
     return {"custom_id": f"request-{get_last_request_id(filename) + 1}", "method": "POST", "url": "/v1/chat/completions", "body": {"model": "gpt-4.1-nano", "messages": query_messages}}
 
 # Change custom id to be unique to the specific court hearing (case id/reference number ideally)
