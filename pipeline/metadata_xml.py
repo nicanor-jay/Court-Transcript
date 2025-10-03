@@ -13,7 +13,7 @@ NS_MAPPING = {
 }
 
 
-def get_case_url(meta: "etree._Element") -> str:
+def get_case_url(meta: "etree._Element") -> str | None:
     """Returns case hearing URL from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRthis"
     url_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -25,7 +25,7 @@ def get_case_url(meta: "etree._Element") -> str:
     return url_element.get("value")
 
 
-def get_case_judgement_date(meta: "etree._Element") -> datetime:
+def get_case_judgement_date(meta: "etree._Element") -> datetime | None:
     """Returns the date when judgement was handed down from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRdate"
     date_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -37,7 +37,7 @@ def get_case_judgement_date(meta: "etree._Element") -> datetime:
     return datetime.strptime(date_str, "%Y-%m-%d")
 
 
-def get_case_citation(meta: "etree._Element") -> str:
+def get_case_citation(meta: "etree._Element") -> str | None:
     """Returns the neutral citation, which can be used as a unique identifier."""
     xpath = "//nuk:cite"
     cite_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -48,7 +48,7 @@ def get_case_citation(meta: "etree._Element") -> str:
     return cite_element.text
 
 
-def get_case_name(meta: "etree._Element") -> str:
+def get_case_name(meta: "etree._Element") -> str | None:
     """Returns the title given to the case hearing."""
     xpath = "//n:FRBRWork//n:FRBRname"
     name_element = meta.xpath(xpath, namespaces=NS_MAPPING)
