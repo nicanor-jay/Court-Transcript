@@ -13,7 +13,7 @@ def get_extract_headings_prompt() -> str:
     You will be given a list of headers from a court transcript.
     You must return a list of headers that you believe will contain the necessary information in the transcript to deduce the following:
     Summary: [a concise description of what the hearing was about, maximum 1000 characters]
-    Ruling: [which party the court ruled in favour of (one word answer e.g. Defendant)]
+    Ruling: [which party the court ruled in favour of. The ruling MUST only be one of these 3 options: Plaintiff, Defendant, Undisclosed]
     Anomalies: [whether anything irregular happened in the context of a normal court hearing]
     Give the list in the following format: "'heading1','heading2','heading3'"
     """
@@ -25,7 +25,7 @@ def get_summarise_prompt() -> str:
     Redact all personal information about the parties involved.
     Your task is to carefully extract and return the following fields:
     Summary: [a concise description of what the hearing was about, maximum 1000 characters]
-    Ruling: [which party the court ruled in favour of (one word answer e.g. Defendant)]
+    Ruling: [which party the court ruled in favour of. The ruling MUST only be one of these 3 options: Plaintiff, Defendant, Undisclosed]
     Anomalies: [whether anything irregular happened in the context of a normal court hearing]
     If any field is missing, write "Not Found".
     Return your output strictly in this JSON format:
