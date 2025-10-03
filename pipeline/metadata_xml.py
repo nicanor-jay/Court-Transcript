@@ -118,8 +118,8 @@ def output_metadata(filename: str, metadata: dict) -> None:
     if not filename.endswith(".json"):
         raise ValueError("filename must be a .json file")
 
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=4)
+    with open(filename, "w", encoding="utf-8") as json_file:
+        json.dump(metadata, json_file, indent=4)
 
 
 def set_up_args() -> argparse.Namespace:
@@ -142,8 +142,8 @@ if __name__ == "__main__":
     data = get_metadata(xml_raw_string)
 
     # datetime can't be serialized, so convert into string
-    date_str = datetime.strftime(data["verdict_date"], "%Y-%m-%d")
-    data["verdict_date"] = date_str
+    date = datetime.strftime(data["verdict_date"], "%Y-%m-%d")
+    data["verdict_date"] = date
 
     print(json.dumps(data, indent=4))
     if args.output:
