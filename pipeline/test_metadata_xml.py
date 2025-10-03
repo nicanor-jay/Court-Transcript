@@ -13,6 +13,7 @@ from metadata_xml import (
     get_case_judgement_date,
     get_court_name,
     get_case_url,
+    get_judges,
     get_metadata
 )
 
@@ -90,6 +91,29 @@ def test_get_case_url_correct_name(xml_metadata):
     url = get_case_url(meta)
     real_url = "https://caselaw.nationalarchives.gov.uk/ukpc/2025/47"
     assert url == real_url
+
+
+def test_get_judges_correct_type(xml_metadata):
+    root = etree.fromstring(xml_metadata)
+    meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
+    judges = get_judges(meta)
+    assert isinstance(judges, list)
+
+
+def test_get_judges_correct_elements_type(xml_metadata):
+    root = etree.fromstring(xml_metadata)
+    meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
+    judges = get_judges(meta)
+    assert all(isinstance(judge, str) for judge in judges)
+
+
+def test_get_judges_correct_name(xml_metadata):
+    root = etree.fromstring(xml_metadata)
+    meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
+    judges = get_judges(meta)
+    real_judges = ['Lord Briggs', 'Lord Sales',
+                   'Lord Hamblen', 'Lord Burrows', 'Lord Richards']
+    assert judges == real_judges
 
 
 def test_get_metadata_rejects_bad_filename():
