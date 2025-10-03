@@ -80,9 +80,9 @@ def get_judges(root: etree._Element) -> list[str] | None:
     return judges if judges else None
 
 
-def get_metadata(filename: str) -> dict:
+def get_metadata(xml_string: str) -> dict:
     """
-    Extracts metadata from `filename` and returns it as a dictionary.
+    Extracts metadata from `xml_str` and returns it as a dictionary.
     Structure of the returned dictionary:
 
     `title` (`str`): The title of the hearing.
@@ -92,14 +92,14 @@ def get_metadata(filename: str) -> dict:
     `url` (`str`): A URL to the hearing transcript page.
     `judges` (`list[str]`): List of judges who sat the hearing.
     """
-    if not filename.endswith(".xml"):
-        raise ValueError("filename must be a .xml file")
+    if not isinstance(xml_string, str):
+        raise TypeError("xml_string must be a str type")
 
-    root = etree.parse(filename)
+    root = etree.fromstring(xml_string.encode("utf-8"))
     try:
         meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     except IndexError as e:
-        raise KeyError(f"{filename} has no meta element") from e
+        raise KeyError("xml_string has no meta element") from e
 
     metadata = {
         "title": get_case_name(meta),
