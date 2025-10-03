@@ -372,7 +372,7 @@ def insert_request(request: str, filename: str) -> None:
 
 
 def upload_batch_file(filename: str):
-    """Upload files for Batch API"""
+    """Upload files for Batch API."""
     batch_input_file = openai.files.create(
         file=open(filename, "rb"),
         purpose="batch"
