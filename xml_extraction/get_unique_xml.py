@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 from os import environ as ENV
 
 import psycopg2

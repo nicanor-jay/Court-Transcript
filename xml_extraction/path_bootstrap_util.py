@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 """Very hacky way of accessing case_fetcher.py from here."""
 
 import sys
