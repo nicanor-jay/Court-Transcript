@@ -10,6 +10,7 @@ import pandas as pd
 
 
 def get_db_connection():
+    load_dotenv()
     """Gets the db connection and returns it."""
     try:
         con = connect(
@@ -28,7 +29,9 @@ def get_db_connection():
         return None
 
 
-def query_rds(con: connection, query: str) -> pd.DataFrame:
+def query_rds(con: connection, query: str) -> dict:
     """Function to query the RDS with a given query."""
-    df = pd.read_sql(query, con)
-    return df
+    with con.cursor() as cur:
+        cur.execute(query)
+        data = cur.fetchall()
+    return data[0]
