@@ -10,16 +10,19 @@ DROP TABLE IF EXISTS title CASCADE;
 
 CREATE TABLE title (
     title_id BIGSERIAL PRIMARY KEY,
-    title_name VARCHAR(60) NOT NULL
+    title_name VARCHAR(60) UNIQUE NOT NULL
 );
 
 CREATE TABLE judge (
     judge_id BIGSERIAL PRIMARY KEY,
     title_id BIGINT REFERENCES title (title_id),
-    first_name VARCHAR(30) NOT NULL,
+    first_name VARCHAR(30),
     middle_name VARCHAR(30),
     last_name VARCHAR(30) NOT NULL,
-    appointment_date TIMESTAMP
+    appointment_date TIMESTAMP,
+    CONSTRAINT unique_judge UNIQUE (
+        title_id, first_name, middle_name, last_name, appointment_date
+    )
 );
 
 CREATE TABLE judgement (
