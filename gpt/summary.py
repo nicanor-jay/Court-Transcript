@@ -365,7 +365,7 @@ def create_batch_request(query_messages: list[dict], filename: str) -> dict:
 # Change custom id to be unique to the specific court hearing (case id/reference number ideally)
 
 def insert_request(request: str, filename: str) -> None:
-    """Insert a request into the .jsonl file for batch processing"""
+    """Insert a request into the .jsonl file for batch processing."""
     with open(filename, 'a') as file:
         json_request = json.dumps(request)
         file.write(json_request + "\n")
