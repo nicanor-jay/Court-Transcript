@@ -39,7 +39,6 @@ def parse_date(text: str) -> Optional[str]:
     match = re.search(r"\b\d{2}[-/\.]\d{2}[-/\.]\d{2,4}\b", text)
     if match:
         raw_date = match.group(0)
-        # Try multiple numeric date formats
         formats = [
             "%d-%m-%y", "%d-%m-%Y",
             "%d/%m/%y", "%d/%m/%Y",
@@ -51,7 +50,6 @@ def parse_date(text: str) -> Optional[str]:
             except ValueError:
                 continue
 
-    # Fallback to full month formats (e.g. "14 May 2018")
     formats = [
         "%d %B %Y", "%d %b %Y",
         "%Y-%m-%d", "%B %Y", "%b %Y",
@@ -70,19 +68,16 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
     if not full:
         return result
 
-    # Extract known title prefix
     for title in TITLES:
         if full.startswith(title + " "):
             result["title"] = title
             full = full[len(title):].strip()
             break
 
-    # Remove trailing postnominals (e.g. "QC")
     for post_nom in POST_NOMINALS:
         if full.endswith(" " + post_nom):
             full = full[: -len(post_nom)].strip()
 
-    # Break into parts for name parsing
     parts = full.split()
     if not parts:
         return result
@@ -90,7 +85,6 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
         result["last_name"] = parts[0]
         return result
 
-    # Detect surname prefixes (e.g. "de la", "van der")
     surname_start_idx = None
     for prefix in sorted(SURNAME_PREFIXES, key=len, reverse=True):
         prefix_parts = prefix.split()
@@ -101,7 +95,6 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
         if surname_start_idx is not None:
             break
 
-    # Assign name fields depending on where surname starts
     if surname_start_idx is not None:
         if surname_start_idx == 0:
             result["last_name"] = " ".join(parts[surname_start_idx:])
@@ -124,7 +117,6 @@ def looks_like_judge(text: str) -> bool:
     if not text:
         return False
     lowered = text.lower()
-    # Match against known titles
     return any(lowered.startswith(t.lower() + " ") for t in TITLES)
 
 
@@ -133,7 +125,6 @@ def scrape_page(page, url: str) -> List[Dict]:
     judges = []
     page.goto(url, wait_until="domcontentloaded", timeout=20000)
 
-    # Iterate over tables/rows on the page
     for table in page.locator("table").all():
         for row in table.locator("tbody tr").all():
             cells = [c.inner_text().strip() for c in row.locator("td").all()]
@@ -144,13 +135,9 @@ def scrape_page(page, url: str) -> List[Dict]:
             if not looks_like_judge(full_name):
                 continue
 
-            # Extract first valid date in row
             date_val = next((parse_date(c) for c in cells[1:] if parse_date(c)), None)
-
-            # Parse name components
             parsed = parse_name(full_name)
 
-            # Build judge record
             judges.append({
                 "source_url": url,
                 "full_name": full_name,
@@ -167,7 +154,6 @@ def extract_titles(judges: List[Dict]) -> List[Dict]:
     """Extract unique titles from judges and create title records."""
     seen_titles = {judge["title"] for judge in judges if judge.get("title")}
     sorted_titles = sorted(seen_titles)
-    # Assign IDs incrementally
     return [{"title_id": idx, "title_name": title}
             for idx, title in enumerate(sorted_titles, start=1)]
 
@@ -175,10 +161,17 @@ def extract_titles(judges: List[Dict]) -> List[Dict]:
 def add_title_ids(judges: List[Dict], titles: List[Dict]) -> None:
     """Add title_id to each judge based on the titles lookup."""
     title_map = {t["title_name"]: t["title_id"] for t in titles}
-    # Attach title_id to each judge
     for judge in judges:
         title_name = judge.get("title")
         judge["title_id"] = title_map.get(title_name) if title_name else None
+
+
+def normalise_judge(judge: Dict) -> Dict:
+    """Convert None values to empty strings for DB-safe JSON."""
+    for key in ["first_name", "middle_name", "last_name"]:
+        if judge.get(key) is None:
+            judge[key] = ''
+    return judge
 
 
 def main():
@@ -194,12 +187,9 @@ def main():
         page = browser.new_page()
         page.goto(base_url, wait_until="domcontentloaded", timeout=20000)
 
-        # Collect all sub-page links
         links = [a.get_attribute("href") for a in page.locator('a[href*="list-of-members"]').all()]
-        links = [f"https://www.judiciary.uk{l}" if \
-                 l and l.startswith("/") else l for l in links if l]
+        links = [f"https://www.judiciary.uk{l}" if l and l.startswith("/") else l for l in links if l]
 
-        # Scrape either all links or the base page
         if links:
             for link in links:
                 all_judges.extend(scrape_page(page, link))
@@ -208,18 +198,19 @@ def main():
 
         browser.close()
 
-    # Build titles lookup
     titles = extract_titles(all_judges)
     add_title_ids(all_judges, titles)
 
-    # Write results to disk
+    # Normalise None → "" for DB-safe JSON
+    normalised_judges = [normalise_judge(j) for j in all_judges]
+
     with open("titles_data.json", "w", encoding="utf-8") as f:
         json.dump(titles, f, indent=2, ensure_ascii=False)
     print(f"Extracted {len(titles)} unique titles -> titles_data.json")
 
     with open("judges_data.json", "w", encoding="utf-8") as f:
-        json.dump(all_judges, f, indent=2, ensure_ascii=False)
-    print(f"Extracted {len(all_judges)} judges -> judges_data.json")
+        json.dump(normalised_judges, f, indent=2, ensure_ascii=False)
+    print(f"Extracted {len(normalised_judges)} judges -> judges_data.json")
 
 
 if __name__ == "__main__":
