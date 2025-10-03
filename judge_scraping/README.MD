@@ -84,6 +84,18 @@ This will:
 ]
 ```
 
+### Scraping into RDS
+
+```bash
+python3 judges_rds.py
+```
+
+This will:
+1. Run the scraper as above
+2. Iterate through all scraped judges
+   1. Gets / Inserts the title from / into the RDS
+   2. Inserts the Judge into the RDS. Postgres & the schema set-up will handle any duplicates automatically.
+
 ## Running Tests
 
 Run the complete test suite:
