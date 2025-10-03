@@ -73,3 +73,21 @@ The script accepts two CLI arguments:
 - `-o`: a flag to indicate if metadata should be output as JSON.
 
 You can also call the script with `-h` to view a summary of the arguments listed above.
+
+## `get_unique_xml.py`
+
+This script - using `metadata_xml.py` and `case_fetcher.py` - will return, up to the last 20, **most recent and unique** XML hearing transcripts as string objects.
+
+### Usage
+
+This script is intended to be imported as a module by other scripts (it has no "standalone" functionality). To use this script, simply import it as:
+
+```python
+""" Your module. """
+
+from get_unique_xml import get_unique_xmls
+
+...
+```
+
+`get_unique_xmls()` will return a list of XML strings that are guaranteed to be unique against the PostgreSQL service that is defined inside your `.env` (see the README.md in the root directory for more details).
