@@ -1,0 +1,7 @@
+pytest
+pylint
+lxml
+types-lxml
+requests
+psycopg2-binary
+python-dotenv
