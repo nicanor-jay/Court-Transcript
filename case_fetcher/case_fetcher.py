@@ -1,9 +1,11 @@
 """National Archive XML Fetcher. """
+#pylint:disable=logging-fstring-interpolation
 import xml.etree.ElementTree as ET
 from pathlib import Path
 import re
 from typing import List, Tuple, Optional, Dict
 import argparse
+import logging
 import requests
 
 BASE_FEED_URL = "https://caselaw.nationalarchives.gov.uk/atom.xml"
@@ -16,8 +18,21 @@ out_dir = Path("xml_cases")
 out_dir.mkdir(exist_ok=True)
 
 
+def setup_logging() -> None:
+    """Configure logging output."""
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.info("Logging initialised.")
+
+
 def slugify(text: str) -> str:
-    """Make a safe filename from a string (max length 100 chars)."""
+    """
+    Make a safe filename from a string (max length 100 chars).
+
+    Example:
+        "Smith v. Jones [2024] UKSC 123" -> "Smith_v__Jones__2024__UKSC_123"
+        "R (on the application of Miller)" -> "R__on_the_application_of_Miller_"
+    """
     return re.sub(r'[^a-zA-Z0-9_-]+', '_', text)[:100]
 
 
@@ -56,9 +71,9 @@ def load_single_xml(entry: Tuple[str, str, Optional[str]], xml_dict: Dict[str, s
             resp.raise_for_status()
             xml_dict[slugify(title)] = resp.text
         except (requests.exceptions.RequestException, TimeoutError) as e:
-            print(f"Failed to load {title} ({href}): {e}")
+            logging.error(f"Failed to load {title} ({href}): {e}")
     else:
-        print(f"No XML for: {title} ({uri})")
+        logging.warning(f"No XML for: {title} ({uri})")
 
 
 def load_all_xml(entries: List[Tuple[str, str, Optional[str]]]) -> Dict[str, str]:
@@ -75,16 +90,17 @@ def download_from_dict(xml_dict: Dict[str, str]) -> None:
         filepath = out_dir / f"{slug}.xml"
         try:
             filepath.write_text(xml_str, encoding="utf-8")
-            print(f"Saved: {filepath}")
+            logging.info(f"Saved: {filepath}")
         except OSError as e:  # catch all file write errors
-            print(f"Failed to save {slug}: {e}")
-
+            logging.error(f"Failed to save {slug}: {e}")
 
 
 def main():
     """Main Function; handles argparse. """
+    setup_logging()
+
     parser = argparse.ArgumentParser(description="Fetch National Archives court XMLs.")
-    parser.add_argument("--per-page", type=int, \
+    parser.add_argument("--per-page", type=int,
                         default=10, help="Number of cases to fetch (default 10).")
     parser.add_argument("--download", action="store_true", help="Save XMLs to disk as files.")
     args = parser.parse_args()
@@ -93,7 +109,7 @@ def main():
     entries = get_xml_entries(feed)
 
     xml_strings = load_all_xml(entries)  # always in memory
-    print(f"Loaded {len(xml_strings)} XMLs into memory")
+    logging.info(f"Loaded {len(xml_strings)} XMLs into memory")
 
     if args.download:
         download_from_dict(xml_strings)

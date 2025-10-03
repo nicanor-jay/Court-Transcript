@@ -11,40 +11,14 @@ This module tests the core functionalities of `case_fetcher`, including:
 
 Uses pytest and responses for mocking HTTP requests.
 """
-
+#pylint:disable=too-many-arguments, too-many-positional-arguments
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest.mock import patch
+import logging
 import pytest
 import responses
 import case_fetcher
-
-
-# Sample Atom feed XML for testing
-SAMPLE_FEED = """<?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xmlns:tna="https://caselaw.nationalarchives.gov.uk">
-    <entry>
-        <title>Sample Case v Another Case [2024] UKSC 1</title>
-        <tna:uri>https://caselaw.nationalarchives.gov.uk/id/uksc/2024/1</tna:uri>
-        <link type="application/akn+xml" href="https://example.com/case1.xml"/>
-    </entry>
-    <entry>
-        <title>Test Case [2024] EWCA 100</title>
-        <tna:uri>https://caselaw.nationalarchives.gov.uk/id/ewca/2024/100</tna:uri>
-        <link type="application/akn+xml" href="https://example.com/case2.xml"/>
-    </entry>
-    <entry>
-        <title>No XML Case [2024] EWHC 50</title>
-        <tna:uri>https://caselaw.nationalarchives.gov.uk/id/ewhc/2024/50</tna:uri>
-    </entry>
-</feed>
-"""
-
-SAMPLE_XML = """<?xml version="1.0" encoding="UTF-8"?>
-<akomaNtoso>
-    <judgment>Test judgment content</judgment>
-</akomaNtoso>
-"""
 
 
 class TestSlugify:
@@ -81,12 +55,12 @@ class TestFetchFeed:
     """Tests for the `fetch_feed` function."""
 
     @responses.activate
-    def test_fetch_feed_success(self):
+    def test_fetch_feed_success(self, sample_feed):
         """Test successful retrieval of Atom feed."""
         responses.add(
             responses.GET,
             f"{case_fetcher.BASE_FEED_URL}?per_page=10",
-            body=SAMPLE_FEED,
+            body=sample_feed,
             status=200
         )
 
@@ -95,12 +69,12 @@ class TestFetchFeed:
         assert feed.tag.endswith("feed")
 
     @responses.activate
-    def test_fetch_feed_custom_per_page(self):
+    def test_fetch_feed_custom_per_page(self, sample_feed):
         """Test fetching feed with a custom `per_page` parameter."""
         responses.add(
             responses.GET,
             f"{case_fetcher.BASE_FEED_URL}?per_page=25",
-            body=SAMPLE_FEED,
+            body=sample_feed,
             status=200
         )
 
@@ -123,9 +97,9 @@ class TestFetchFeed:
 class TestGetXmlEntries:
     """Tests for the `get_xml_entries` function."""
 
-    def test_get_xml_entries_all_fields(self):
+    def test_get_xml_entries_all_fields(self, sample_feed):
         """Ensure all expected fields are extracted from feed entries."""
-        feed = ET.fromstring(SAMPLE_FEED)
+        feed = ET.fromstring(sample_feed)
         entries = case_fetcher.get_xml_entries(feed)
 
         assert len(entries) == 3
@@ -133,9 +107,9 @@ class TestGetXmlEntries:
         assert entries[0][1] == "https://caselaw.nationalarchives.gov.uk/id/uksc/2024/1"
         assert entries[0][2] == "https://example.com/case1.xml"
 
-    def test_get_xml_entries_missing_xml_link(self):
+    def test_get_xml_entries_missing_xml_link(self, sample_feed):
         """Ensure entries without XML links return `None` for href."""
-        feed = ET.fromstring(SAMPLE_FEED)
+        feed = ET.fromstring(sample_feed)
         entries = case_fetcher.get_xml_entries(feed)
 
         assert entries[2][2] is None
@@ -156,12 +130,12 @@ class TestLoadSingleXml:
     """Tests for the `load_single_xml` function."""
 
     @responses.activate
-    def test_load_single_xml_success(self):
+    def test_load_single_xml_success(self, sample_xml):
         """Ensure a single XML file is correctly loaded into a dictionary."""
         responses.add(
             responses.GET,
             "https://example.com/case1.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
 
@@ -171,10 +145,10 @@ class TestLoadSingleXml:
         case_fetcher.load_single_xml(entry, xml_dict)
 
         assert "Sample_Case" in xml_dict
-        assert xml_dict["Sample_Case"] == SAMPLE_XML
+        assert xml_dict["Sample_Case"] == sample_xml
 
     @responses.activate
-    def test_load_single_xml_http_error(self, capsys):
+    def test_load_single_xml_http_error(self, caplog):
         """Ensure HTTP errors are handled gracefully and logged."""
         responses.add(
             responses.GET,
@@ -187,19 +161,17 @@ class TestLoadSingleXml:
 
         case_fetcher.load_single_xml(entry, xml_dict)
 
-        captured = capsys.readouterr()
-        assert "Failed to load" in captured.out
+        assert "Failed to load" in caplog.text
         assert "Sample_Case" not in xml_dict
 
-    def test_load_single_xml_no_href(self, capsys):
+    def test_load_single_xml_no_href(self, caplog):
         """Ensure entries with no XML link are logged and skipped."""
         entry = ("Sample Case", "uri", None)
         xml_dict = {}
 
         case_fetcher.load_single_xml(entry, xml_dict)
 
-        captured = capsys.readouterr()
-        assert "No XML for" in captured.out
+        assert "No XML for" in caplog.text
         assert len(xml_dict) == 0
 
 
@@ -207,18 +179,18 @@ class TestLoadAllXml:
     """Tests for the `load_all_xml` function."""
 
     @responses.activate
-    def test_load_all_xml_multiple_entries(self):
+    def test_load_all_xml_multiple_entries(self, sample_xml):
         """Ensure multiple XML files are loaded correctly."""
         responses.add(
             responses.GET,
             "https://example.com/case1.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
         responses.add(
             responses.GET,
             "https://example.com/case2.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
 
@@ -234,12 +206,12 @@ class TestLoadAllXml:
         assert "Case_Two" in xml_dict
 
     @responses.activate
-    def test_load_all_xml_mixed_success_failure(self):
+    def test_load_all_xml_mixed_success_failure(self, sample_xml):
         """Ensure failed XML loads are skipped, successful ones stored."""
         responses.add(
             responses.GET,
             "https://example.com/case1.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
         responses.add(
@@ -262,32 +234,31 @@ class TestLoadAllXml:
 class TestDownloadFromDict:
     """Tests for the `download_from_dict` function."""
 
-    def test_download_from_dict_success(self, tmp_path, monkeypatch):
+    def test_download_from_dict_success(self, tmp_path, monkeypatch, sample_xml):
         """Ensure XML dictionary is correctly saved to disk."""
         monkeypatch.setattr(case_fetcher, "out_dir", tmp_path)
 
         xml_dict = {
-            "test_case": SAMPLE_XML,
-            "another_case": SAMPLE_XML
+            "test_case": sample_xml,
+            "another_case": sample_xml
         }
 
         case_fetcher.download_from_dict(xml_dict)
 
         assert (tmp_path / "test_case.xml").exists()
         assert (tmp_path / "another_case.xml").exists()
-        assert (tmp_path / "test_case.xml").read_text() == SAMPLE_XML
+        assert (tmp_path / "test_case.xml").read_text() == sample_xml
 
-    def test_download_from_dict_write_error(self, tmp_path, monkeypatch, capsys):
+    def test_download_from_dict_write_error(self, tmp_path, monkeypatch, caplog, sample_xml):
         """Ensure write errors are logged but do not crash execution."""
         monkeypatch.setattr(case_fetcher, "out_dir", tmp_path)
 
-        xml_dict = {"test_case": SAMPLE_XML}
+        xml_dict = {"test_case": sample_xml}
 
         with patch.object(Path, 'write_text', side_effect=IOError("Write error")):
             case_fetcher.download_from_dict(xml_dict)
 
-        captured = capsys.readouterr()
-        assert "Failed to save" in captured.out
+        assert "Failed to save" in caplog.text
 
     def test_download_from_dict_empty_dict(self, tmp_path, monkeypatch):
         """Ensure empty dictionary results in no files written."""
@@ -303,7 +274,7 @@ class TestMain:
     """Integration tests for the `main` function."""
 
     @responses.activate
-    def test_main_default_args(self, monkeypatch, tmp_path, capsys):
+    def test_main_default_args(self, monkeypatch, tmp_path, caplog, sample_feed, sample_xml):
         """Test main workflow with default arguments (no download)."""
         monkeypatch.setattr(case_fetcher, "out_dir", tmp_path)
         monkeypatch.setattr('sys.argv', ['case_fetcher.py'])
@@ -311,31 +282,31 @@ class TestMain:
         responses.add(
             responses.GET,
             f"{case_fetcher.BASE_FEED_URL}?per_page=10",
-            body=SAMPLE_FEED,
+            body=sample_feed,
             status=200
         )
         responses.add(
             responses.GET,
             "https://example.com/case1.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
         responses.add(
             responses.GET,
             "https://example.com/case2.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
 
-        case_fetcher.main()
+        with caplog.at_level(logging.INFO):
+            case_fetcher.main()
 
-        captured = capsys.readouterr()
-        assert "Loaded" in captured.out
-        assert "2 XMLs" in captured.out
+        assert "Loaded" in caplog.text
+        assert "2 XMLs" in caplog.text
         assert not (tmp_path / "Sample_Case_v_Another_Case__2024__UKSC_1.xml").exists()
 
     @responses.activate
-    def test_main_with_download_flag(self, monkeypatch, tmp_path):
+    def test_main_with_download_flag(self, monkeypatch, tmp_path, sample_feed, sample_xml):
         """Test main workflow with --download flag (files saved)."""
         monkeypatch.setattr(case_fetcher, "out_dir", tmp_path)
         monkeypatch.setattr('sys.argv', ['case_fetcher.py', '--download'])
@@ -343,19 +314,19 @@ class TestMain:
         responses.add(
             responses.GET,
             f"{case_fetcher.BASE_FEED_URL}?per_page=10",
-            body=SAMPLE_FEED,
+            body=sample_feed,
             status=200
         )
         responses.add(
             responses.GET,
             "https://example.com/case1.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
         responses.add(
             responses.GET,
             "https://example.com/case2.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
 
@@ -365,7 +336,7 @@ class TestMain:
         assert len(xml_files) == 2
 
     @responses.activate
-    def test_main_custom_per_page(self, monkeypatch, tmp_path):
+    def test_main_custom_per_page(self, monkeypatch, tmp_path, sample_feed, sample_xml):
         """Test main workflow with custom --per-page argument."""
         monkeypatch.setattr(case_fetcher, "out_dir", tmp_path)
         monkeypatch.setattr('sys.argv', ['case_fetcher.py', '--per-page', '25'])
@@ -373,19 +344,19 @@ class TestMain:
         responses.add(
             responses.GET,
             f"{case_fetcher.BASE_FEED_URL}?per_page=25",
-            body=SAMPLE_FEED,
+            body=sample_feed,
             status=200
         )
         responses.add(
             responses.GET,
             "https://example.com/case1.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
         responses.add(
             responses.GET,
             "https://example.com/case2.xml",
-            body=SAMPLE_XML,
+            body=sample_xml,
             status=200
         )
 
