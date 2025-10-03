@@ -106,7 +106,8 @@ def get_metadata(xml_string: str) -> dict:
         "citation": get_case_citation(meta),
         "verdict_date": get_case_judgement_date(meta),
         "court": get_court_name(meta),
-        "url": get_case_url(meta)
+        "url": get_case_url(meta),
+        "judges": get_judges(meta)
     }
 
     return metadata
