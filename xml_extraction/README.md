@@ -56,7 +56,7 @@ Specifically, the data returned is:
 
 > **NOTE**:
 >
-> If a _field of metadata_ is not found, then it will be |**returned as `None`**.
+> If a _field of metadata_ is not found, then it will be **returned as `None`**.
 >
 > If the XML file is _missing a `<meta>` element entirely_, the script **will raise a `KeyError`**.
 
