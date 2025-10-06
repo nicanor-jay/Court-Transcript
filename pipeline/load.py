@@ -126,7 +126,7 @@ def insert_into_hearing(conn: connection, hearing: dict, metadata: dict) -> None
     """ Inserts a new row in the hearing table. """
     judge_ids = check_judge_exists(conn, metadata.get('judges'))
     if judge_ids:
-        judgement_id = get_judgement_id(conn, hearing.get(('ruling')))
+        judgement_id = get_judgement_id(conn, hearing.get('ruling'))
         court_id = get_court_id(conn, metadata.get('court'))
         if court_id is None:
             court_id = insert_into_court(conn, metadata.get('court'))
