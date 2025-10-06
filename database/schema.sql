@@ -37,7 +37,7 @@ CREATE TABLE hearing (
     judgement_id BIGINT REFERENCES judgement (judgement_id),
     court_id BIGINT REFERENCES court (court_id),
     hearing_citation VARCHAR(50) NOT NULL,
-    hearing_title VARCHAR(50),
+    hearing_title VARCHAR(200),
     hearing_date TIMESTAMP,
     hearing_description VARCHAR(1000),
     hearing_anomaly VARCHAR(1000),
