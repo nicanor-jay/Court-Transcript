@@ -3,9 +3,10 @@
 from os import environ as ENV
 
 import psycopg2
+from psycopg2.extensions import connection
+from psycopg2.errors import Error
 from dotenv import load_dotenv
 from lxml import etree
-from psycopg2.extensions import connection
 
 from metadata_xml import get_metadata
 import path_bootstrap_util
@@ -13,13 +14,17 @@ import path_bootstrap_util
 
 def get_db_connection() -> connection:
     """Return a connection to a PostgreSQL database."""
-    return psycopg2.connect(
-        dbname=ENV["DB_NAME"],
-        host=ENV["DB_HOST"],
-        port=ENV["DB_PORT"],
-        user=ENV["DB_USERNAME"],
-        password=ENV["DB_PASSWORD"]
-    )
+    load_dotenv()
+    try:
+        return psycopg2.connect(
+            dbname=ENV["DB_NAME"],
+            host=ENV["DB_HOST"],
+            port=ENV["DB_PORT"],
+            user=ENV["DB_USERNAME"],
+            password=ENV["DB_PASSWORD"]
+        )
+    except Error as e:
+        raise ConnectionError(f"connection to {ENV["DB_NAME"]} failed") from e
 
 
 def get_xml_strings(per_page: int = 20) -> list[str]:
