@@ -1,8 +1,5 @@
 """This script loads data into the hearing table as well as the judge_hearing table."""
 
-# pylint: disable=wrong-import-order
-
-from judge_scraping.judge_scraping import parse_name
 from os import environ as ENV
 from psycopg2 import connect
 from psycopg2.extensions import connection
@@ -10,11 +7,7 @@ from psycopg2.extras import RealDictCursor
 from psycopg2 import Error
 
 
-# This will be changed when we set up the __init__.py files
-import sys
-import os
-project_root = os.path.dirname(os.path.dirname(__file__))
-sys.path.insert(0, project_root)
+from judge_scraping.judge_scraping import parse_name
 
 
 def get_db_connection() -> connection:
