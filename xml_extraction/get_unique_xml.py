@@ -6,7 +6,6 @@ import psycopg2
 from psycopg2.extensions import connection
 from psycopg2.errors import Error
 from dotenv import load_dotenv
-from lxml import etree
 
 from case_fetcher import case_fetcher
 from xml_extraction import metadata_xml
@@ -29,7 +28,7 @@ def get_db_connection() -> connection:
 
 def get_xml_strings(per_page: int = 20) -> list[str]:
     """Returns the last `per_page` transcript XMLs as strings."""
-    feed = case_fetcher.fetch_feed(20)
+    feed = case_fetcher.fetch_feed(per_page)
     entries = case_fetcher.get_xml_entries(feed)
     xml_strings = list(case_fetcher.load_all_xml(entries).values())
     return xml_strings
@@ -57,6 +56,9 @@ def get_unique_xmls(conn: connection) -> list[str]:
 
 if __name__ == "__main__":
     load_dotenv()
-    db_conn = get_db_connection()
-    unique_xmls = get_unique_xmls(db_conn)
-    db_conn.close()
+    try:
+        db_conn = get_db_connection()
+        unique_xmls = get_unique_xmls(db_conn)
+    finally:
+        # ensure that connection is always closed
+        db_conn.close()
