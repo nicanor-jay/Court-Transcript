@@ -1,5 +1,6 @@
 """This script loads data into the hearing table as well as the judge_hearing table."""
 
+import logging
 from os import environ as ENV
 from psycopg2 import connect
 from psycopg2.extensions import connection
@@ -8,6 +9,9 @@ from psycopg2 import Error
 
 
 from judge_scraping.judge_scraper import parse_name
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def get_db_connection() -> connection:
@@ -21,7 +25,7 @@ def get_db_connection() -> connection:
         )
         return db_connection
     except Error as e:
-        # print(f"Error connecting to database: {e}")
+        print(f"Error connecting to database: {e}")
         return None
 
 
@@ -32,10 +36,10 @@ def get_title_id(conn: connection, title_name: str) -> int:
         query = """
         SELECT title_id
         FROM title
-        WHERE title_name = %s;
+        WHERE LOWER(title_name) = LOWER(%s);
         """
 
-        cur.execute(query, title_name)
+        cur.execute(query, (title_name,))
         return cur.fetchone()
 
 
@@ -43,20 +47,23 @@ def check_judge_exists(conn: connection, judges: list) -> list[int]:
     """ Returns the judge_id if the judge exists in the judge table. """
 
     judge_ids = []
-    for judge in judges:
-        judge = parse_name(judge)
-        title_id = get_title_id(conn, judge['title'])
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            query = """
-            SELECT id
-            FROM judge
-            WHERE title_id = %s
-            AND last_name = %s;
-            """
-            cur.execute(query, (title_id, judge.get('last_name')))
-            judge_ids.append(cur.fetchone()[0])
+    if judges:
+        for judge in judges:
+            judge = parse_name(judge)
+            title_id = get_title_id(conn, judge['title'])
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                query = """
+                SELECT judge_id
+                FROM judge
+                WHERE title_id = %s
+                AND LOWER(last_name) = LOWER(%s);
+                """
+                cur.execute(query, (title_id, judge.get('last_name')))
+                data = cur.fetchone()
+                if data:
+                    judge_ids.append(cur.fetchone()[0])
 
-    return [id for id in judge_ids if id is not None]
+    return judge_ids
 
 
 def get_judgement_id(conn: connection, ruling: str) -> int:
@@ -66,10 +73,10 @@ def get_judgement_id(conn: connection, ruling: str) -> int:
         query = """
         SELECT judgement_id
         FROM judgement
-        WHERE judgement_favour = %s;
+        WHERE LOWER(judgement_favour) = LOWER(%s);
         """
 
-        cur.execute(query, ruling)
+        cur.execute(query, (ruling,))
         result = cur.fetchone()
     return result
 
@@ -81,10 +88,10 @@ def get_court_id(conn: connection, court_name: str) -> int:
         query = """
         SELECT court_id
         FROM court
-        WHERE court_name = %s;
+        WHERE LOWER(court_name) = LOWER(%s);
         """
 
-        cur.execute(query, court_name)
+        cur.execute(query, (court_name,))
         return cur.fetchone()
 
 
@@ -95,9 +102,9 @@ def insert_into_court(conn: connection, court: str) -> int:
         query = """
         INSERT INTO court (court_name)
         VALUES (%s)
-        RETURNING id;
+        RETURNING court_id;
         """  # may need to change id to court_id (find out after testing)
-        cur.execute(query, court)
+        cur.execute(query, (court,))
         conn.commit()
 
     return cur.fetchone()
@@ -112,7 +119,7 @@ def insert_into_judge_hearing(conn: connection, judge_ids: list, hearing_id: int
             INSERT INTO judge_hearing (judge_id, hearing_id)
             VALUES (%s, %s);
             """
-            cur.execute(query, (judge_id, hearing_id,))
+            cur.execute(query, (judge_id, hearing_id))
             conn.commit()
 
 
@@ -136,7 +143,7 @@ def insert_into_hearing(conn: connection, hearing: dict, metadata: dict) -> None
             INSERT INTO hearing
             (judgement_id, court_id, case_number, hearing_title, hearing_date, hearing_description, hearing_url, hearing_anomaly)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id;
+            RETURNING hearing_id;
             """
             cur.execute(query, (judgement_id, court_id, citation,
                         hearing_title, hearing_date, description, hearing_url, anomaly))

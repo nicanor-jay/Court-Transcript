@@ -34,7 +34,7 @@ def get_judges_from_rds(conn: connection):
 def run_scraper():
     """Run the judge scraping script."""
     logging.info("Running scraper")
-    subprocess.run(["python3", "judge_scraping.py"], check=True)
+    subprocess.run(["python3", "judge_scraping/judge_scraper.py"], check=True)
     logging.info("Completed scraping. ")
 
 
