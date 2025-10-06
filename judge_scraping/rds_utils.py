@@ -24,7 +24,7 @@ def get_db_connection():
         logging.info("Connected to RDS.")
         return con
     except Error as e:
-        print(f"Error connecting to database: {e}")
+        # print(f"Error connecting to database: {e}")
         logging.critical("Error connecting to RDS")
         return None
 

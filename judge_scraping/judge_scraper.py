@@ -1,4 +1,4 @@
-#pylint: disable=use-dict-literal, too-many-branches
+# pylint: disable=use-dict-literal, too-many-branches
 """
 UK Judiciary Web Scraper - Judges Only
 Scrapes judiciary.uk and extracts *only* real judges.
@@ -26,7 +26,8 @@ TITLES = [
 POST_NOMINALS = ["KC", "QC", "CBE", "OBE", "MBE", "JP"]
 
 # Prefixes that indicate multiword surnames
-SURNAME_PREFIXES = ["van", "van der", "van den", "de", "de la", "du", "von", "von der"]
+SURNAME_PREFIXES = ["van", "van der", "van den",
+                    "de", "de la", "du", "von", "von der"]
 
 
 def parse_date(text: str) -> Optional[str]:
@@ -64,7 +65,8 @@ def parse_date(text: str) -> Optional[str]:
 
 def parse_name(full: str) -> Dict[str, Optional[str]]:
     """Split judge full name into components."""
-    result = dict(title=None, first_name=None, middle_name=None, last_name=None)
+    result = dict(title=None, first_name=None,
+                  middle_name=None, last_name=None)
     if not full:
         return result
 
@@ -135,7 +137,8 @@ def scrape_page(page, url: str) -> List[Dict]:
             if not looks_like_judge(full_name):
                 continue
 
-            date_val = next((parse_date(c) for c in cells[1:] if parse_date(c)), None)
+            date_val = next((parse_date(c)
+                            for c in cells[1:] if parse_date(c)), None)
             parsed = parse_name(full_name)
 
             judges.append({
@@ -187,8 +190,10 @@ def main():
         page = browser.new_page()
         page.goto(base_url, wait_until="domcontentloaded", timeout=20000)
 
-        links = [a.get_attribute("href") for a in page.locator('a[href*="list-of-members"]').all()]
-        links = [f"https://www.judiciary.uk{l}" if l and l.startswith("/") else l for l in links if l]
+        links = [a.get_attribute("href") for a in page.locator(
+            'a[href*="list-of-members"]').all()]
+        links = [
+            f"https://www.judiciary.uk{l}" if l and l.startswith("/") else l for l in links if l]
 
         if links:
             for link in links:
@@ -206,11 +211,11 @@ def main():
 
     with open("titles_data.json", "w", encoding="utf-8") as f:
         json.dump(titles, f, indent=2, ensure_ascii=False)
-    print(f"Extracted {len(titles)} unique titles -> titles_data.json")
+    # print(f"Extracted {len(titles)} unique titles -> titles_data.json")
 
     with open("judges_data.json", "w", encoding="utf-8") as f:
         json.dump(normalised_judges, f, indent=2, ensure_ascii=False)
-    print(f"Extracted {len(normalised_judges)} judges -> judges_data.json")
+    # print(f"Extracted {len(normalised_judges)} judges -> judges_data.json")
 
 
 if __name__ == "__main__":

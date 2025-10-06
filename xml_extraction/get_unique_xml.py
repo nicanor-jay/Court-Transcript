@@ -26,7 +26,7 @@ def get_db_connection() -> connection:
         raise ConnectionError(f"connection to {ENV["DB_NAME"]} failed") from e
 
 
-def get_xml_strings(per_page: int = 20) -> list[str]:
+def get_xml_strings(per_page: int = 3) -> list[str]:
     """Returns the last `per_page` transcript XMLs as strings."""
     feed = case_fetcher.fetch_feed(per_page)
     entries = case_fetcher.get_xml_entries(feed)

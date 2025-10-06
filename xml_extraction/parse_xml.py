@@ -64,7 +64,7 @@ def find_headings_subparagraph_rule(root: "etree._ElementTree") -> list["etree._
     return list(filter(lambda e: e.find(NAMESPACE + "num") is None, matched_elements))
 
 
-def get_headings(root: "etree._ElementTree") -> list["etree._Element"]:
+def get_headings(root: "etree._ElementTree") -> list["etree._Element"] | None:
     """
     This function - through several methods - will attempt to extract
     headings from `filename` and return them as a list of their parent
@@ -88,9 +88,12 @@ def get_headings(root: "etree._ElementTree") -> list["etree._Element"]:
     # first grab the parent of the judgement text
     decision_element = list(root.iter(NAMESPACE + "decision"))[0]
     # then its children elements
-    all_tags = list(decision_element)
+    all_tags = list(decision_element.iter())
     # sort heading elements according to their occurrence in all_tags
-    headings.sort(key=all_tags.index)
+    try:
+        headings.sort(key=all_tags.index)
+    except ValueError:
+        return None
 
     return headings
 
@@ -146,19 +149,20 @@ def get_text_between_elements(
     return text
 
 
-def get_label_text_dict(filename: str) -> dict[str, str] | None:
+def get_label_text_dict(xml_str: str) -> dict[str, str] | None:
     """
     Returns a dictionary containing {label: key} pairs
-    corresponding to a heading in `filename` and the
-    raw text in that section. `filename` must be an XML file.
+    corresponding to a heading in `xml_str` and the
+    raw text in that section. `xml_str` must be an XML str.
     """
-    root = etree.parse(filename)
 
-    if not filename.endswith(".xml"):
-        raise ValueError("filename must be an .xml file")
+    if not isinstance(xml_str, str):
+        raise ValueError("filename must be a str")
+
+    root = etree.fromstring(xml_str.encode())
     headings = get_headings(root)
 
-    if len(headings) == 0:
+    if not headings:
         return None
 
     text_pairings = {}

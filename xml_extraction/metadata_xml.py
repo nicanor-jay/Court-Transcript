@@ -145,6 +145,6 @@ if __name__ == "__main__":
     date = datetime.strftime(data["verdict_date"], "%Y-%m-%d")
     data["verdict_date"] = date
 
-    print(json.dumps(data, indent=4))
+    # print(json.dumps(data, indent=4))
     if args.output:
         output_metadata(args.output, data)
