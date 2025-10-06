@@ -77,7 +77,7 @@ def get_judgement_id(conn: connection, ruling: str) -> int:
 
         cur.execute(query, ruling)
         result = cur.fetchone()
-    return result if result else "Not found"
+    return result
 
 
 def get_court_id(conn: connection, court_name: str) -> int:
