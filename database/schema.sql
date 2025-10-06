@@ -10,17 +10,25 @@ DROP TABLE IF EXISTS title CASCADE;
 
 CREATE TABLE title (
     title_id BIGSERIAL PRIMARY KEY,
-    title_name VARCHAR(60) NOT NULL
+    title_name VARCHAR(60) UNIQUE NOT NULL
 );
 
 CREATE TABLE judge (
     judge_id BIGSERIAL PRIMARY KEY,
     title_id BIGINT REFERENCES title (title_id),
-    first_name VARCHAR(30) NOT NULL,
+    first_name VARCHAR(30),
     middle_name VARCHAR(30),
     last_name VARCHAR(30) NOT NULL,
-    appointment_date TIMESTAMP
+    appointment_date TIMESTAMP,
+    CONSTRAINT unique_judge UNIQUE (
+        title_id, first_name, middle_name, last_name, appointment_date
+    )
 );
+
+CREATE UNIQUE INDEX judge_unique_idx
+ON
+judge (title_id, first_name, middle_name, last_name, appointment_date)
+NULLS NOT DISTINCT;
 
 CREATE TABLE judgement (
     judgement_id BIGSERIAL PRIMARY KEY,
@@ -36,10 +44,11 @@ CREATE TABLE hearing (
     hearing_id BIGSERIAL PRIMARY KEY,
     judgement_id BIGINT REFERENCES judgement (judgement_id),
     court_id BIGINT REFERENCES court (court_id),
-    case_number VARCHAR(20) NOT NULL,
-    hearing_title VARCHAR(50),
+    hearing_citation VARCHAR(50) NOT NULL,
+    hearing_title VARCHAR(200),
     hearing_date TIMESTAMP,
     hearing_description VARCHAR(1000),
+    hearing_anomaly VARCHAR(1000),
     hearing_url VARCHAR(100)
 );
 

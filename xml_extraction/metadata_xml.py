@@ -13,7 +13,7 @@ NS_MAPPING = {
 }
 
 
-def get_case_url(meta: "etree._Element") -> str:
+def get_case_url(meta: "etree._Element") -> str | None:
     """Returns case hearing URL from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRthis"
     url_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -25,7 +25,7 @@ def get_case_url(meta: "etree._Element") -> str:
     return url_element.get("value")
 
 
-def get_case_judgement_date(meta: "etree._Element") -> datetime:
+def get_case_judgement_date(meta: "etree._Element") -> datetime | None:
     """Returns the date when judgement was handed down from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRdate"
     date_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -37,7 +37,7 @@ def get_case_judgement_date(meta: "etree._Element") -> datetime:
     return datetime.strptime(date_str, "%Y-%m-%d")
 
 
-def get_case_citation(meta: "etree._Element") -> str:
+def get_case_citation(meta: "etree._Element") -> str | None:
     """Returns the neutral citation, which can be used as a unique identifier."""
     xpath = "//nuk:cite"
     cite_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -48,7 +48,7 @@ def get_case_citation(meta: "etree._Element") -> str:
     return cite_element.text
 
 
-def get_case_name(meta: "etree._Element") -> str:
+def get_case_name(meta: "etree._Element") -> str | None:
     """Returns the title given to the case hearing."""
     xpath = "//n:FRBRWork//n:FRBRname"
     name_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -59,18 +59,30 @@ def get_case_name(meta: "etree._Element") -> str:
     return name_element.get("value")
 
 
-def get_court_name(meta: "etree._Element") -> str:
+def get_court_name(meta: "etree._Element") -> str | None:
     """Returns the name of the institution/court where the hearing took place."""
     xpath = "//n:TLCOrganization"
     org_element = meta.xpath(xpath, namespaces=NS_MAPPING)
     # tna (The National Archives) is also listed as an org, so we need to filter it
-    org_element = list(filter(lambda e: e.get("eId") != "tna", org_element))[0]
+    org_element = list(filter(lambda e: e.get("eId") != "tna", org_element))
+    if org_element:
+        org_element = org_element[0]
+    else:
+        return None
     return org_element.get("showAs")
 
 
-def get_metadata(filename: str) -> dict:
+def get_judges(root: etree._Element) -> list[str] | None:
+    """Returns a list of the judges who sat the hearing."""
+    people = root.xpath("//n:TLCPerson", namespaces=NS_MAPPING)
+    judges = [person.get("showAs")
+              for person in people if person.get("href") != ""]
+    return judges if judges else None
+
+
+def get_metadata(xml_string: str) -> dict:
     """
-    Extracts metadata from `filename` and returns it as a dictionary.
+    Extracts metadata from `xml_str` and returns it as a dictionary.
     Structure of the returned dictionary:
 
     `title` (`str`): The title of the hearing.
@@ -78,22 +90,24 @@ def get_metadata(filename: str) -> dict:
     `verdict_date` (`datetime`): The date when judgement was handed down.
     `court` (`str`): The name of the court where the hearing took place.
     `url` (`str`): A URL to the hearing transcript page.
+    `judges` (`list[str]`): List of judges who sat the hearing.
     """
-    if not filename.endswith(".xml"):
-        raise ValueError("filename must be a .xml file")
+    if not isinstance(xml_string, str):
+        raise TypeError("xml_string must be a str type")
 
-    root = etree.parse(filename)
+    root = etree.fromstring(xml_string.encode("utf-8"))
     try:
         meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     except IndexError as e:
-        raise KeyError(f"{filename} has no meta element") from e
+        raise KeyError("xml_string has no meta element") from e
 
     metadata = {
         "title": get_case_name(meta),
         "citation": get_case_citation(meta),
         "verdict_date": get_case_judgement_date(meta),
         "court": get_court_name(meta),
-        "url": get_case_url(meta)
+        "url": get_case_url(meta),
+        "judges": get_judges(meta)
     }
 
     return metadata
@@ -104,12 +118,8 @@ def output_metadata(filename: str, metadata: dict) -> None:
     if not filename.endswith(".json"):
         raise ValueError("filename must be a .json file")
 
-    # datetime can't be serialized, so convert into string
-    date_str = datetime.strftime(metadata["verdict_date"], "%Y-%m-%d")
-    metadata["verdict_date"] = date_str
-
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=4)
+    with open(filename, "w", encoding="utf-8") as json_file:
+        json.dump(metadata, json_file, indent=4)
 
 
 def set_up_args() -> argparse.Namespace:
@@ -120,18 +130,21 @@ def set_up_args() -> argparse.Namespace:
         type=str, required=True,
         help="XML file to process")
     parser.add_argument(
-        "-o", "--output", action="store_true",
+        "-o", "--output",
         help="If given, will output a JSON file of the same name")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = set_up_args()
-    data = get_metadata(args.file)
+    with open(args.file, encoding="utf-8") as f:
+        xml_raw_string = f.read()
+    data = get_metadata(xml_raw_string)
+
+    # datetime can't be serialized, so convert into string
+    date = datetime.strftime(data["verdict_date"], "%Y-%m-%d")
+    data["verdict_date"] = date
+
+    print(json.dumps(data, indent=4))
     if args.output:
-        # change filename extension
-        output_file = args.file.replace(".xml", ".json")
-        # get base of path
-        base_start = output_file.rfind('/')+1
-        output_file = output_file[base_start:] if base_start >= 0 else output_file
-        output_metadata(output_file, data)
+        output_metadata(args.output, data)

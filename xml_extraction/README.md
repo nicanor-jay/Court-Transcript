@@ -44,7 +44,7 @@ from metadata_xml import get_metadata
 ...
 ```
 
-`get_metadata()` takes a filepath to an `.xml` file, and returns a dictionary containing metadata about that file.
+`get_metadata()` takes a raw XML file string, and returns a dictionary containing metadata about that file.
 
 Specifically, the data returned is:
 - `title` (`str`): The title of the hearing.
@@ -52,6 +52,7 @@ Specifically, the data returned is:
 - `verdict_date` (`datetime`): The date when judgement was handed down.
 - `court` (`str`): The name of the court where the hearing took place.
 - `url` (`str`): A URL to the hearing transcript page.
+- `judges` (`list[str]`): A list containing the names of judges who sat the hearing.
 
 > **NOTE**:
 >
@@ -70,7 +71,7 @@ $ python metadata_xml.py -f <filename.xml>
 The script accepts two CLI arguments:
 
 - `-f`: path to XML file to extract from; mandatory.
-- `-o`: a flag to indicate if metadata should be output as JSON.
+- `-o`: output data to JSON file.
 
 You can also call the script with `-h` to view a summary of the arguments listed above.
 

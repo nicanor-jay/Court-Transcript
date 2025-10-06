@@ -34,8 +34,7 @@ def test_create_query_messages_invalid_prompt_type_2():
 def test_create_batch_request_valid_request():
     """Check whether the function correctly creates a valid batch request"""
     query_messages = [{"role": "user", "content": "Hello"}]
-    with patch("summary.get_last_request_id", return_value=3): # return value for custom id will be amended once I have unique hearing identifier
-        result = create_batch_request(query_messages, "testfile")
+    result = create_batch_request(query_messages, "fake_citation")
     assert "custom_id" in result
     assert result["body"]["messages"] == query_messages
     assert result["body"]["model"] == "gpt-4.1-nano"
