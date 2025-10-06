@@ -13,11 +13,13 @@ from metadata_xml import (
     get_case_judgement_date,
     get_court_name,
     get_case_url,
+    get_judges,
     get_metadata
 )
 
 
 def test_get_case_name_correct_type(xml_metadata):
+    """Check case name is a string."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     name = get_case_name(meta)
@@ -25,6 +27,7 @@ def test_get_case_name_correct_type(xml_metadata):
 
 
 def test_get_case_name_correct_name(xml_metadata):
+    """Check case name is correct."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     name = get_case_name(meta)
@@ -33,6 +36,7 @@ def test_get_case_name_correct_name(xml_metadata):
 
 
 def test_get_case_citation_correct_type(xml_metadata):
+    """Check citation is a string."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     citation = get_case_citation(meta)
@@ -40,6 +44,7 @@ def test_get_case_citation_correct_type(xml_metadata):
 
 
 def test_get_case_citation_correct_citation(xml_metadata):
+    """Check citation is correct."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     citation = get_case_citation(meta)
@@ -48,6 +53,7 @@ def test_get_case_citation_correct_citation(xml_metadata):
 
 
 def test_get_case_judgement_date_correct_type(xml_metadata):
+    """Check judgement date is datetime."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     date = get_case_judgement_date(meta)
@@ -55,6 +61,7 @@ def test_get_case_judgement_date_correct_type(xml_metadata):
 
 
 def test_get_case_judgement_date_correct_citation(xml_metadata):
+    """Check judgement date is correct."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     date = get_case_judgement_date(meta)
@@ -63,6 +70,7 @@ def test_get_case_judgement_date_correct_citation(xml_metadata):
 
 
 def test_get_court_name_correct_type(xml_metadata):
+    """Test court name is string."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     court_name = get_court_name(meta)
@@ -70,6 +78,7 @@ def test_get_court_name_correct_type(xml_metadata):
 
 
 def test_get_court_name_correct_name(xml_metadata):
+    """Test court name is correct."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     court_name = get_court_name(meta)
@@ -78,13 +87,15 @@ def test_get_court_name_correct_name(xml_metadata):
 
 
 def test_get_case_url_correct_type(xml_metadata):
+    """Test url is string."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     url = get_case_url(meta)
     assert isinstance(url, str)
 
 
-def test_get_case_url_correct_name(xml_metadata):
+def test_get_case_url_is_correct(xml_metadata):
+    """Test url is correct."""
     root = etree.fromstring(xml_metadata)
     meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
     url = get_case_url(meta)
@@ -92,20 +103,47 @@ def test_get_case_url_correct_name(xml_metadata):
     assert url == real_url
 
 
-def test_get_metadata_rejects_bad_filename():
-    with pytest.raises(ValueError) as exc_info:
-        get_metadata("bad_file.csv")
-        assert "filename must be a .xml file" in exc_info.value
+def test_get_judges_correct_type(xml_metadata):
+    """Test judges is a list."""
+    root = etree.fromstring(xml_metadata)
+    meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
+    judges = get_judges(meta)
+    assert isinstance(judges, list)
+
+
+def test_get_judges_correct_elements_type(xml_metadata):
+    """Test judges elements are all strings."""
+    root = etree.fromstring(xml_metadata)
+    meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
+    judges = get_judges(meta)
+    assert all(isinstance(judge, str) for judge in judges)
+
+
+def test_get_judges_correct_name(xml_metadata):
+    """Test names in judges is correct."""
+    root = etree.fromstring(xml_metadata)
+    meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
+    judges = get_judges(meta)
+    real_judges = ['Lord Briggs', 'Lord Sales',
+                   'Lord Hamblen', 'Lord Burrows', 'Lord Richards']
+    assert judges == real_judges
+
+
+def test_get_metadata_rejects_bad_xml_string_type():
+    """Test get metadata rejects bad xml_string."""
+    with pytest.raises(TypeError) as exc_info:
+        get_metadata(101)
+        assert "xml_string must be a str type" in exc_info.value
 
 
 def test_get_metadata_returns_dict(xml_metadata):
-    etree.parse = Mock(return_value=etree.fromstring(xml_metadata))
-    metadata = get_metadata("dummy.xml")
+    """Test get metadata returns a dictionary."""
+    metadata = get_metadata(xml_metadata.decode("utf-8"))
     assert isinstance(metadata, dict)
 
 
 def test_get_metadata_dict_has_correct_keys(xml_metadata):
-    etree.parse = Mock(return_value=etree.fromstring(xml_metadata))
-    metadata = get_metadata("dummy.xml")
-    assert list(metadata.keys()) == ['title', 'citation',
-                                     'verdict_date', 'court', 'url']
+    """Test get metadata dictionary has correct keys."""
+    metadata = get_metadata(xml_metadata.decode("utf-8"))
+    assert list(metadata.keys()) == ['title', 'citation', 'verdict_date',
+                                     'court', 'url', 'judges']
