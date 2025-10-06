@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from lxml import etree
 from psycopg2.extensions import connection
 
-from metadata_xml import get_case_citation, NS_MAPPING
+from metadata_xml import get_metadata
 import path_bootstrap_util
 
 
@@ -32,9 +32,7 @@ def get_xml_strings(per_page: int = 20) -> list[str]:
 
 def is_xml_unique(xml_string: str, conn: connection) -> bool:
     """Identifies `xml_string` by its citation, and checks if it's already in DB."""
-    root = etree.parse(xml_string)
-    meta = root.xpath("//n:meta", namespaces=NS_MAPPING)[0]
-    citation = get_case_citation(meta)
+    citation = get_metadata(xml_string)["citation"]
 
     query = """
     SELECT * FROM hearing
