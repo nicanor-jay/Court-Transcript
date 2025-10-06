@@ -1,4 +1,0 @@
-lxml
-types-lxml
-pytest
-pylint
