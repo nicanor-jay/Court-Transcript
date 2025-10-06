@@ -2,6 +2,7 @@
 
 # pylint: disable=wrong-import-order
 
+from judge_scraping.judge_scraping import parse_name
 from os import environ as ENV
 from psycopg2 import connect
 from psycopg2.extensions import connection
@@ -14,7 +15,7 @@ import sys
 import os
 project_root = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, project_root)
-from judge_scraping.judge_scraping import parse_name
+
 
 def get_db_connection() -> connection:
     """ Returns a connection to our database. """
@@ -51,7 +52,7 @@ def check_judge_exists(conn: connection, judges: list) -> list[int]:
     judge_ids = []
     for judge in judges:
         judge = parse_name(judge)
-        title_id = get_title_id(judge['title'])
+        title_id = get_title_id(conn, judge['title'])
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             query = """
             SELECT id
