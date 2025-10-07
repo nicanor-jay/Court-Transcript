@@ -238,7 +238,7 @@ def insert_into_hearing(conn: connection, hearing: dict, metadata: dict) -> None
         RETURNING hearing_id;
         """
         cur.execute(query, (judgement_id, court_id, citation,
-                    hearing_title, hearing_date, description, hearing_url, anomaly))
+                    hearing_title, hearing_date, description[:1000], hearing_url, anomaly[:1000]))
         hearing_id = cur.fetchone()['hearing_id']
         logging.info("Inserting hearing: %s...", citation)
         conn.commit()
