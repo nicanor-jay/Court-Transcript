@@ -86,7 +86,3 @@ def handler(event=None, context=None) -> None:
 
 if __name__ == "__main__":
     handler()
-    # conn = get_unique_xml.get_db_connection()
-    # print(load.insert_judges(conn, ["His Honour Butcher"]))
-    # print(load.check_judge_exists(conn, ["His Honour Butcher"]))
-    # conn.close()
