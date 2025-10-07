@@ -149,42 +149,51 @@ def get_text_between_elements(
     return text
 
 
-def get_label_text_dict(xml_str: str) -> dict[str, str] | None:
+def get_label_text_dict(xml_string: str) -> dict[str, str] | None:
     """
     Returns a dictionary containing {label: key} pairs
-    corresponding to a heading in `xml_str` and the
-    raw text in that section. `xml_str` must be an XML str.
+    corresponding to a heading in `xml_string` and the
+    raw text in that section. `xml_string` must be an XML str.
     """
 
-    if not isinstance(xml_str, str):
-        raise ValueError("filename must be a str")
+    if not isinstance(xml_string, str):
+        raise TypeError("xml_string must be a str")
 
-    root = etree.fromstring(xml_str.encode())
+    root = etree.fromstring(xml_string.encode())
     headings = get_headings(root)
 
     if not headings:
         return None
 
+    # this regex will find any excessive whitespace
+    # which will be used to clean up the raw text
+    whitespace_pattern = re.compile(r"(?:[\n\t]+ *)+")
+
     text_pairings = {}
     # Get text up to first heading
     # labeled as 'DOC_START'
     raw_text = get_text_between_elements(root, end_element=headings[0])
+    raw_text = whitespace_pattern.sub(' ', raw_text).strip()
     if raw_text != "":
         text_pairings["DOC_START"] = raw_text
 
     for i, heading in enumerate(headings):
-        if i >= len(headings)-1:
-            # skip the last element as there is
-            # no next heading to read up to
-            continue
         header_text = "".join(heading.itertext()).strip()
+        # sometimes run-off text tends to get lumped in with headings
+        # we can remove this by cutting the text to the first newline
+        newline_idx = header_text.find('\n')
+        header_text = header_text[:newline_idx] if newline_idx > 0 else header_text
+        if i >= len(headings)-1:
+            # raw text of last element is a special case
+            # should have end_element as None
+            raw_text = get_text_between_elements(
+                root, start_element=headings[-1])
+            raw_text = whitespace_pattern.sub(' ', raw_text).strip()
+            if raw_text != "":
+                text_pairings[header_text] = raw_text
+            continue
         raw_text = get_text_between_elements(root, headings[0], headings[1])
+        raw_text = whitespace_pattern.sub(' ', raw_text).strip()
         text_pairings[header_text] = raw_text
-
-    # Get from last heading til end
-    # labeled as 'DOC_END'
-    raw_text = get_text_between_elements(root, start_element=headings[-1])
-    if raw_text != "":
-        text_pairings["DOC_END"] = raw_text
 
     return text_pairings
