@@ -79,7 +79,7 @@ def get_judges(root: etree._Element) -> list[str] | None:
     people = root.xpath("//n:TLCPerson", namespaces=NS_MAPPING)
     judges = [person.get("showAs")
               for person in people if person.get("href") != ""]
-    judges = [pattern.sub('', judge).strip() for judge in judges]
+    judges = [pattern.sub('', judge).strip().title() for judge in judges]
     return judges if judges else None
 
 
