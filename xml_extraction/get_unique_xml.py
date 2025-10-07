@@ -23,7 +23,7 @@ def get_db_connection() -> connection:
             password=ENV["DB_PASSWORD"]
         )
     except Error as e:
-        raise ConnectionError(f"connection to {ENV["DB_NAME"]} failed") from e
+        raise ConnectionError(f"Connection to {ENV['DB_NAME']} failed") from e
 
 
 def get_xml_strings(per_page: int = 20) -> list[str]:

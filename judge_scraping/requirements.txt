@@ -2,7 +2,6 @@ playwright
 
 # Database
 psycopg2-binary
-pandas
 python-dotenv
 
 # Scraping

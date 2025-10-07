@@ -4,6 +4,7 @@ import argparse
 import json
 import re
 from datetime import datetime
+from typing import Optional
 
 from lxml import etree
 
@@ -14,7 +15,7 @@ NS_MAPPING = {
 }
 
 
-def get_case_url(meta: "etree._Element") -> str | None:
+def get_case_url(meta: "etree._Element") -> Optional[str]:
     """Returns case hearing URL from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRthis"
     url_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -26,7 +27,7 @@ def get_case_url(meta: "etree._Element") -> str | None:
     return url_element.get("value")
 
 
-def get_case_judgement_date(meta: "etree._Element") -> datetime | None:
+def get_case_judgement_date(meta: "etree._Element") -> Optional[datetime]:
     """Returns the date when judgement was handed down from metadata."""
     xpath = "//n:FRBRExpression//n:FRBRdate"
     date_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -38,7 +39,7 @@ def get_case_judgement_date(meta: "etree._Element") -> datetime | None:
     return datetime.strptime(date_str, "%Y-%m-%d")
 
 
-def get_case_citation(meta: "etree._Element") -> str | None:
+def get_case_citation(meta: "etree._Element") -> Optional[str]:
     """Returns the neutral citation, which can be used as a unique identifier."""
     xpath = "//nuk:cite"
     cite_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -49,7 +50,7 @@ def get_case_citation(meta: "etree._Element") -> str | None:
     return cite_element.text
 
 
-def get_case_name(meta: "etree._Element") -> str | None:
+def get_case_name(meta: "etree._Element") -> Optional[str]:
     """Returns the title given to the case hearing."""
     xpath = "//n:FRBRWork//n:FRBRname"
     name_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -60,7 +61,7 @@ def get_case_name(meta: "etree._Element") -> str | None:
     return name_element.get("value")
 
 
-def get_court_name(meta: "etree._Element") -> str | None:
+def get_court_name(meta: "etree._Element") -> Optional[str]:
     """Returns the name of the institution/court where the hearing took place."""
     xpath = "//n:TLCOrganization"
     org_element = meta.xpath(xpath, namespaces=NS_MAPPING)
@@ -73,7 +74,7 @@ def get_court_name(meta: "etree._Element") -> str | None:
     return org_element.get("showAs")
 
 
-def get_judges(root: etree._Element) -> list[str] | None:
+def get_judges(root: etree._Element) -> Optional[list[str]]:
     """Returns a list of the judges who sat the hearing."""
     pattern = re.compile(r"\(.*\)")
     people = root.xpath("//n:TLCPerson", namespaces=NS_MAPPING)

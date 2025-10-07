@@ -1,6 +1,7 @@
 """Module which roughly extracts heading sections out of hearing transcripts."""
 
 import re
+from typing import Optional
 
 from lxml import etree
 
@@ -64,7 +65,7 @@ def find_headings_subparagraph_rule(root: "etree._ElementTree") -> list["etree._
     return list(filter(lambda e: e.find(NAMESPACE + "num") is None, matched_elements))
 
 
-def get_headings(root: "etree._ElementTree") -> list["etree._Element"] | None:
+def get_headings(root: "etree._ElementTree") -> Optional[list["etree._Element"]]:
     """
     This function - through several methods - will attempt to extract
     headings from `filename` and return them as a list of their parent
@@ -149,7 +150,7 @@ def get_text_between_elements(
     return text
 
 
-def get_label_text_dict(xml_str: str) -> dict[str, str] | None:
+def get_label_text_dict(xml_str: str) -> Optional[dict[str, str]]:
     """
     Returns a dictionary containing {label: key} pairs
     corresponding to a heading in `xml_str` and the
@@ -157,7 +158,7 @@ def get_label_text_dict(xml_str: str) -> dict[str, str] | None:
     """
 
     if not isinstance(xml_str, str):
-        raise ValueError("filename must be a str")
+        raise ValueError("Filename must be a str")
 
     root = etree.fromstring(xml_str.encode())
     headings = get_headings(root)

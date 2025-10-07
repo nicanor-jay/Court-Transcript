@@ -6,7 +6,6 @@ from psycopg2.extensions import connection
 from psycopg2 import connect, Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-import pandas as pd
 
 
 def get_db_connection():
