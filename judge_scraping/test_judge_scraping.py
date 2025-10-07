@@ -5,7 +5,7 @@ Run with: pytest test_judge_scraping.py -v
 """
 
 import pytest
-from judge_scraping import (
+from judge_scraper import (
     parse_date,
     parse_name,
     looks_like_judge,

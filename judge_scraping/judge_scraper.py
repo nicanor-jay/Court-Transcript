@@ -1,4 +1,4 @@
-#pylint: disable=use-dict-literal, too-many-branches
+#pylint: disable=use-dict-literal, too-many-branches, too-many-return-statements
 """
 UK Judiciary Web Scraper - Judges Only
 Scrapes judiciary.uk and extracts *only* real judges.
@@ -12,18 +12,23 @@ from playwright.sync_api import sync_playwright
 
 # Judicial titles (longest first to avoid partial matches)
 TITLES = [
+    "The Right Honourable Lord Justice",
+    "The Right Honourable Lady Justice",
     "The Honourable Mr Justice",
+    "The Honourable Mrs Justice",
+    "The Honourable Judge",
     "District Judge (MC)", "District Judge",
+    "Lord Chief Justice",
     "Lord Justice", "Lady Justice",
     "His Honour Judge", "Her Honour Judge",
-    "Mr Justice",
+    "Mr Justice", "Mrs Justice",
     "Tribunal Judge",
     "His Honour", "Her Honour",
     "Lord", "Lady", "Sir", "Dame",
     "The",
     "Mr", "Mrs", "Miss", "Ms",
     "Dr", "Professor",
-    "Judge", "HHJ", "DHJ",
+    "Judge", "HHJ", "DHJ", "DJ",
 ]
 
 # Postnominal titles to strip from the end
@@ -72,18 +77,23 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
     if not full:
         return result
 
-    # Case-insensitive title matching
+    # Case-insensitive title matching - try longest matches first
     full_lower = full.lower()
     matched_title = None
-    
+    remaining_text = full
+
     for title in TITLES:
         title_lower = title.lower()
-        if full_lower.startswith(title_lower + " "):
+        # Check if starts with this title followed by space or end of string
+        if full_lower.startswith(title_lower + " ") or full_lower == title_lower:
             matched_title = title  # Keep original casing for storage
-            full = full[len(title):].strip()
+            remaining_text = full[len(title):].strip()
             break
 
     result["title"] = matched_title
+
+    # Work with the remaining text after title
+    full = remaining_text
 
     # Case-insensitive post-nominal removal
     for post_nom in POST_NOMINALS:
@@ -132,7 +142,7 @@ def looks_like_judge(text: str) -> bool:
     if not text:
         return False
     text_lower = text.lower()
-    
+
     # Exclude obvious non-judge entries
     exclusions = [
         "the black country", "the midlands", "the north", "the south",
@@ -141,11 +151,11 @@ def looks_like_judge(text: str) -> bool:
     ]
     if any(text_lower.startswith(excl) for excl in exclusions):
         return False
-    
+
     # Must start with a known judicial title
     if not any(text_lower.startswith(t.lower() + " ") for t in TITLES):
         return False
-    
+
     # Additional validation: should contain at least one more word after title
     # and shouldn't be all location-like words
     for title in TITLES:
@@ -160,13 +170,13 @@ def looks_like_judge(text: str) -> bool:
             words = remainder.split()
             if len(words) >= 1:
                 # Exclude common location words
-                location_words = {"country", "region", "area", "circuit", "division", 
-                                "midlands", "north", "south", "east", "west", "city", 
+                location_words = {"country", "region", "area", "circuit", "division",
+                                "midlands", "north", "south", "east", "west", "city",
                                 "county", "district", "wales", "scotland", "england", "ireland"}
                 if all(w.lower() in location_words for w in words):
                     return False
             return True
-    
+
     return False
 
 
@@ -238,7 +248,8 @@ def main():
         page.goto(base_url, wait_until="domcontentloaded", timeout=20000)
 
         links = [a.get_attribute("href") for a in page.locator('a[href*="list-of-members"]').all()]
-        links = [f"https://www.judiciary.uk{l}" if l and l.startswith("/") else l for l in links if l]
+        links = [f"https://www.judiciary.uk{l}" if \
+                 l and l.startswith("/") else l for l in links if l]
 
         if links:
             for link in links:

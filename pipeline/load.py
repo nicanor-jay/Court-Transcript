@@ -7,7 +7,7 @@ from psycopg2.extras import RealDictCursor
 from psycopg2 import Error
 
 
-from judge_scraping.judge_scraping import parse_name
+from judge_scraping.judge_scraper import parse_name
 
 
 def get_db_connection() -> connection:
