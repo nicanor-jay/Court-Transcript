@@ -36,7 +36,7 @@ def insert_scraped_judges() -> None:
 
 
 def extract_and_parse_xml(xmls: list[str]) -> list[str]:
-    """Function to extract xml and parse it to a list of xml strings with all the metadata"""
+    """Function to extract xml and parse it to a list of xml strings with all the metadata."""
     logging.info("Extracting metadata from XMLs")
     metadatas = []
     for xml in xmls:
