@@ -178,6 +178,10 @@ def get_label_text_dict(xml_string: str) -> dict[str, str] | None:
             # no next heading to read up to
             continue
         header_text = "".join(heading.itertext()).strip()
+        # sometimes run-off text tends to get lumped in with headings
+        # we can remove this by cutting the text to the first newline
+        newline_idx = header_text.find('\n')
+        header_text = header_text[:newline_idx] if newline_idx > 0 else header_text
         raw_text = get_text_between_elements(root, headings[0], headings[1])
         text_pairings[header_text] = raw_text
 
