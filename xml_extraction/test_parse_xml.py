@@ -95,25 +95,22 @@ def test_get_text_between_elements_correct_text(xml_natural_file):
 
 
 def test_get_label_text_dict_correct_length(xml_natural_file):
-    etree.parse = Mock(return_value=etree.fromstring(xml_natural_file))
-    label_dict = get_label_text_dict("dummy.xml")
+    label_dict = get_label_text_dict(xml_natural_file.decode())
     assert len(label_dict) == 2
 
 
 def test_get_label_text_dict_correct_keys(xml_natural_file):
-    etree.parse = Mock(return_value=etree.fromstring(xml_natural_file))
-    label_dict = get_label_text_dict("dummy.xml")
+    label_dict = get_label_text_dict(xml_natural_file.decode())
     assert any("The facts" in k for k in label_dict.keys())
     assert any("DOC_END" in k for k in label_dict.keys())
 
 
-def test_get_label_text_dict_rejects_bad_filename():
-    with pytest.raises(ValueError) as exc_info:
-        get_label_text_dict("bad_file.csv")
-        assert "filename must be an .xml file" in exc_info.value
+# def test_get_label_text_dict_rejects_bad_filename():
+#     with pytest.raises(ValueError) as exc_info:
+#         get_label_text_dict("bad_file.csv")
+#         assert "filename must be an .xml file" in exc_info.value
 
 
 def test_get_label_text_dict_no_headings_is_none(xml_no_headings):
-    etree.parse = Mock(return_value=etree.fromstring(xml_no_headings))
-    label_dict = get_label_text_dict("dummy.xml")
+    label_dict = get_label_text_dict(xml_no_headings.decode())
     assert label_dict is None

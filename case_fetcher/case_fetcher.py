@@ -1,5 +1,5 @@
 """National Archive XML Fetcher. """
-#pylint:disable=logging-fstring-interpolation
+# pylint:disable=logging-fstring-interpolation
 import xml.etree.ElementTree as ET
 from pathlib import Path
 import re
@@ -36,7 +36,7 @@ def slugify(text: str) -> str:
     return re.sub(r'[^a-zA-Z0-9_-]+', '_', text)[:100]
 
 
-def fetch_feed(per_page: int = 10) -> ET.Element:
+def fetch_feed(per_page: int = 20) -> ET.Element:
     """Fetch the Atom feed with the specified batch size."""
     url = f"{BASE_FEED_URL}?per_page={per_page}"
     r = requests.get(url, timeout=1000)
@@ -53,7 +53,8 @@ def get_xml_entries(feed: ET.Element) -> List[Tuple[str, str, Optional[str]]]:
     for entry in feed.findall("atom:entry", NAMESPACES):
         title = entry.find("atom:title", NAMESPACES).text
         uri = entry.find("tna:uri", NAMESPACES).text
-        xml_link = entry.find('atom:link[@type="application/akn+xml"]', NAMESPACES)
+        xml_link = entry.find(
+            'atom:link[@type="application/akn+xml"]', NAMESPACES)
         href = xml_link.attrib["href"] if xml_link is not None else None
         entries.append((title, uri, href))
     return entries
@@ -99,10 +100,12 @@ def main():
     """Main Function; handles argparse. """
     setup_logging()
 
-    parser = argparse.ArgumentParser(description="Fetch National Archives court XMLs.")
+    parser = argparse.ArgumentParser(
+        description="Fetch National Archives court XMLs.")
     parser.add_argument("--per-page", type=int,
                         default=10, help="Number of cases to fetch (default 10).")
-    parser.add_argument("--download", action="store_true", help="Save XMLs to disk as files.")
+    parser.add_argument("--download", action="store_true",
+                        help="Save XMLs to disk as files.")
     args = parser.parse_args()
 
     feed = fetch_feed(per_page=args.per_page)
