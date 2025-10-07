@@ -157,7 +157,7 @@ def get_label_text_dict(xml_string: str) -> dict[str, str] | None:
     """
 
     if not isinstance(xml_string, str):
-        raise ValueError("filename must be a str")
+        raise TypeError("xml_string must be a str")
 
     root = etree.fromstring(xml_string.encode())
     headings = get_headings(root)
