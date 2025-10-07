@@ -1,10 +1,10 @@
 -- Seed judgement table
 
 INSERT INTO judgement
-(judgement_favour)
+    (judgement_favour)
 VALUES
-('Defendant'),
-('Plaintiff');
+    ('Defendant'),
+    ('Plaintiff');
 
 -- Seed placeholder judge
 
