@@ -30,7 +30,7 @@ def reset_jsonl_file(filename: str) -> None:
 
 
 def insert_scraped_judges() -> None:
-    """Scrapes judges and inserts them in the DB."""
+    """Scrapes judges from the judiciary website, and inserts them in the DB."""
     logging.info("Scraping judges into RDS")
     judges_rds.scrape_and_upload_judges()
 
