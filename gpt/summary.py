@@ -26,12 +26,14 @@ def get_summarise_prompt() -> str:
     """Return the system prompt for the 'summarise' function requests."""
     return """ You are a UK legal data extraction assistant.
     You will be given a python-style dictionary where headings will be mapped to their corresponding content for a single transcript.
-    Redact all personal information about the parties involved.
     Your task is to carefully extract and return the following fields:
     Summary: [a concise description of what the hearing was about, MAXIMUM MAXIMUM 1000 characters]
     Ruling: [which party the court ruled in favour of. ONLY ONLY ONLY give a one word answer out of the options: Plaintiff, Defendant]
     It is your job to analyse the hearing, and decide whether the verdict was in the favour or Plaintiff or Defendant.
     Anomalies: [whether anything irregular happened in the context of a normal court hearing. If no anomalies found, reply with 'None Found']
+    Redact all personal names (e.g. parties or witnesses) to initials only. Example: "John Smith" -> "J.S."
+    Ensure the same person has the same abbreviation throughout the response.
+    Do not include any identifying initials beyond the initials.
     Return your output strictly in this JSON format:
     {
     "summary": "...",
