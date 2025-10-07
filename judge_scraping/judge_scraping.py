@@ -12,11 +12,15 @@ from playwright.sync_api import sync_playwright
 
 # Judicial titles (longest first to avoid partial matches)
 TITLES = [
+    "The Honourable Mr Justice",
     "District Judge (MC)", "District Judge",
     "Lord Justice", "Lady Justice",
     "His Honour Judge", "Her Honour Judge",
+    "Mr Justice",
+    "Tribunal Judge",
     "His Honour", "Her Honour",
     "Lord", "Lady", "Sir", "Dame",
+    "The",
     "Mr", "Mrs", "Miss", "Ms",
     "Dr", "Professor",
     "Judge", "HHJ", "DHJ",
@@ -68,15 +72,24 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
     if not full:
         return result
 
+    # Case-insensitive title matching
+    full_lower = full.lower()
+    matched_title = None
+    
     for title in TITLES:
-        if full.startswith(title + " "):
-            result["title"] = title
+        title_lower = title.lower()
+        if full_lower.startswith(title_lower + " "):
+            matched_title = title  # Keep original casing for storage
             full = full[len(title):].strip()
             break
 
+    result["title"] = matched_title
+
+    # Case-insensitive post-nominal removal
     for post_nom in POST_NOMINALS:
-        if full.endswith(" " + post_nom):
-            full = full[: -len(post_nom)].strip()
+        post_nom_lower = post_nom.lower()
+        if full.lower().endswith(" " + post_nom_lower):
+            full = full[: -len(post_nom) - 1].strip()
 
     parts = full.split()
     if not parts:
@@ -85,11 +98,13 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
         result["last_name"] = parts[0]
         return result
 
+    # Case-insensitive surname prefix matching
     surname_start_idx = None
     for prefix in sorted(SURNAME_PREFIXES, key=len, reverse=True):
         prefix_parts = prefix.split()
         for i in range(len(parts) - len(prefix_parts)):
-            if " ".join(parts[i:i+len(prefix_parts)]).lower() == prefix:
+            candidate = " ".join(parts[i:i+len(prefix_parts)]).lower()
+            if candidate == prefix.lower():
                 surname_start_idx = i
                 break
         if surname_start_idx is not None:
@@ -116,8 +131,43 @@ def looks_like_judge(text: str) -> bool:
     """Return True if text looks like a judge name (starts with known title)."""
     if not text:
         return False
-    lowered = text.lower()
-    return any(lowered.startswith(t.lower() + " ") for t in TITLES)
+    text_lower = text.lower()
+    
+    # Exclude obvious non-judge entries
+    exclusions = [
+        "the black country", "the midlands", "the north", "the south",
+        "the east", "the west", "the city", "the county", "the district",
+        "the region", "the area", "the circuit", "the division"
+    ]
+    if any(text_lower.startswith(excl) for excl in exclusions):
+        return False
+    
+    # Must start with a known judicial title
+    if not any(text_lower.startswith(t.lower() + " ") for t in TITLES):
+        return False
+    
+    # Additional validation: should contain at least one more word after title
+    # and shouldn't be all location-like words
+    for title in TITLES:
+        title_lower = title.lower()
+        if text_lower.startswith(title_lower + " "):
+            remainder = text[len(title):].strip()
+            # Must have at least one word after the title
+            if not remainder or len(remainder.split()) == 0:
+                return False
+            # Check if remainder looks like a person's name (not all capitals for locations)
+            # and contains at least 2 words for proper names
+            words = remainder.split()
+            if len(words) >= 1:
+                # Exclude common location words
+                location_words = {"country", "region", "area", "circuit", "division", 
+                                "midlands", "north", "south", "east", "west", "city", 
+                                "county", "district", "wales", "scotland", "england", "ireland"}
+                if all(w.lower() in location_words for w in words):
+                    return False
+            return True
+    
+    return False
 
 
 def scrape_page(page, url: str) -> List[Dict]:
