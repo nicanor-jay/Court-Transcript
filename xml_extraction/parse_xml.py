@@ -150,7 +150,7 @@ def get_text_between_elements(
     return text
 
 
-def get_label_text_dict(xml_str: str) -> Optional[dict[str, str]]:
+def get_label_text_dict(xml_string: str) -> Optional[dict[str, str]]:
     """
     Returns a dictionary containing {label: key} pairs
     corresponding to a heading in `xml_string` and the
