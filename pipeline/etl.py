@@ -58,12 +58,12 @@ def parse_transcripts(unique_xmls: list[str]) -> list[dict]:
     return transcripts
 
 
-def extract_meaningful_headers_and_content(transcripts: list[dict]) -> list[dict]:
+def extract_meaningful_headers_and_content(transcripts: list[dict], filename: str) -> list[dict]:
     """Grabs only the meaningful headers and their content from each hearing
        inside the transcripts."""
     logging.info("Extracting meaningful headers.")
     meaningful_headers = summary.extract_meaningful_headers(
-        transcripts, 'input.jsonl')
+        transcripts, f'{filename}.jsonl')
 
     for i, items in enumerate(meaningful_headers.items()):
         citation, headers = items
@@ -80,10 +80,11 @@ def extract_meaningful_headers_and_content(transcripts: list[dict]) -> list[dict
 
 def gpt_summarise_transcripts(conn: connection,
                               transcripts: list[dict],
-                              metadatas: list[str]) -> None:
+                              metadatas: list[str],
+                              filename: str) -> None:
     """Feeds GPT-API headers and content, and it summarises it. Data is then pushed to the DB."""
     logging.info("Getting summaries from GPT-API")
-    summaries = summary.summarise(transcripts, "output.jsonl")
+    summaries = summary.summarise(transcripts, f"{filename}.jsonl")
 
     for metadata in metadatas:
         logging.info(metadata)
@@ -96,14 +97,16 @@ def gpt_summarise_transcripts(conn: connection,
 
 def handler(event=None, context=None) -> None:
     """Handler for AWS Lambda"""
+    MEANINGFUL_HEADERS_INPUT = 'headers_input'
+    SUMMARY_INPUT = 'summary_input'
 
     # Getting DB connection
     logging.info("Starting Courts ETL Pipeline")
     conn = get_unique_xml.get_db_connection()
 
     # Resetting jsonl files
-    reset_jsonl_file('input')
-    reset_jsonl_file('output')
+    reset_jsonl_file(MEANINGFUL_HEADERS_INPUT)
+    reset_jsonl_file(SUMMARY_INPUT)
 
     # Scraping + updating judges
     insert_scraped_judges()
@@ -113,10 +116,11 @@ def handler(event=None, context=None) -> None:
     unique_xmls = get_unique_xml.get_unique_xmls(conn)
     metadatas = extract_and_parse_xml(unique_xmls)
     transcripts = parse_transcripts(unique_xmls)
-    transcripts = extract_meaningful_headers_and_content(transcripts)
+    transcripts = extract_meaningful_headers_and_content(
+        transcripts, MEANINGFUL_HEADERS_INPUT)
 
     # Summarising with GPT-API
-    gpt_summarise_transcripts(conn, transcripts, metadatas)
+    gpt_summarise_transcripts(conn, transcripts, metadatas, SUMMARY_INPUT)
 
     conn.close()
 
