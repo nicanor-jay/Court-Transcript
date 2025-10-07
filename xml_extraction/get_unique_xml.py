@@ -48,8 +48,8 @@ def is_xml_unique(xml_string: str, conn: connection) -> bool:
     return result is None
 
 
-def get_unique_xmls(conn: connection, number: int) -> list[str]:
-    """Fetches the last `number` XML transcripts, and returns only the uniques"""
+def get_unique_xmls(conn: connection, number: int = 20) -> list[str]:
+    """Fetches the last `number` (default 20) XML transcripts, and returns only the uniques"""
     xml_strings = get_xml_strings(per_page=number)
     return [string for string in xml_strings if is_xml_unique(string, conn)]
 
