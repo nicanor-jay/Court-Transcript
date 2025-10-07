@@ -199,7 +199,6 @@ def insert_into_hearing(conn: connection, hearing: dict, metadata: dict) -> None
         logging.info('No Judges in %s - defaulting to unknown.',
                      metadata.get("citation"))
         metadata['judges'] = ["Unknown"]
-        return
 
     if not get_judgement_id(conn, hearing.get('ruling')):
         logging.info('Skipping. No conclusive judgement found.')
