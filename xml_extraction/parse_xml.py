@@ -149,17 +149,17 @@ def get_text_between_elements(
     return text
 
 
-def get_label_text_dict(xml_str: str) -> dict[str, str] | None:
+def get_label_text_dict(xml_string: str) -> dict[str, str] | None:
     """
     Returns a dictionary containing {label: key} pairs
-    corresponding to a heading in `xml_str` and the
-    raw text in that section. `xml_str` must be an XML str.
+    corresponding to a heading in `xml_string` and the
+    raw text in that section. `xml_string` must be an XML str.
     """
 
-    if not isinstance(xml_str, str):
+    if not isinstance(xml_string, str):
         raise ValueError("filename must be a str")
 
-    root = etree.fromstring(xml_str.encode())
+    root = etree.fromstring(xml_string.encode())
     headings = get_headings(root)
 
     if not headings:
