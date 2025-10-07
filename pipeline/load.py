@@ -212,7 +212,6 @@ def insert_into_hearing(conn: connection, hearing: dict, metadata: dict) -> None
 
     logging.info("Ruling: %s", hearing.get('ruling'))
 
-    # if judge_ids:
     judgement_id = get_judgement_id(conn, hearing.get('ruling'))
     court_id = get_court_id(conn, metadata.get('court'))
     if court_id is None:
