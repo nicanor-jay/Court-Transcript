@@ -16,6 +16,10 @@ RUN find . -type f -name "requirements.txt" | sed -e 's/^/-r /' | xargs pip inst
 
 # Install playwright chromium
 RUN playwright install chromium
+
+# This is needed due to playwright's dependencies
+# It installs a bunch of shared library files that
+# are missing from the image OS (Rocky Linux)
 RUN dnf install -y alsa-lib \
 at-spi2-atk \
 at-spi2-core \
