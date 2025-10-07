@@ -1,5 +1,6 @@
 """Script to run the daily judges & court hearing pipeline."""
 
+# pylint: disable=unused-argument, import-error
 
 # Judge extraction script
 # Get unique xmls
@@ -14,6 +15,7 @@ import csv
 import io
 from judge_scraping import judges_rds
 from xml_extraction import get_unique_xml, parse_xml, metadata_xml
+from psycopg2.extensions import connection
 from gpt import summary
 from pipeline import load
 
@@ -21,30 +23,30 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def handler(event=None, context=None) -> None:
-    """Handler for AWS Lambda"""
-    logging.info("Starting Courts ETL Pipeline")
-    conn = get_unique_xml.get_db_connection()
+def reset_jsonl_file(filename: str) -> None:
+    """Deletes the target files if they already exist."""
+    if os.path.exists(f"{filename}.jsonl"):
+        os.remove(f"{filename}.jsonl")
 
-    # if courts.jsonl exists, delete it
-    if os.path.exists("courts.jsonl"):
-        os.remove("courts.jsonl")
 
-    # if output.jsonl exists, delete it
-    if os.path.exists("output.jsonl"):
-        os.remove("output.jsonl")
-
+def insert_scraped_judges() -> None:
+    """Scrapes judges from the judiciary website, and inserts them in the DB."""
     logging.info("Scraping judges into RDS")
     judges_rds.scrape_and_upload_judges()
 
-    logging.info("Getting unique XMLs")
-    unique_xmls = get_unique_xml.get_unique_xmls(conn)
 
+def extract_and_parse_xml(xmls: list[str]) -> list[str]:
+    """Function to extract xml and parse it to a list of xml strings with all the metadata."""
     logging.info("Extracting metadata from XMLs")
     metadatas = []
-    for xml in unique_xmls:
+    for xml in xmls:
         metadatas.append(metadata_xml.get_metadata(xml))
 
+    return metadatas
+
+
+def parse_transcripts(unique_xmls: list[str]) -> list[dict]:
+    """Parses the unique xmls into a list of dictionaries, each representing a hearing."""
     logging.info("Parsing transcripts")
     transcripts = []
     for xml in unique_xmls:
@@ -53,10 +55,15 @@ def handler(event=None, context=None) -> None:
             continue
         citation = metadata_xml.get_metadata(xml)["citation"]
         transcripts.append({citation: headings_dict})
+    return transcripts
 
+
+def extract_meaningful_headers_and_content(transcripts: list[dict], filename: str) -> list[dict]:
+    """Grabs only the meaningful headers and their content from each hearing
+       inside the transcripts."""
     logging.info("Extracting meaningful headers.")
     meaningful_headers = summary.extract_meaningful_headers(
-        transcripts, 'courts.jsonl')
+        transcripts, f'{filename}.jsonl')
 
     for i, items in enumerate(meaningful_headers.items()):
         citation, headers = items
@@ -68,9 +75,16 @@ def handler(event=None, context=None) -> None:
                              in orig_headings.items() if k in headers_list}
 
         transcripts[i] = {citation: filtered_headings}
+    return transcripts
 
+
+def gpt_summarise_transcripts(conn: connection,
+                              transcripts: list[dict],
+                              metadatas: list[str],
+                              filename: str) -> None:
+    """Feeds GPT-API headers and content, and it summarises it. Data is then pushed to the DB."""
     logging.info("Getting summaries from GPT-API")
-    summaries = summary.summarise(transcripts, "output.jsonl")
+    summaries = summary.summarise(transcripts, f"{filename}.jsonl")
 
     for metadata in metadatas:
         logging.info(metadata)
@@ -79,6 +93,34 @@ def handler(event=None, context=None) -> None:
         logging.info(hearing)
         if hearing:
             load.insert_into_hearing(conn, hearing, metadata)
+
+
+def handler(event=None, context=None) -> None:
+    """Handler for AWS Lambda"""
+    MEANINGFUL_HEADERS_INPUT = 'headers_input'
+    SUMMARY_INPUT = 'summary_input'
+
+    # Getting DB connection
+    logging.info("Starting Courts ETL Pipeline")
+    conn = get_unique_xml.get_db_connection()
+
+    # Resetting jsonl files
+    reset_jsonl_file(MEANINGFUL_HEADERS_INPUT)
+    reset_jsonl_file(SUMMARY_INPUT)
+
+    # Scraping + updating judges
+    insert_scraped_judges()
+
+    # Extracting and dealing with XMLs
+    logging.info("Getting unique XMLs")
+    unique_xmls = get_unique_xml.get_unique_xmls(conn)
+    metadatas = extract_and_parse_xml(unique_xmls)
+    transcripts = parse_transcripts(unique_xmls)
+    transcripts = extract_meaningful_headers_and_content(
+        transcripts, MEANINGFUL_HEADERS_INPUT)
+
+    # Summarising with GPT-API
+    gpt_summarise_transcripts(conn, transcripts, metadatas, SUMMARY_INPUT)
 
     conn.close()
 
