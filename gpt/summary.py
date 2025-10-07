@@ -3,7 +3,10 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import json
 import time
+import logging
 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 load_dotenv()
 openai = OpenAI()
@@ -112,9 +115,53 @@ def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
     raise TimeoutError(f"Batch {batch_id} did not complete within {timeout}s")
 
 
+def get_batch_token_usage(batch_id: str):
+    """Retrieve and print token usage per request and total usage for a completed batch."""
+
+    # Get batch object
+    batch = openai.batches.retrieve(batch_id)
+    output_file_id = batch.output_file_id
+
+    if not output_file_id:
+        print(
+            f"No output file yet for batch {batch_id}. Current status: {batch.status}")
+        return None
+
+    # Download output file
+    output_file = openai.files.content(output_file_id)
+    total_batch_tokens = 0
+    token_summary = []
+
+    for line in output_file.text.strip().split("\n"):
+        record = json.loads(line)
+        custom_id = record.get("custom_id")
+        usage = record.get("responses", {}).get("body", {}).get("usage", {})
+
+        input_tokens = usage.get("input_tokens", 0)
+        output_tokens = usage.get("output_tokens", 0)
+        total_request_tokens = usage.get("total_tokens", 0)
+        total_batch_tokens += total_request_tokens
+
+        token_summary.append({
+            "custom_id": custom_id,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_request_tokens": total_request_tokens
+        })
+
+    return token_summary, total_batch_tokens
+
+
 def get_batch_meaningful_headers(batch_id: str) -> dict:
     """Return a dictionary mapping the unique case citation to a list of meaningful headers for a transcript."""
     batch = wait_for_batch(batch_id)
+
+    # show token usage for requests in the batch
+    token_summary, total_batch_tokens = get_batch_token_usage(batch_id)
+    logging.info(f"token usage per request:")
+    for item in token_summary:
+        logging.info(f"{item['custom_id']} Request Token Usage: {item}")
+    logging.info(f"Total batch tokens used: {total_batch_tokens}")
 
     response = openai.files.content(batch.output_file_id)
     headers_dict = {}
@@ -137,6 +184,14 @@ def get_batch_summaries(batch_id: str) -> dict:
     if not batch.output_file_id:
         raise ValueError(
             "Batch not finished processing yet or no output file detected.")
+    
+    # show token usage for requests in the batch
+    token_summary, total_batch_tokens = get_batch_token_usage(batch_id)
+    logging.info(f"token usage per request:")
+    for item in token_summary:
+        logging.info(f"{item['custom_id']} Request Token Usage: {item}")
+    logging.info(f"Total batch tokens used: {total_batch_tokens}")
+
     response = openai.files.content(batch.output_file_id)
     summary_dict = {}
     for line in response.text.splitlines():
