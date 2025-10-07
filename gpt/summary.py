@@ -26,7 +26,6 @@ def get_summarise_prompt() -> str:
     """Return the system prompt for the 'summarise' function requests."""
     return """ You are a UK legal data extraction assistant.
     You will be given a python-style dictionary where headings will be mapped to their corresponding content for a single transcript.
-    Redact all personal information about the parties involved.
     Your task is to carefully extract and return the following fields:
     Summary: [a concise description of what the hearing was about, MAXIMUM MAXIMUM 1000 characters]
     Ruling: [which party the court ruled in favour of. ONLY ONLY ONLY give a one word answer out of the options: Plaintiff, Defendant]
@@ -93,7 +92,6 @@ def run_batch_requests(batch_input_file):
     return batch
 
 
-# timeout parameter default value will be amended once tested on larger batch sizes.
 def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
     """Poll batch until processing has finished."""
     waited = 0
@@ -115,7 +113,7 @@ def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
 
 
 def get_batch_meaningful_headers(batch_id: str) -> dict:
-    """Return a dictionary mapping the unique case citation to a list of meaningful headers retrieved from the GPT-API request."""
+    """Return a dictionary mapping the unique case citation to a list of meaningful headers for a transcript."""
     batch = wait_for_batch(batch_id)
 
     response = openai.files.content(batch.output_file_id)
@@ -133,7 +131,7 @@ def get_batch_meaningful_headers(batch_id: str) -> dict:
 
 
 def get_batch_summaries(batch_id: str) -> dict:
-    """Return the transcript summary responses from the GPT-API request."""
+    """Return the summary responses from the GPT-API request for a transcript."""
     batch = wait_for_batch(batch_id)
 
     if not batch.output_file_id:
@@ -166,8 +164,8 @@ def get_batch_summaries(batch_id: str) -> dict:
 
 def extract_meaningful_headers(transcripts: list[dict], filename: str) -> dict:
     """Return necessary headers needed to summarise each court transcript.
-    transcripts: list of dictionaries where each dictionary represents the headings mapped to
-    their text for a single transcript
+    transcripts: list of dictionaries where each dictionary represents a court citation mapped to
+    a dictionary of headers and their text in the transcript.
 
     """
 
@@ -187,10 +185,10 @@ def extract_meaningful_headers(transcripts: list[dict], filename: str) -> dict:
     return get_batch_meaningful_headers(batch.id)
 
 
-def summarise(transcripts: list[dict], filename: str):
+def summarise(transcripts: list[dict], filename: str) -> dict:
     """Return summarised data for each court transcript.
-    transcript_text: a list of dictionaries where each dictionary represents the meaningful headings mapped to
-    their text for a single transcript
+    transcripts: list of dictionaries where each dictionary represents a court citation mapped to
+    a dictionary of meaningful headers and their text in the transcript.
     """
 
     # Setup .jsonl file with individual requests
