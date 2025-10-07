@@ -196,7 +196,9 @@ def insert_into_hearing(conn: connection, hearing: dict, metadata: dict) -> None
     """ Inserts a new row in the hearing table. """
     if not metadata.get('judges'):
         # Skip if judges is None
-        logging.info('Skipping %s - No Judges', metadata.get("citation"))
+        logging.info('No Judges in %s - defaulting to unknown.',
+                     metadata.get("citation"))
+        metadata['judges'] = ["Unknown"]
         return
 
     if not get_judgement_id(conn, hearing.get('ruling')):
