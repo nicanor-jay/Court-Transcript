@@ -57,11 +57,3 @@ CREATE TABLE judge_hearing (
     judge_id BIGINT REFERENCES judge (judge_id),
     hearing_id BIGINT REFERENCES hearing (hearing_id)
 );
-
--- Seed judgement table
-
-INSERT INTO judgement
-(judgement_favour)
-VALUES
-('Defendant'),
-('Plaintiff');
