@@ -14,10 +14,9 @@ def get_extract_headings_prompt() -> str:
     return """You are a UK legal data extraction assistant.
     You will be given a python-style list of headers from a court transcript.
     Return a list of headers from the input, where the content of the headers will help deduce the following:
-    Summary: [a concise description of what the hearing was about, maximum 1000 characters]
-    Ruling: [which party the court ruled in favour of. ONLY ONLY ONLY give a one word answer out of the options: Plaintiff, Defendant, Undisclosed]
-    Only give Undisclosed if the court hearing explicitly state so. Otherwise, it is your job to analyse the hearing, and decide whether the verdict was
-    in the favour or Plaintiff or Defendant.
+    Summary: [a concise description of what the hearing was about, MAXIMUM MAXIMUM 1000 characters]
+    Ruling: [which party the court ruled in favour of. ONLY ONLY ONLY give a one word answer out of the options: Plaintiff, Defendant]
+    It is your job to analyse the hearing, and decide whether the verdict was in the favour or Plaintiff or Defendant.
     Anomalies: [whether anything irregular happened in the context of a normal court hearing. If no anomalies found, reply with 'None Found']
     Give the list in the following format: "'heading1','heading2','heading3'"
     """
@@ -29,10 +28,9 @@ def get_summarise_prompt() -> str:
     You will be given a python-style dictionary where headings will be mapped to their corresponding content for a single transcript.
     Redact all personal information about the parties involved.
     Your task is to carefully extract and return the following fields:
-    Summary: [a concise description of what the hearing was about, maximum 1000 characters]
-    Ruling: [which party the court ruled in favour of. ONLY ONLY ONLY give a one word answer out of the options: Plaintiff, Defendant, Undisclosed]
-    Only give Undisclosed if the court hearing explicitly state so. Otherwise, it is your job to analyse the hearing, and decide whether the verdict was
-    in the favour or Plaintiff or Defendant.
+    Summary: [a concise description of what the hearing was about, MAXIMUM MAXIMUM 1000 characters]
+    Ruling: [which party the court ruled in favour of. ONLY ONLY ONLY give a one word answer out of the options: Plaintiff, Defendant]
+    It is your job to analyse the hearing, and decide whether the verdict was in the favour or Plaintiff or Defendant.
     Anomalies: [whether anything irregular happened in the context of a normal court hearing. If no anomalies found, reply with 'None Found']
     Return your output strictly in this JSON format:
     {
@@ -177,7 +175,7 @@ def extract_meaningful_headers(transcripts: list[dict], filename: str) -> dict:
     for transcript in transcripts:
         for citation, headers_info in transcript.items():
             query_message = create_query_messages(
-                get_extract_headings_prompt(), str(list[headers_info.keys()]))
+                get_extract_headings_prompt(), str(list(headers_info.keys())))
             request = create_batch_request(
                 query_message, citation)
             insert_request(request, filename)

@@ -64,5 +64,4 @@ INSERT INTO judgement
 (judgement_favour)
 VALUES
 ('Defendant'),
-('Plaintiff'),
-('Undisclosed');
+('Plaintiff');
