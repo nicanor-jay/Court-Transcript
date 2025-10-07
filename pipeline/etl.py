@@ -34,8 +34,8 @@ def handler(event=None, context=None) -> None:
     if os.path.exists("output.jsonl"):
         os.remove("output.jsonl")
 
-    # logging.info("Scraping judges into RDS")
-    # judges_rds.scrape_and_upload_judges()
+    logging.info("Scraping judges into RDS")
+    judges_rds.scrape_and_upload_judges()
 
     logging.info("Getting unique XMLs")
     unique_xmls = get_unique_xml.get_unique_xmls(conn)

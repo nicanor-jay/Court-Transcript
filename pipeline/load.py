@@ -11,7 +11,9 @@ import logging
 
 from judge_scraping.judge_scraper import parse_name
 
-logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 def get_db_connection() -> connection:
     """ Returns a connection to our database. """
@@ -68,6 +70,11 @@ def insert_judges(conn: connection, judges: list) -> list[int]:
 
             name = parse_name(judge)
             title_id = get_title_id(conn, name['title'])
+
+            # Move this into branch and PR
+            if not name.get('last_name'):
+                logging.info('Skipping %s - Last name is null.', name)
+                continue
 
             if not title_id and name['title']:
                 title_id = insert_title_id(conn, name['title'])
