@@ -15,8 +15,8 @@ def get_extract_headings_prompt() -> str:
     You will be given a python-style list of headers from a court transcript.
     Return a list of headers from the input, where the content of the headers will help deduce the following:
     Summary: [a concise description of what the hearing was about, maximum 1000 characters]
-    Ruling: [which party the court ruled in favour of. ONLY give a one word answer out of the options: Plaintiff, Defendant, Undisclosed.]
-    Anomalies: [whether anything irregular happened in the context of a normal court hearing]
+    Ruling: [which party the court ruled in favour of. ONLY ONLY ONLY give a one word answer out of the options: Plaintiff, Defendant, Undisclosed]
+    Anomalies: [whether anything irregular happened in the context of a normal court hearing. If no anomalies found, reply with 'None Found']
     Give the list in the following format: "'heading1','heading2','heading3'"
     """
 
@@ -28,9 +28,8 @@ def get_summarise_prompt() -> str:
     Redact all personal information about the parties involved.
     Your task is to carefully extract and return the following fields:
     Summary: [a concise description of what the hearing was about, maximum 1000 characters]
-    Ruling: [which party the court ruled in favour of. ONLY give a one word answer out of the options: Plaintiff, Defendant, Undisclosed.]
-    Anomalies: [whether anything irregular happened in the context of a normal court hearing]
-    If any field is missing, write "Not Found".
+    Ruling: [which party the court ruled in favour of. ONLY ONLY ONLY give a one word answer out of the options: Plaintiff, Defendant, Undisclosed]
+    Anomalies: [whether anything irregular happened in the context of a normal court hearing. If no anomalies found, reply with 'None Found']
     Return your output strictly in this JSON format:
     {
     "summary": "...",
@@ -100,7 +99,7 @@ def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
         batch = openai.batches.retrieve(batch_id)
 
         status = batch.status
-        # print(f"[Batch {batch_id}] Status: {status} (waited {waited}s)")
+        print(f"[Batch {batch_id}] Status: {status} (waited {waited}s)")
 
         if status == "completed":
             return batch

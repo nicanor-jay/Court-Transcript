@@ -34,7 +34,7 @@ def handler(event=None, context=None) -> None:
     if os.path.exists("output.jsonl"):
         os.remove("output.jsonl")
 
-    logging.info("Scraping judges into RDS")
+    # logging.info("Scraping judges into RDS")
     # judges_rds.scrape_and_upload_judges()
 
     logging.info("Getting unique XMLs")
@@ -73,9 +73,12 @@ def handler(event=None, context=None) -> None:
     summaries = summary.summarise(transcripts, "output.jsonl")
 
     for metadata in metadatas:
+        print(metadata)
         print(metadata.get('judges'))
         hearing = summaries.get(metadata["citation"])
+        print(hearing)
         if hearing:
+            # logging.info("Inserting hearing %s...", metadata["citation"])
             load.insert_into_hearing(conn, hearing, metadata)
 
     conn.close()
@@ -83,3 +86,7 @@ def handler(event=None, context=None) -> None:
 
 if __name__ == "__main__":
     handler()
+    # conn = get_unique_xml.get_db_connection()
+    # print(load.insert_judges(conn, ["His Honour Butcher"]))
+    # print(load.check_judge_exists(conn, ["His Honour Butcher"]))
+    # conn.close()

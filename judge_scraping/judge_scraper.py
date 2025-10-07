@@ -15,6 +15,7 @@ TITLES = [
     "District Judge (MC)", "District Judge",
     "Lord Justice", "Lady Justice",
     "His Honour Judge", "Her Honour Judge",
+    "Mr Justice",
     "His Honour", "Her Honour",
     "Lord", "Lady", "Sir", "Dame",
     "Mr", "Mrs", "Miss", "Ms",

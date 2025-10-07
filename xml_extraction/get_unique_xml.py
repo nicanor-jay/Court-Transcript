@@ -50,7 +50,7 @@ def is_xml_unique(xml_string: str, conn: connection) -> bool:
 
 def get_unique_xmls(conn: connection) -> list[str]:
     """Fetches the last 20 XML transcripts, and returns only the uniques"""
-    xml_strings = get_xml_strings()
+    xml_strings = get_xml_strings(50)
     return [string for string in xml_strings if is_xml_unique(string, conn)]
 
 

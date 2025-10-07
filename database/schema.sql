@@ -16,9 +16,9 @@ CREATE TABLE title (
 CREATE TABLE judge (
     judge_id BIGSERIAL PRIMARY KEY,
     title_id BIGINT REFERENCES title (title_id),
-    first_name VARCHAR(30),
-    middle_name VARCHAR(30),
-    last_name VARCHAR(30) NOT NULL,
+    first_name VARCHAR(50),
+    middle_name VARCHAR(50),
+    last_name VARCHAR(50) NOT NULL,
     appointment_date TIMESTAMP,
     CONSTRAINT unique_judge UNIQUE (
         title_id, first_name, middle_name, last_name, appointment_date

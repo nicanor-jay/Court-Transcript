@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import re
 from datetime import datetime
 
 from lxml import etree
@@ -74,9 +75,11 @@ def get_court_name(meta: "etree._Element") -> str | None:
 
 def get_judges(root: etree._Element) -> list[str] | None:
     """Returns a list of the judges who sat the hearing."""
+    pattern = re.compile(r"\(.*\)")
     people = root.xpath("//n:TLCPerson", namespaces=NS_MAPPING)
     judges = [person.get("showAs")
               for person in people if person.get("href") != ""]
+    judges = [pattern.sub('', judge).strip() for judge in judges]
     return judges if judges else None
 
 
