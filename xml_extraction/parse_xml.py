@@ -189,7 +189,8 @@ def get_label_text_dict(xml_string: str) -> dict[str, str] | None:
             raw_text = get_text_between_elements(
                 root, start_element=headings[-1])
             raw_text = whitespace_pattern.sub(' ', raw_text).strip()
-            text_pairings[header_text] = raw_text
+            if raw_text != "":
+                text_pairings[header_text] = raw_text
             continue
         raw_text = get_text_between_elements(root, headings[0], headings[1])
         raw_text = whitespace_pattern.sub(' ', raw_text).strip()
