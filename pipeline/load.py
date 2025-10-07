@@ -6,13 +6,12 @@ from psycopg2 import connect
 from psycopg2.extensions import connection
 from psycopg2.extras import RealDictCursor
 from psycopg2 import Error
+import logging
 
 
 from judge_scraping.judge_scraper import parse_name
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
-
+logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_db_connection() -> connection:
     """ Returns a connection to our database. """
