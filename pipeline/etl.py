@@ -73,12 +73,11 @@ def handler(event=None, context=None) -> None:
     summaries = summary.summarise(transcripts, "output.jsonl")
 
     for metadata in metadatas:
-        print(metadata)
-        print(metadata.get('judges'))
+        logging.info(metadata)
+        logging.info(metadata.get('judges'))
         hearing = summaries.get(metadata["citation"])
-        print(hearing)
+        logging.info(hearing)
         if hearing:
-            # logging.info("Inserting hearing %s...", metadata["citation"])
             load.insert_into_hearing(conn, hearing, metadata)
 
     conn.close()
