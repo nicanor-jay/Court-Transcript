@@ -165,10 +165,15 @@ def get_label_text_dict(xml_string: str) -> dict[str, str] | None:
     if not headings:
         return None
 
+    # this regex will find any excessive whitespace
+    # which will be used to clean up the raw text
+    whitespace_pattern = re.compile(r"(?:[\n\t]+ *)+")
+
     text_pairings = {}
     # Get text up to first heading
     # labeled as 'DOC_START'
     raw_text = get_text_between_elements(root, end_element=headings[0])
+    raw_text = whitespace_pattern.sub(' ', raw_text).strip()
     if raw_text != "":
         text_pairings["DOC_START"] = raw_text
 
@@ -183,11 +188,13 @@ def get_label_text_dict(xml_string: str) -> dict[str, str] | None:
         newline_idx = header_text.find('\n')
         header_text = header_text[:newline_idx] if newline_idx > 0 else header_text
         raw_text = get_text_between_elements(root, headings[0], headings[1])
+        raw_text = whitespace_pattern.sub(' ', raw_text).strip()
         text_pairings[header_text] = raw_text
 
     # Get from last heading til end
     # labeled as 'DOC_END'
     raw_text = get_text_between_elements(root, start_element=headings[-1])
+    raw_text = whitespace_pattern.sub(' ', raw_text).strip()
     if raw_text != "":
         text_pairings["DOC_END"] = raw_text
 
