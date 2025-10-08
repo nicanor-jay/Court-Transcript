@@ -20,7 +20,7 @@ from psycopg2.extensions import connection
 from judge_scraping import judges_rds
 from xml_extraction import get_unique_xml, parse_xml, metadata_xml
 from gpt import summary
-from pipeline import load
+import load
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')

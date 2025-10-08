@@ -1,4 +1,36 @@
-python-dotenv
-pytest
-pylint
+
+# Database
 psycopg2-binary
+python-dotenv
+
+# Scraping
+selenium
+
+# Dashboard / Data handling
+matplotlib
+plotly
+dash
+
+# Utils
+requests
+tqdm
+
+# Testing
+pytest
+pytest-mock
+pytest-cov
+
+# Linting
+pylint
+
+# XML
+lxml
+types-lxml
+requests
+
+# GPT-API
+openai
+
+# Requests
+requests
+responses

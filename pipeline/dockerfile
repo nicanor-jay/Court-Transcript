@@ -12,25 +12,14 @@ RUN yum install xz atk cups-libs gtk3 libXcomposite alsa-lib \
     libXtst pango at-spi2-atk libXt xorg-x11-server-Xvfb \
     xorg-x11-xauth dbus-glib dbus-glib-devel -y -q
 RUN rm -rf /var/cache/yum
-COPY ./pipeline/install-firefox.sh .
+COPY install-firefox.sh .
 RUN bash install-firefox.sh
 
-# Grab requirement files
-COPY ./case_fetcher/requirements.txt ./case_fetcher/
-COPY ./gpt/requirements.txt ./gpt/
-COPY ./judge_scraping/requirements.txt ./judge_scraping/
-COPY ./xml_extraction/requirements.txt ./xml_extraction/
-COPY ./pipeline/requirements.txt ./pipeline/
-
-# Install all requirements
-RUN yum install -y findutils
-RUN find . -type f -name "requirements.txt" | sed -e 's/^/-r /' | xargs pip install
+# Grab requirement file and install
+COPY requirements.txt  .
+RUN  pip3 install -r requirements.txt
 
 # Copy everything else
-COPY ./case_fetcher ./case_fetcher/
-COPY ./gpt ./gpt/
-COPY ./judge_scraping ./judge_scraping/
-COPY ./xml_extraction ./xml_extraction/
-COPY ./pipeline ./pipeline/
+COPY . .
 
-CMD [ "pipeline.etl.handler" ]
+CMD [ "etl.handler" ]
