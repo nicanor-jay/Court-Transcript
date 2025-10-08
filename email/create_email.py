@@ -37,6 +37,8 @@ def write_email(hearings: list[dict]) -> str:
 
     yesterdays_date = (datetime.now() - timedelta(days=1)).date()
 
+    print(hearings[0])
+
     html = f"""<h1>Barristers Brief - Daily Report</h1>
 
 <h2> Hearing Overview - {yesterdays_date}</h2>
