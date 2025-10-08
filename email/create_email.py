@@ -57,9 +57,6 @@ def write_email(hearings: list[dict]) -> str:
         html += "</div>"
     html += "<p>From, Objection Handling</p>"
 
-    # with open(f"report_data_{yesterdays_date}.html", "w", encoding='utf-8') as f:
-    #     f.write(html)
-
     return html
 
 
