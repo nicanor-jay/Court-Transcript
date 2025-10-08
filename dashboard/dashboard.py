@@ -9,7 +9,6 @@ from data_cache import (
     get_data_from_db,
 )
 from charts import (
-    get_data_from_db,
     get_recent_hearings_table,
     get_rulings_by_court_chart,
     get_overall_ruling_bias_chart,
@@ -19,6 +18,7 @@ from charts import (
 
 
 def main():
+    """Main function to load and create dashboard. """
     load_dotenv()
     st.set_page_config(page_title="Court Hearings Dashboard", layout="wide")
 

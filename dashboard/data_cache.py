@@ -1,6 +1,6 @@
 """File holding functions which retrieve data from the RDS (which can be cached)."""
-from psycopg2.extensions import connection
 import datetime
+from psycopg2.extensions import connection
 import streamlit as st
 import pandas as pd
 from rds_utils import query_rds
@@ -23,7 +23,7 @@ def get_data_from_db(_con: connection) -> pd.DataFrame:
 
     with _con.cursor() as cur:
         query = """
-            SELECT 
+            SELECT
                 h.hearing_id,
                 h.hearing_citation,
                 h.hearing_title,
@@ -49,16 +49,17 @@ def get_data_from_db(_con: connection) -> pd.DataFrame:
         cur.execute(query)
         rows = cur.fetchall()
         colnames = [desc[0] for desc in cur.description]
-    
+
     df = pd.DataFrame(rows, columns=colnames)
     df = df.drop_duplicates(subset=["hearing_id"]).reset_index(drop=True)
-    
+
     # Convert datetime objects to strings for Streamlit display
     for col in ['hearing_date', 'appointment_date']:
         if col in df.columns:
             if pd.api.types.is_datetime64_any_dtype(df[col]):
                 df[col] = df[col].astype(str)
-            elif df[col].apply(lambda x: isinstance(x, (pd.Timestamp, datetime.date, datetime.datetime))).any():
+            elif df[col].apply(lambda x: isinstance\
+                               (x, (pd.Timestamp, datetime.date, datetime.datetime))).any():
                 df[col] = df[col].astype(str)
-                 
+
     return df

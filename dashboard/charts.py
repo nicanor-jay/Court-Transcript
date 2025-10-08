@@ -6,9 +6,6 @@ for usage in the Streamlit dashboard.
 
 import altair as alt
 import pandas as pd
-import datetime
-from psycopg2 import connect
-from data_cache import get_data_from_db
 
 def get_overall_ruling_bias_chart(data: pd.DataFrame):
     """Donut chart showing favour (Claimant vs Defendant vs Undisclosed)."""
@@ -28,7 +25,8 @@ def get_overall_ruling_bias_chart(data: pd.DataFrame):
 def get_recent_hearings_table(data: pd.DataFrame):
     """Display last 3–5 hearings chronologically."""
     recent = data.sort_values(by='hearing_date', ascending=False).head(5)
-    table = recent[['hearing_date', 'court_name', 'hearing_title', 'judgement_favour', 'hearing_url', 'hearing_citation']]
+    table = recent[['hearing_date', 'court_name', 'hearing_title',\
+                     'judgement_favour', 'hearing_url', 'hearing_citation']]
 
     table = table.rename(columns={
         'hearing_citation': 'Citation',
@@ -90,7 +88,8 @@ def get_anomalies_visualisation(data: pd.DataFrame):
     ].copy()
 
     if anomalies.empty:
-        return alt.Chart(pd.DataFrame({"message": ["No significant anomalies detected."]})).mark_text(
+        return alt.Chart(pd.DataFrame({"message": \
+                                       ["No significant anomalies detected."]})).mark_text(
             align="center",
             fontSize=13,
             color="gray"
@@ -114,7 +113,8 @@ def get_anomalies_visualisation(data: pd.DataFrame):
         .encode(
             x=alt.X("month:N", title="Month", sort="ascending"),
             y=alt.Y("court_name:N", title="Court"),
-            color=alt.Color("count:Q", title="No. of Anomalies", scale=alt.Scale(scheme="orangered")),
+            color=alt.Color("count:Q", title="No. of Anomalies", \
+                            scale=alt.Scale(scheme="orangered")),
             tooltip=[
                 alt.Tooltip("court_name:N", title="Court"),
                 alt.Tooltip("month:N", title="Month"),
