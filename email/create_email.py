@@ -8,12 +8,20 @@ from psycopg2.extensions import connection
 def get_yesterdays_hearings(conn: connection) -> list[dict]:
     """Function to retrieve yesterday's hearings."""
     query = """
-        SELECT
-            *
-        FROM
-            hearing
-        WHERE
-            date(hearing_date) = (current_date - interval '1' day);
+    SELECT
+        h.hearing_citation,
+        h.hearing_title,
+        h.hearing_description,
+        h.hearing_anomaly,
+        h.hearing_url,
+        j.judgement_favour
+    FROM
+        hearing h
+    JOIN
+        judgement j 
+    USING(judgement_id)
+    WHERE
+        date(hearing_date) = (current_date - interval '1' day);
     """
     hearings = query_rds(conn, query)
 
@@ -33,7 +41,7 @@ def write_email(hearings: list[dict]) -> str:
 
     yesterdays_date = (datetime.now() - timedelta(days=1)).date()
 
-    html = f"""<h1> Objection Handler - Daily Report</h1>
+    html = f"""<h1>Barristers Brief - Daily Report</h1>
 
 <h2> Hearing Overview - {yesterdays_date}</h2>
     """
@@ -43,18 +51,18 @@ def write_email(hearings: list[dict]) -> str:
     for hearing in hearings:
         html += "<div>"
         html += f"<h4>{hearing['hearing_citation']} - {hearing['hearing_title']}</h4>"
-        html += f"<p>Judgement: {hearing['judgement_id']}</p>"
-        html += f"<p>Summary: {hearing['hearing_description']}</p>"
-        html += f"<p>Anomaly: {hearing['hearing_anomaly']}</p>"
+        html += f"<p>Ruled in favour of <b>{hearing['judgement_favour']}</b></p>"
+        html += f"<p>{hearing['hearing_description']}</p>"
+        if hearing['hearing_anomaly'] != 'None Found':
+            html += f"<p>Anomaly: {hearing['hearing_anomaly']}</p>"
         html += f"<p>URL: <a href ='{hearing['hearing_url']}'>{hearing['hearing_url']}</a></p>"
         html += "<hr>"
 
         html += "</div>"
+    html += "<p>From, Objection Handling</p>"
 
     with open(f"report_data_{yesterdays_date}.html", "w", encoding='utf-8') as f:
         f.write(html)
-
-    print(html)
 
     return html
 
