@@ -33,11 +33,13 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
 3. Install dependencies:
+
+The following command finds all requirements in the project and installs them.
 ```bash
-pip install -r requirements.txt
+find . -type f -name "requirements.txt" | sed -e 's/^/-r /' | xargs pip install
 ```
 
-4. Install [Playwright](https://playwright.dev) browsers:
+1. Install [Playwright](https://playwright.dev) browsers:
 ```bash
 playwright install chromium
 ```
