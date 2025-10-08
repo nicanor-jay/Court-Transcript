@@ -54,6 +54,12 @@ From the root directory, run
 python -m pipeline.etl
 ```
 
+You can also use the CLI argument of `-n`/`--number` to denote how many XML's you want to download (defaulted to 20)
+
+```bash
+python -m pipeline.etl -n 10
+```
+
 This will:
 1. Create `headers_input.json` with all subtitles for each court hearing. Given to GPT-API to retrieve meaningful headers.
 2. Create `summary_input.json` with all meaningful subtitles & texts for each court hearing. Given to the GPT-API for summarisation.
