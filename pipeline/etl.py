@@ -114,11 +114,11 @@ def run_etl(number_of_transcripts: int = 20) -> None:
     reset_jsonl_file(SUMMARY_INPUT)
 
     # Scraping + updating judges
-    insert_scraped_judges()
+    # insert_scraped_judges()
 
     # Extracting and dealing with XMLs
     logging.info("Getting unique XMLs")
-    unique_xmls = get_unique_xml.get_unique_xmls(conn)
+    unique_xmls = get_unique_xml.get_unique_xmls(conn,)
     logging.info("%s unique transcripts found", len(unique_xmls))
     metadatas = extract_and_parse_xml(unique_xmls)
     transcripts = parse_transcripts(unique_xmls)
