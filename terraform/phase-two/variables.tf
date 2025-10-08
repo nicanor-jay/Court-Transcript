@@ -59,8 +59,18 @@ variable "DASHBOARD_IMAGE_URI" {
   type        = string
 }
 
+variable "PIPELINE_IMAGE_URI" {
+  description = "URI for the pipeline image"
+  type        = string
+}
+
 variable "ECS_CLUSTER" {
   description = "ARN of ECS cluster to use for the dashboard ECS service"
+  type        = string
+}
+
+variable "OPENAI_API_KEY" {
+  description = "GPT-API key"
   type        = string
 }
 
@@ -76,5 +86,15 @@ variable "DASHBOARD_SECURITY_GROUP_NAME" {
 
 variable "DASHBOARD_ECS_SERVICE_NAME" {
   description = "Name for the dashboard's ECS service resource"
+  type        = string
+}
+
+variable "LAMBDA_EXEC_ROLE_NAME" {
+  description = "Name for the lambda's execution role"
+  type        = string
+}
+
+variable "PIPELINE_LAMBDA_NAME" {
+  description = "Name for the pipeline lambda"
   type        = string
 }

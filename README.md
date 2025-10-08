@@ -46,6 +46,9 @@ DB_PASSWORD={db_password}
 AWS_ACCOUNT_ID={aws_account_id}
 APP_NAME={app_name}
 DASHBOARD_ECR_NAME={dashboard_ecr_name}
+EMAIL_ECR_NAME={email_ecr_name}
+
+OPENAI_API_KEY={}
 ```
 
 Additionally, look at our [Terraform `README`](https://github.com/nicanor-jay/Court-Transcript/blob/main/terraform/README.md) and follow the instructions in there.
@@ -91,3 +94,5 @@ We've kept in mind many different aspects mentioned in the court transcripts - f
 - `judgement`: stores the possible outcomes of the hearings (defendant, plaintiff or undisclosed)
 
 - `court`: stores the different court names (High Court, Court of Appeal, etc)
+
+- `subscriber`: stores all the subscribers information for the daily email newsletter

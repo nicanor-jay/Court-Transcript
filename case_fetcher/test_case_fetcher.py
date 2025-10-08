@@ -11,7 +11,7 @@ This module tests the core functionalities of `case_fetcher`, including:
 
 Uses pytest and responses for mocking HTTP requests.
 """
-#pylint:disable=too-many-arguments, too-many-positional-arguments
+# pylint:disable=too-many-arguments, too-many-positional-arguments
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest.mock import patch
@@ -303,7 +303,8 @@ class TestMain:
 
         assert "Loaded" in caplog.text
         assert "2 XMLs" in caplog.text
-        assert not (tmp_path / "Sample_Case_v_Another_Case__2024__UKSC_1.xml").exists()
+        assert not (
+            tmp_path / "Sample_Case_v_Another_Case__2024__UKSC_1.xml").exists()
 
     @responses.activate
     def test_main_with_download_flag(self, monkeypatch, tmp_path, sample_feed, sample_xml):
@@ -339,7 +340,8 @@ class TestMain:
     def test_main_custom_per_page(self, monkeypatch, tmp_path, sample_feed, sample_xml):
         """Test main workflow with custom --per-page argument."""
         monkeypatch.setattr(case_fetcher, "out_dir", tmp_path)
-        monkeypatch.setattr('sys.argv', ['case_fetcher.py', '--per-page', '25'])
+        monkeypatch.setattr(
+            'sys.argv', ['case_fetcher.py', '--per-page', '25'])
 
         responses.add(
             responses.GET,

@@ -1,4 +1,4 @@
-#pylint: disable=use-dict-literal, too-many-branches, too-many-return-statements
+# pylint: disable=use-dict-literal, too-many-branches, too-many-return-statements
 """
 UK Judiciary Web Scraper - Judges Only (Simplified Selenium)
 Scrapes judiciary.uk and extracts only real judges.
@@ -36,7 +36,9 @@ TITLES = [
 
 POST_NOMINALS = ["KC", "QC", "CBE", "OBE", "MBE", "JP"]
 
-SURNAME_PREFIXES = ["van", "van der", "van den", "de", "de la", "du", "von", "von der"]
+# Prefixes that indicate multiword surnames
+SURNAME_PREFIXES = ["van", "van der", "van den",
+                    "de", "de la", "du", "von", "von der"]
 
 
 def parse_date(text: str) -> Optional[str]:
@@ -73,7 +75,8 @@ def parse_date(text: str) -> Optional[str]:
 
 def parse_name(full: str) -> Dict[str, Optional[str]]:
     """Split judge full name into components."""
-    result = dict(title=None, first_name=None, middle_name=None, last_name=None)
+    result = dict(title=None, first_name=None,
+                  middle_name=None, last_name=None)
     if not full:
         return result
 
@@ -157,8 +160,8 @@ def looks_like_judge(text: str) -> bool:
             words = remainder.split()
             if len(words) >= 1:
                 location_words = {"country", "region", "area", "circuit", "division",
-                                "midlands", "north", "south", "east", "west", "city",
-                                "county", "district", "wales", "scotland", "england", "ireland"}
+                                  "midlands", "north", "south", "east", "west", "city",
+                                  "county", "district", "wales", "scotland", "england", "ireland"}
                 if all(w.lower() in location_words for w in words):
                     return False
             return True
@@ -193,7 +196,8 @@ def scrape_page(driver, url: str) -> List[Dict]:
             if not looks_like_judge(full_name):
                 continue
 
-            date_val = next((parse_date(c) for c in cells[1:] if parse_date(c)), None)
+            date_val = next((parse_date(c)
+                            for c in cells[1:] if parse_date(c)), None)
             parsed = parse_name(full_name)
 
             judges.append({
@@ -283,4 +287,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    judge_main()

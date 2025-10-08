@@ -14,7 +14,7 @@ NAMESPACES = {
     "tna": "https://caselaw.nationalarchives.gov.uk"
 }
 
-out_dir = Path("xml_cases")
+out_dir = Path("/tmp/xml_cases")
 out_dir.mkdir(exist_ok=True)
 
 
