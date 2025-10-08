@@ -1,11 +1,12 @@
 """This script generates an HTML email to send to subscribers."""
 
+from datetime import datetime, timedelta
 from rds_utils import get_db_connection, query_rds
 from psycopg2.extensions import connection
 
 
-def get_yesterdays_hearings(conn: connection):
-    """Function to retrieve yesterday"""
+def get_yesterdays_hearings(conn: connection) -> list[dict]:
+    """Function to retrieve yesterday's hearings."""
     query = """
         SELECT
             *
@@ -16,13 +17,55 @@ def get_yesterdays_hearings(conn: connection):
     """
     hearings = query_rds(conn, query)
 
+    return hearings
+
+
+def get_newsletter_row(hearing: dict) -> str:
+    """Function to retrieve a HTML section for a given hearing."""
+
+    html_str = """
+        {hearing['citation]}
+    """
+
+
+def write_email(hearings: list[dict]) -> str:
+    """Function to write todays comprehensive newsletter."""
+
+    yesterdays_date = (datetime.now() - timedelta(days=1)).date()
+
+    html = f"""<h1> Objection Handler - Daily Report</h1>
+
+<h2> Hearing Overview - {yesterdays_date}</h2>
+    """
+    html += "<p>Thanks for reading this daily update. For more details, access the <a href='http://35.179.105.252:8501'/>dashboard</a>.</p>"
+    html += "<hr>"
+
     for hearing in hearings:
-        print(hearing)
+        html += "<div>"
+        html += f"<h4>{hearing['hearing_citation']} - {hearing['hearing_title']}</h4>"
+        html += f"<p>Judgement: {hearing['judgement_id']}</p>"
+        html += f"<p>Summary: {hearing['hearing_description']}</p>"
+        html += f"<p>Anomaly: {hearing['hearing_anomaly']}</p>"
+        html += f"<p>URL: <a href ='{hearing['hearing_url']}'>{hearing['hearing_url']}</a></p>"
+        html += "<hr>"
+
+        html += "</div>"
+
+    with open(f"report_data_{yesterdays_date}.html", "w", encoding='utf-8') as f:
+        f.write(html)
+
+    print(html)
+
+    return html
 
 
 def handler(context=None, event=None):
     """Handler function which runs on the lambda."""
     conn = get_db_connection()
+
+    hearings = get_yesterdays_hearings(conn)
+
+    write_email(hearings)
 
     conn.close()
 
