@@ -136,7 +136,7 @@ def check_judge_exists(conn: connection, judges: list) -> list[int]:
 
 def get_judgement_id(conn: connection, ruling: str) -> int:
     """ Returns the judgement ID that matches the ruling. """
-    if ruling.lower() not in ['plaintiff', 'defendant', 'undisclosed']:
+    if not ruling or ruling.lower() not in ['plaintiff', 'defendant', 'undisclosed']:
         return None
 
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
