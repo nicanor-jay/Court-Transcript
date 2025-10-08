@@ -1,16 +1,19 @@
 # pylint: disable=use-dict-literal, too-many-branches, too-many-return-statements
 """
-UK Judiciary Web Scraper - Judges Only
-Scrapes judiciary.uk and extracts *only* real judges.
+UK Judiciary Web Scraper - Judges Only (Simplified Selenium)
+Scrapes judiciary.uk and extracts only real judges.
 """
 
 import json
 from datetime import datetime
 from typing import List, Dict, Optional
 import re
-from playwright.sync_api import sync_playwright
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
-# Judicial titles (longest first to avoid partial matches)
 TITLES = [
     "The Right Honourable Lord Justice",
     "The Right Honourable Lady Justice",
@@ -31,7 +34,6 @@ TITLES = [
     "Judge", "HHJ", "DHJ", "DJ",
 ]
 
-# Postnominal titles to strip from the end
 POST_NOMINALS = ["KC", "QC", "CBE", "OBE", "MBE", "JP"]
 
 # Prefixes that indicate multiword surnames
@@ -45,7 +47,6 @@ def parse_date(text: str) -> Optional[str]:
         return None
     text = text.strip()
 
-    # Regex to detect common numeric formats (e.g. 14-05-18, 14/05/2018)
     match = re.search(r"\b\d{2}[-/\.]\d{2}[-/\.]\d{2,4}\b", text)
     if match:
         raw_date = match.group(0)
@@ -79,25 +80,20 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
     if not full:
         return result
 
-    # Case-insensitive title matching - try longest matches first
     full_lower = full.lower()
     matched_title = None
     remaining_text = full
 
     for title in TITLES:
         title_lower = title.lower()
-        # Check if starts with this title followed by space or end of string
         if full_lower.startswith(title_lower + " ") or full_lower == title_lower:
-            matched_title = title  # Keep original casing for storage
+            matched_title = title
             remaining_text = full[len(title):].strip()
             break
 
     result["title"] = matched_title
-
-    # Work with the remaining text after title
     full = remaining_text
 
-    # Case-insensitive post-nominal removal
     for post_nom in POST_NOMINALS:
         post_nom_lower = post_nom.lower()
         if full.lower().endswith(" " + post_nom_lower):
@@ -110,7 +106,6 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
         result["last_name"] = parts[0]
         return result
 
-    # Case-insensitive surname prefix matching
     surname_start_idx = None
     for prefix in sorted(SURNAME_PREFIXES, key=len, reverse=True):
         prefix_parts = prefix.split()
@@ -140,12 +135,11 @@ def parse_name(full: str) -> Dict[str, Optional[str]]:
 
 
 def looks_like_judge(text: str) -> bool:
-    """Return True if text looks like a judge name (starts with known title)."""
+    """Return True if text looks like a judge name."""
     if not text:
         return False
     text_lower = text.lower()
 
-    # Exclude obvious non-judge entries
     exclusions = [
         "the black country", "the midlands", "the north", "the south",
         "the east", "the west", "the city", "the county", "the district",
@@ -154,24 +148,17 @@ def looks_like_judge(text: str) -> bool:
     if any(text_lower.startswith(excl) for excl in exclusions):
         return False
 
-    # Must start with a known judicial title
     if not any(text_lower.startswith(t.lower() + " ") for t in TITLES):
         return False
 
-    # Additional validation: should contain at least one more word after title
-    # and shouldn't be all location-like words
     for title in TITLES:
         title_lower = title.lower()
         if text_lower.startswith(title_lower + " "):
             remainder = text[len(title):].strip()
-            # Must have at least one word after the title
             if not remainder or len(remainder.split()) == 0:
                 return False
-            # Check if remainder looks like a person's name (not all capitals for locations)
-            # and contains at least 2 words for proper names
             words = remainder.split()
             if len(words) >= 1:
-                # Exclude common location words
                 location_words = {"country", "region", "area", "circuit", "division",
                                   "midlands", "north", "south", "east", "west", "city",
                                   "county", "district", "wales", "scotland", "england", "ireland"}
@@ -182,15 +169,27 @@ def looks_like_judge(text: str) -> bool:
     return False
 
 
-def scrape_page(page, url: str) -> List[Dict]:
+def scrape_page(driver, url: str) -> List[Dict]:
     """Scrape all judges from one URL."""
     judges = []
-    page.goto(url, wait_until="domcontentloaded", timeout=20000)
+    driver.get(url)
 
-    for table in page.locator("table").all():
-        for row in table.locator("tbody tr").all():
-            cells = [c.inner_text().strip() for c in row.locator("td").all()]
-            if not any(cells):
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, "table"))
+        )
+    except:
+        return judges
+
+    tables = driver.find_elements(By.TAG_NAME, "table")
+
+    for table in tables:
+        rows = table.find_elements(By.CSS_SELECTOR, "tbody tr")
+
+        for row in rows:
+            cells = [c.text.strip() for c in row.find_elements(By.TAG_NAME, "td")]
+
+            if not cells or not cells[0]:
                 continue
 
             full_name = cells[0]
@@ -210,6 +209,7 @@ def scrape_page(page, url: str) -> List[Dict]:
                 "last_name": parsed["last_name"],
                 "appointment_date": date_val,
             })
+
     return judges
 
 
@@ -230,43 +230,51 @@ def add_title_ids(judges: List[Dict], titles: List[Dict]) -> None:
 
 
 def normalise_judge(judge: Dict) -> Dict:
-    """Convert None values to empty strings for DB-safe JSON."""
+    """Convert None values to empty strings for database-safe JSON."""
     for key in ["first_name", "middle_name", "last_name"]:
         if judge.get(key) is None:
             judge[key] = ''
     return judge
 
 
-def judge_main():
-    """Main script for file."""
+def main():
+    """Main entry point."""
     base_url = (
         "https://www.judiciary.uk/about-the-judiciary/who-are-the-judiciary/"
         "list-of-members-of-the-judiciary/"
     )
-    all_judges: List[Dict] = []
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto(base_url, wait_until="domcontentloaded", timeout=20000)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
 
-        links = [a.get_attribute("href") for a in page.locator(
-            'a[href*="list-of-members"]').all()]
-        links = [f"https://www.judiciary.uk{l}" if
-                 l and l.startswith("/") else l for l in links if l]
+    driver = webdriver.Chrome(options=chrome_options)
 
+    try:
+        driver.get(base_url)
+
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, "a"))
+        )
+
+        link_elements = driver.find_elements(By.CSS_SELECTOR, 'a[href*="list-of-members"]')
+        links = [elem.get_attribute("href") for elem in link_elements if elem.get_attribute("href")]
+
+        links = [f"https://www.judiciary.uk{l}" if l.startswith("/") else l for l in links]
+
+        all_judges = []
         if links:
             for link in links:
-                all_judges.extend(scrape_page(page, link))
+                all_judges.extend(scrape_page(driver, link))
         else:
-            all_judges.extend(scrape_page(page, base_url))
+            all_judges.extend(scrape_page(driver, base_url))
 
-        browser.close()
+    finally:
+        driver.quit()
 
     titles = extract_titles(all_judges)
     add_title_ids(all_judges, titles)
-
-    # Normalise None → "" for DB-safe JSON
     normalised_judges = [normalise_judge(j) for j in all_judges]
 
     with open("titles_data.json", "w", encoding="utf-8") as f:
