@@ -73,4 +73,4 @@ else:
             with cols[1]:
                 if st.button("View Details", key=f"judge_{row.id}_{idx}"):
                     st.session_state["selected_judge_id"] = row["id"]
-                    st.switch_page("pages/_judge_details.py")
+                    st.switch_page("pages/judge_details.py")
