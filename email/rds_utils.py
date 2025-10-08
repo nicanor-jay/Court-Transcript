@@ -34,4 +34,4 @@ def query_rds(con: connection, query: str) -> dict:
     with con.cursor() as cur:
         cur.execute(query)
         data = cur.fetchall()
-    return data[0]
+    return data
