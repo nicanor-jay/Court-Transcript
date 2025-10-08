@@ -32,14 +32,6 @@ def get_yesterdays_hearings(conn: connection) -> list[dict]:
     return hearings
 
 
-def get_newsletter_row(hearing: dict) -> str:
-    """Function to retrieve a HTML section for a given hearing."""
-
-    html_str = """
-        {hearing['citation]}
-    """
-
-
 def write_email(hearings: list[dict]) -> str:
     """Function to write todays comprehensive newsletter."""
 
