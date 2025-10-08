@@ -70,10 +70,22 @@ def write_email(hearings: list[dict]) -> str:
 def get_subscriber_list(conn: connection) -> list[str]:
     """Function to get all subscribers from the RDS."""
 
+    subscriber_list = []
+
     query = """
         SELECT
-            
+            email
+        FROM
+            subscriber;
     """
+
+    res = query_rds(conn, query)
+
+    if res:
+        for email in res:
+            subscriber_list.append(email['email'])
+
+    return subscriber_list
 
 
 def handler(context=None, event=None):
@@ -82,9 +94,18 @@ def handler(context=None, event=None):
 
     hearings = get_yesterdays_hearings(conn)
 
-    write_email(hearings)
+    subscriber_emails = get_subscriber_list(conn)
+    email = write_email(hearings)
+
+    print(subscriber_emails)
+    print(email)
 
     conn.close()
+
+    return {
+        'subscriber_emails': subscriber_emails,
+        'email': email
+    }
 
 
 if __name__ == "__main__":
