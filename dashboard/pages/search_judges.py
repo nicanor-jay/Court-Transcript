@@ -1,5 +1,6 @@
+#pylint:disable=import-error
+"""Script to search for specific judges within the DB via keyword filers etc. """
 import streamlit as st
-import pandas as pd
 from data_cache import get_data_from_db
 from rds_utils import get_db_connection
 
@@ -13,7 +14,8 @@ conn = get_db_connection()
 data = get_data_from_db(conn)
 
 # Extract unique judges
-judges_df = data[["judge_id", "first_name", "middle_name", "last_name", "title_name", "court_name"]].drop_duplicates()
+judges_df = data[["judge_id", "first_name", \
+                  "middle_name", "last_name", "title_name", "court_name"]].drop_duplicates()
 
 # Combine names
 judges_df["name"] = (
@@ -38,9 +40,11 @@ col1, col2, col3 = st.columns([3, 2, 2])
 with col1:
     name_filter = st.text_input("Judge Name", placeholder="Enter judge name...")
 with col2:
-    title_filter = st.selectbox("Judge Title", ["All"] + sorted(judges_df["title"].unique().tolist()))
+    title_filter = st.selectbox("Judge Title", \
+                                ["All"] + sorted(judges_df["title"].unique().tolist()))
 with col3:
-    court_filter = st.selectbox("Court", ["All"] + sorted(judges_df["court_name"].unique().tolist()))
+    court_filter = st.selectbox("Court", ["All"] + \
+                                sorted(judges_df["court_name"].unique().tolist()))
 
 # Apply filters
 filtered = judges_df.copy()

@@ -1,6 +1,8 @@
+#pylint:disable=import-error
+"""Streamlit page for showing further insights into judges. """
+import datetime
 import streamlit as st
 import pandas as pd
-import datetime
 from data_cache import get_data_from_db
 from rds_utils import get_db_connection
 from charts import get_judge_ruling_bias_chart, get_overall_ruling_bias_chart
@@ -23,8 +25,9 @@ if judge_hearings.empty:
     st.stop()
 
 judge = judge_hearings.iloc[0]
-full_name = " ".join(
-    filter(None, [judge.get("title_name"), judge.get("first_name"), judge.get("middle_name"), judge.get("last_name")])
+FULL_NAME = " ".join(
+    filter(None, [judge.get("title_name"), judge.get("first_name"), \
+                  judge.get("middle_name"), judge.get("last_name")])
 ).strip()
 appointment_date = judge.get("appointment_date", "Unknown")
 court_name = judge.get("court_name", "Unknown")
@@ -35,10 +38,11 @@ total_cases = len(judge_hearings)
 today = datetime.date.today()
 
 month_str = today.strftime("%Y-%m")
-month_cases = judge_hearings[judge_hearings["hearing_date"].dt.to_period("M").astype(str) == month_str].shape[0]
+month_cases = judge_hearings[judge_hearings\
+                             ["hearing_date"].dt.to_period("M").astype(str) == month_str].shape[0]
 year_cases = judge_hearings[judge_hearings["hearing_date"].dt.year == today.year].shape[0]
 
-st.title(full_name or "Unknown Judge")
+st.title(FULL_NAME or "Unknown Judge")
 st.caption(f"{judge.get('title_name', 'Unknown Title')} | {court_name}")
 st.markdown(f"**Appointed:** {appointment_date}")
 
@@ -54,7 +58,7 @@ st.subheader("Ruling Bias Overview")
 col1, col2 = st.columns(2)
 with col1:
     st.markdown("**Judge’s Ruling Bias**")
-    bias_chart = get_judge_ruling_bias_chart(judge_hearings, full_name)
+    bias_chart = get_judge_ruling_bias_chart(judge_hearings, FULL_NAME)
     st.altair_chart(bias_chart, use_container_width=True)
 
 with col2:

@@ -64,7 +64,8 @@ def get_recent_hearings_table(data: pd.DataFrame):
     """Display last 3–5 hearings chronologically."""
     recent = data.sort_values(by="hearing_date", ascending=False).head(5)
     table = recent[
-        ["hearing_date", "court_name", "hearing_title", "judgement_favour", "hearing_url", "hearing_citation"]
+        ["hearing_date", "court_name", \
+         "hearing_title", "judgement_favour", "hearing_url", "hearing_citation"]
     ]
 
     table = table.rename(
@@ -148,7 +149,8 @@ def get_anomalies_visualisation(data: pd.DataFrame):
         .encode(
             x=alt.X("month:N", title="Month", sort="ascending"),
             y=alt.Y("court_name:N", title="Court"),
-            color=alt.Color("count:Q", title="No. of Anomalies", scale=alt.Scale(scheme="orangered")),
+            color=alt.Color("count:Q", title=\
+                            "No. of Anomalies", scale=alt.Scale(scheme="orangered")),
             tooltip=[
                 alt.Tooltip("court_name:N", title="Court"),
                 alt.Tooltip("month:N", title="Month"),
