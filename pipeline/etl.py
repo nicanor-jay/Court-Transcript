@@ -13,9 +13,12 @@ import os
 import logging
 import csv
 import io
+import argparse
+
+from psycopg2.extensions import connection
+
 from judge_scraping import judges_rds
 from xml_extraction import get_unique_xml, parse_xml, metadata_xml
-from psycopg2.extensions import connection
 from gpt import summary
 from pipeline import load
 
@@ -95,10 +98,12 @@ def gpt_summarise_transcripts(conn: connection,
             load.insert_into_hearing(conn, hearing, metadata)
 
 
-def handler(event=None, context=None) -> None:
-    """Handler for AWS Lambda"""
+def run_etl(number_of_transcripts: int = 20) -> None:
+    """Runs the entire ETL process."""
     MEANINGFUL_HEADERS_INPUT = 'headers_input'
     SUMMARY_INPUT = 'summary_input'
+    logging.info("Processing %s most recent transcripts",
+                 number_of_transcripts)
 
     # Getting DB connection
     logging.info("Starting Courts ETL Pipeline")
@@ -109,11 +114,12 @@ def handler(event=None, context=None) -> None:
     reset_jsonl_file(SUMMARY_INPUT)
 
     # Scraping + updating judges
-    insert_scraped_judges()
+    # insert_scraped_judges()
 
     # Extracting and dealing with XMLs
     logging.info("Getting unique XMLs")
-    unique_xmls = get_unique_xml.get_unique_xmls(conn)
+    unique_xmls = get_unique_xml.get_unique_xmls(conn,)
+    logging.info("%s unique transcripts found", len(unique_xmls))
     metadatas = extract_and_parse_xml(unique_xmls)
     transcripts = parse_transcripts(unique_xmls)
     transcripts = extract_meaningful_headers_and_content(
@@ -125,5 +131,21 @@ def handler(event=None, context=None) -> None:
     conn.close()
 
 
+def handler(event=None, context=None) -> None:
+    """Handler for AWS Lambda (on 20 files by default)."""
+    run_etl(number_of_transcripts=20)
+
+
+def get_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n", "--number", type=int,
+                        help="Number of transcripts to process.")
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    handler()
+    args = get_args()
+    num_files = args.number if args.number else 20
+    if num_files <= 0:
+        raise ValueError("number must be a value greater than 0")
+    run_etl(number_of_transcripts=num_files)

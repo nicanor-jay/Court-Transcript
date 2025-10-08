@@ -46,6 +46,12 @@ resource "aws_ecr_repository" "lambda-ecr" {
   image_tag_mutability = "MUTABLE"
 }
 
+# ECR to host the email image
+resource "aws_ecr_repository" "email-ecr" {
+  name                 = var.ECR_FOR_EMAIL_NAME
+  image_tag_mutability = "MUTABLE"
+}
+
 # ECR to host the ECS Dashboard
 resource "aws_ecr_repository" "dashboard-ecr" {
   name                 = var.ECR_FOR_DASHBOARD_NAME
