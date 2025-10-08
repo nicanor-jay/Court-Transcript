@@ -9,7 +9,7 @@ from rds_utils import get_db_connection
 # Page Config
 st.set_page_config(page_title="Search Court Hearings", layout="wide")
 
-st.title("🔍 Search Through Court Hearings")
+st.title("Search Through Court Hearings")
 st.markdown("Use the filters below to explore recent hearings \
             stored in the Court Transcripts database.")
 
