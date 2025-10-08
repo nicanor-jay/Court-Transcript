@@ -53,3 +53,19 @@ python -m pipeline.etl
 This will:
 1. Create `headers_input.json` with all subtitles for each court hearing. Given to GPT-API to retrieve meaningful headers.
 2. Create `summary_input.json` with all meaningful subtitles & texts for each court hearing. Given to the GPT-API for summarisation.
+
+## Containerising the Pipeline
+
+### Requirements
+
+A `.env` file as described in the root level [README.md](../README.md)
+
+### Usage
+
+To containerise the pipeline and upload to ECR run the following command from the root directory.
+
+```bash
+bash pipeline/build_push_dockerfile.sh
+```
+
+This will build, tag, & upload the containerised image to AWS ECR.
