@@ -135,18 +135,17 @@ def get_batch_token_usage(batch_id: str):
     for line in output_file.text.strip().split("\n"):
         record = json.loads(line)
         custom_id = record.get("custom_id")
-        usage = record.get("responses", {}).get("body", {}).get("usage", {})
+        usage = record.get("response", {}).get("body", {}).get("usage", {})
 
-        input_tokens = usage.get("input_tokens", 0)
-        output_tokens = usage.get("output_tokens", 0)
+        input_tokens = usage.get("prompt_tokens", 0)
         total_request_tokens = usage.get("total_tokens", 0)
         total_batch_tokens += total_request_tokens
 
         token_summary.append({
             "custom_id": custom_id,
             "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
             "total_request_tokens": total_request_tokens
+
         })
 
     return token_summary, total_batch_tokens
@@ -158,7 +157,7 @@ def get_batch_meaningful_headers(batch_id: str) -> dict:
 
     # show token usage for requests in the batch
     token_summary, total_batch_tokens = get_batch_token_usage(batch_id)
-    logging.info(f"token usage per request:")
+    logging.info(f"Token usage per request:")
     for item in token_summary:
         logging.info(f"{item['custom_id']} Request Token Usage: {item}")
     logging.info(f"Total batch tokens used: {total_batch_tokens}")
@@ -187,7 +186,7 @@ def get_batch_summaries(batch_id: str) -> dict:
     
     # show token usage for requests in the batch
     token_summary, total_batch_tokens = get_batch_token_usage(batch_id)
-    logging.info(f"token usage per request:")
+    logging.info(f"Token usage per request:")
     for item in token_summary:
         logging.info(f"{item['custom_id']} Request Token Usage: {item}")
     logging.info(f"Total batch tokens used: {total_batch_tokens}")
