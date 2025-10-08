@@ -67,6 +67,15 @@ def write_email(hearings: list[dict]) -> str:
     return html
 
 
+def get_subscriber_list(conn: connection) -> list[str]:
+    """Function to get all subscribers from the RDS."""
+
+    query = """
+        SELECT
+            
+    """
+
+
 def handler(context=None, event=None):
     """Handler function which runs on the lambda."""
     conn = get_db_connection()
