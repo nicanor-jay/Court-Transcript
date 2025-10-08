@@ -57,3 +57,10 @@ CREATE TABLE judge_hearing (
     judge_id BIGINT REFERENCES judge (judge_id),
     hearing_id BIGINT REFERENCES hearing (hearing_id)
 );
+
+CREATE TABLE subscriber(
+    subscriber_id BIGSERIAL PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(50) 
+);
