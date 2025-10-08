@@ -2,7 +2,9 @@
 
 
 A Python ETL pipeline that extracts both judge information from the UK Judiciary website ([judiciary.uk](https://www.judiciary.uk)) and
-court hearings from the Case Law National Archive Website ([caselaw.gov.uk](https://caselaw.nationalarchives.gov.uk/)), extracts the meaningful information from the court transcript, and also summarises the contents of the document with GPT-API. Valid data is then uploaded to the RDS for usage in the dashboard & associated services.
+court hearings from the Case Law National Archive Website ([caselaw.gov.uk](https://caselaw.nationalarchives.gov.uk/)), extracts the meaningful information from the court transcript, and also summarises the contents of the document with GPT-API. 
+
+Valid data is then uploaded to the RDS for usage in the dashboard & associated services.
 
 ## Features
 
