@@ -1,5 +1,3 @@
-playwright
-
 # Database
 psycopg2-binary
 python-dotenv

@@ -39,11 +39,6 @@ The following command finds all requirements in the project and installs them.
 find . -type f -name "requirements.txt" | sed -e 's/^/-r /' | xargs pip install
 ```
 
-1. Install [Playwright](https://playwright.dev) browsers:
-```bash
-playwright install chromium
-```
-
 ## Usage
 
 ### Running the Scraper
