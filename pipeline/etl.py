@@ -118,7 +118,8 @@ def run_etl(number_of_transcripts: int = 20) -> None:
 
     # Extracting and dealing with XMLs
     logging.info("Getting unique XMLs")
-    unique_xmls = get_unique_xml.get_unique_xmls(conn)
+    unique_xmls = get_unique_xml.get_unique_xmls(
+        conn, number=number_of_transcripts)
     logging.info("%s unique transcripts found", len(unique_xmls))
     metadatas = extract_and_parse_xml(unique_xmls)
     transcripts = parse_transcripts(unique_xmls)
