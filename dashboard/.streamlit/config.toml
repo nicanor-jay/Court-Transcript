@@ -1,0 +1,15 @@
+[theme]
+# Use the dark base theme as a starting point
+base = "dark"
+
+# Main application background color (212838)
+backgroundColor = "#212838"
+
+# Sidebar and secondary background color (3a4769)
+secondaryBackgroundColor = "#323e5dff"
+
+# Text color for body text (ead9d6)
+textColor = "#ead9d6"
+
+# You can add other colors if needed, but these three fulfill your request:
+primaryColor = "#b29758"

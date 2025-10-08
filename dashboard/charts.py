@@ -8,8 +8,19 @@ import altair as alt
 import pandas as pd
 
 
+# Custom color scale for 'judgement_favour' using user-provided colors.
+JUDGEMENT_DOMAINS = ["Plaintiff", "Defendant", "Undisclosed"]
+# Using provided colors for key categories and neutral grey for Undisclosed.
+JUDGEMENT_RANGES = ["#007f8c", "#12516a", "#707070"]
+
+ruling_color_scale = alt.Scale(
+    domain=JUDGEMENT_DOMAINS,
+    range=JUDGEMENT_RANGES
+)
+
+
 def get_overall_ruling_bias_chart(data: pd.DataFrame):
-    """Donut chart showing favour (Claimant vs Defendant vs Undisclosed)."""
+    """Donut chart showing favour (Plaintiff vs Defendant vs Undisclosed)."""
     data = data.copy()
     data["judgement_favour"] = data["judgement_favour"].fillna("Undisclosed")
     counts = data["judgement_favour"].value_counts().reset_index()
@@ -20,7 +31,12 @@ def get_overall_ruling_bias_chart(data: pd.DataFrame):
         .mark_arc(innerRadius=50)
         .encode(
             theta=alt.Theta(field="count", type="quantitative"),
-            color=alt.Color(field="judgement_favour", type="nominal", title="Ruling Favour"),
+            color=alt.Color(
+                field="judgement_favour",
+                type="nominal",
+                title="Ruling Favour",
+                scale=ruling_color_scale,
+            ),
             tooltip=["judgement_favour", "count"],
         )
         .properties(width=250, height=250, title="Overall Ruling Bias")
@@ -51,7 +67,12 @@ def get_judge_ruling_bias_chart(data: pd.DataFrame, judge_name: str = ""):
         .mark_arc(innerRadius=50)
         .encode(
             theta=alt.Theta(field="count", type="quantitative"),
-            color=alt.Color(field="judgement_favour", type="nominal", title="Ruling Favour"),
+            color=alt.Color(
+                field="judgement_favour",
+                type="nominal",
+                title="Ruling Favour",
+                scale=ruling_color_scale,
+            ),
             tooltip=["judgement_favour", "count"],
         )
         .properties(width=250, height=250, title=title)
@@ -61,14 +82,11 @@ def get_judge_ruling_bias_chart(data: pd.DataFrame, judge_name: str = ""):
 
 
 def get_recent_hearings_table(data: pd.DataFrame):
-    """Display last 3–5 hearings chronologically."""
     recent = data.sort_values(by="hearing_date", ascending=False).head(5)
     table = recent[
-        ["hearing_date", "court_name", \
+        ["hearing_date", "court_name",
          "hearing_title", "judgement_favour", "hearing_url", "hearing_citation"]
-    ]
-
-    table = table.rename(
+    ].rename(
         columns={
             "hearing_citation": "Citation",
             "hearing_date": "Date",
@@ -78,6 +96,8 @@ def get_recent_hearings_table(data: pd.DataFrame):
             "hearing_url": "Source URL",
         }
     )
+
+    # REMOVED custom styling to use Streamlit's default DataFrame appearance.
     return table
 
 
@@ -91,7 +111,11 @@ def get_rulings_by_court_chart(data: pd.DataFrame):
         .encode(
             y=alt.Y("court_name:N", title="Court"),
             x=alt.X("count():Q", title="Number of Hearings"),
-            color=alt.Color("judgement_favour:N", title="Ruling Favour"),
+            color=alt.Color(
+                "judgement_favour:N",
+                title="Ruling Favour",
+                scale=ruling_color_scale,
+            ),
             tooltip=["court_name", "count()"],
         )
         .properties(title="Recent Rulings across Different Courts")
@@ -111,7 +135,11 @@ def get_rulings_by_title(data: pd.DataFrame):
         .encode(
             x=alt.X("count():Q", title="Number of Hearings"),
             y=alt.Y("title_name:N", sort="-x", title="Judge Title"),
-            color=alt.Color("judgement_favour:N", title="Ruling Favour"),
+            color=alt.Color(
+                "judgement_favour:N",
+                title="Ruling Favour",
+                scale=ruling_color_scale,
+            ),
             tooltip=[
                 alt.Tooltip("title_name:N", title="Title"),
                 alt.Tooltip("judgement_favour:N", title="Ruling Favour"),
@@ -149,7 +177,7 @@ def get_anomalies_visualisation(data: pd.DataFrame):
         .encode(
             x=alt.X("month:N", title="Month", sort="ascending"),
             y=alt.Y("court_name:N", title="Court"),
-            color=alt.Color("count:Q", title=\
+            color=alt.Color("count:Q", title=
                             "No. of Anomalies", scale=alt.Scale(scheme="orangered")),
             tooltip=[
                 alt.Tooltip("court_name:N", title="Court"),
