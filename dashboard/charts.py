@@ -8,9 +8,9 @@ import altair as alt
 import pandas as pd
 
 
-# Custom color scale for 'judgement_favour' using user-provided colors.
+# Custom color scale for 'judgement_favour'.
 JUDGEMENT_DOMAINS = ["Plaintiff", "Defendant", "Undisclosed"]
-# Using provided colors for key categories and neutral grey for Undisclosed.
+# Using colors for key categories and neutral grey for Undisclosed.
 JUDGEMENT_RANGES = ["#007f8c", "#12516a", "#707070"]
 
 ruling_color_scale = alt.Scale(
