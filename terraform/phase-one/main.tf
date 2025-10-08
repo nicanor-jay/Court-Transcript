@@ -46,9 +46,9 @@ resource "aws_ecr_repository" "lambda-ecr" {
   image_tag_mutability = "MUTABLE"
 }
 
-# ECR to host the ECS Task
-resource "aws_ecr_repository" "ecs-ecr" {
-  name                 = var.ECR_FOR_ECS_NAME
+# ECR to host the email image
+resource "aws_ecr_repository" "email-ecr" {
+  name                 = var.ECR_FOR_EMAIL_NAME
   image_tag_mutability = "MUTABLE"
 }
 
