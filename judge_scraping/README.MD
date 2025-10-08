@@ -4,40 +4,39 @@ A Python web scraper that extracts judge information from the UK Judiciary websi
 
 ## Features
 
-- Scrapes judge names, titles, and appointment dates
-- Handles complex name parsing (multi-word surnames, post-nominals)
-- Supports surname prefixes (van der, de la, von, etc.)
-- Removes post-nominal titles (KC, QC, CBE, etc.)
-- Extracts and normalises judicial titles
-- Outputs normalised data ready for database import
-- Comprehensive test suite included
+- Scrapes judge names, titles, and appointment dates  
+- Handles complex name parsing (multi-word surnames, post-nominals)  
+- Supports surname prefixes (van der, de la, von, etc.)  
+- Removes post-nominal titles (KC, QC, CBE, etc.)  
+- Extracts and normalises judicial titles  
+- Outputs normalised data ready for database import  
+- Comprehensive test suite included  
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.9 or higher
-- pip (Python package manager)
+- Python 3.9 or higher  
+- pip (Python package manager)  
+- Google Chrome browser  
+- [ChromeDriver](https://chromedriver.chromium.org/downloads) (must match your Chrome version)
 
 ### Setup
 
-1. Clone or download this repository
+1. Clone or download this repository  
 
-2. Create a virtual environment (recommended):
+2. Create a virtual environment (recommended):  
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
-3. Install dependencies:
+3. Install dependencies:  
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Install [Playwright](https://playwright.dev) browsers:
-```bash
-playwright install chromium
-```
+4. Ensure Selenium and ChromeDriver are correctly installed and on your system PATH.
 
 ## Usage
 
@@ -47,14 +46,14 @@ playwright install chromium
 python judge_scraping.py
 ```
 
-This will:
-1. Scrape all judge data from [judiciary.uk](https://www.judiciary.uk)
-2. Create `judges_data.json` with all judge records
-3. Create `titles_data.json` with normalised title data
+This will:  
+1. Scrape all judge data from [judiciary.uk](https://www.judiciary.uk)  
+2. Create `judges_data.json` with all judge records  
+3. Create `titles_data.json` with normalised title data  
 
 ### Output Files
 
-**`judges_data.json`** - Contains individual judge records:
+**`judges_data.json`** – Contains individual judge records:  
 ```json
 [
   {
@@ -70,7 +69,7 @@ This will:
 ]
 ```
 
-**`titles_data.json`** - Contains normalised title data:
+**`titles_data.json`** – Contains normalised title data:  
 ```json
 [
   {
@@ -90,25 +89,25 @@ This will:
 python3 judges_rds.py
 ```
 
-This will:
-1. Run the scraper as above
-2. Iterate through all scraped judges
-   1. Gets / Inserts the title from / into the RDS
-   2. Inserts the Judge into the RDS. Postgres & the schema set-up will handle any duplicates automatically.
+This will:  
+1. Run the scraper as above  
+2. Iterate through all scraped judges  
+   1. Gets/Inserts the title from/into the RDS  
+   2. Inserts the Judge into the RDS. Postgres & the schema setup will handle any duplicates automatically.
 
 ## Running Tests
 
-Run the complete test suite:
+Run the complete test suite:  
 ```bash
 pytest test_judge_scraping.py -v
 ```
 
-Run specific test classes:
+Run specific test classes:  
 ```bash
 pytest test_judge_scraping.py::TestParseName -v
 ```
 
-Run with coverage report:
+Run with coverage report:  
 ```bash
 pip install pytest-cov
 pytest test_judge_scraping.py --cov=judge_scraping --cov-report=html
@@ -117,42 +116,42 @@ pytest test_judge_scraping.py --cov=judge_scraping --cov-report=html
 ## Name Parsing Features
 
 ### Supported Titles
-- District Judge (MC), District Judge
-- Lord/Lady Justice
-- His/Her Honour Judge
-- Sir, Dame, Lord, Lady
-- Mr, Mrs, Miss, Ms
-- Dr, Professor
-- Judge, HHJ, DHJ
+- District Judge (MC), District Judge  
+- Lord/Lady Justice  
+- His/Her Honour Judge  
+- Sir, Dame, Lord, Lady  
+- Mr, Mrs, Miss, Ms  
+- Dr, Professor  
+- Judge, HHJ, DHJ  
 
 ### Post-Nominal Handling
 Automatically removes post-nominal titles:
-- KC, QC (King's/Queen's Counsel)
-- CBE, OBE, MBE (Honours)
-- JP (Justice of the Peace)
+- KC, QC (King's/Queen's Counsel)  
+- CBE, OBE, MBE (Honours)  
+- JP (Justice of the Peace)  
 
 ### Surname Prefix Support
 Correctly handles multi-word surnames with prefixes:
-- van, van der, van den
-- de, de la
-- du
-- von, von der
+- van, van der, van den  
+- de, de la  
+- du  
+- von, von der  
 
 **Examples:**
-- "Judge van der Zwart" → last_name: "van der Zwart"
-- "Judge John van den Berg" → first: "John", last: "van den Berg"
+- "Judge van der Zwart" → last_name: "van der Zwart"  
+- "Judge John van den Berg" → first: "John", last: "van den Berg"  
 - "Sir Anthony Watson KC" → first: "Anthony", last: "Watson" (KC removed)
 
 ## Project Structure
 
 ```
 .
-├── judge_scraping.py          # Main scraper script
+├── judge_scraping.py          # Main scraper script (now Selenium-based)
 ├── test_judge_scraping.py     # Test suite
 ├── requirements.txt           # Python dependencies
 ├── README.md                  # This file
-├── judges_data.json          # Output: judge records (generated but gitignored)
-└── titles_data.json          # Output: title records (generated but gitignored)
+├── judges_data.json           # Output: judge records (generated but gitignored)
+└── titles_data.json           # Output: title records (generated but gitignored)
 ```
 
 ## Database Integration
@@ -180,40 +179,52 @@ CREATE TABLE judge (
 
 ## Troubleshooting
 
-### Playwright Installation Issues
-If you encounter browser installation issues:
+### ChromeDriver Not Found
+Ensure that ChromeDriver is installed and matches your Chrome version:
 ```bash
-playwright install-deps  # Install system dependencies
-playwright install chromium
+chromedriver --version
+```
+If not found, download it from [chromedriver.chromium.org/downloads](https://chromedriver.chromium.org/downloads) and place it on your PATH.
+
+### Headless Mode
+The scraper runs Chrome in headless mode by default.  
+If you want to see it run in a browser window, edit `judge_scraping.py` and remove:
+```python
+chrome_options.add_argument("--headless")
 ```
 
 ### Timeout Errors
-If scraping times out, increase the timeout in the code:
+If scraping times out, increase the Selenium wait time in the code:
 ```python
-page.goto(url, wait_until="domcontentloaded", timeout=30000)  # 30 seconds
+WebDriverWait(driver, 20)
 ```
 
 ### Missing Data
-Some judges may not have appointment dates or complete name information. The scraper handles this gracefully by setting fields to `None`.
+Some judges may not have appointment dates or complete name information.  
+The scraper handles this gracefully by setting fields to `None`.
 
 ## Contributing
 
 To add support for new name patterns:
 
-1. Add the pattern to the appropriate list (`TITLES`, `POST_NOMINALS`, or `SURNAME_PREFIXES`)
-2. Add test cases to `test_judge_scraping.py`
-3. Run tests to ensure no regressions: `pytest test_judge_scraping.py -v`
+1. Add the pattern to the appropriate list (`TITLES`, `POST_NOMINALS`, or `SURNAME_PREFIXES`)  
+2. Add test cases to `test_judge_scraping.py`  
+3. Run tests to ensure no regressions:  
+   ```bash
+   pytest test_judge_scraping.py -v
+   ```
 
 ## Notes
 
-- The scraper respects the [judiciary.uk](https://www.judiciary.uk) website structure
-- Website structure changes may require updates to the scraper
-- Always review scraped data for accuracy before use
-- Consider rate limiting if running frequent scrapes
+- The scraper uses **Selenium with ChromeDriver** (instead of Playwright).  
+- It filters out non-judicial entries (regions, circuits, etc.).  
+- Website structure changes may require updates to the scraper.  
+- Always review scraped data for accuracy before use.  
+- Consider rate limiting if running frequent scrapes.  
 
 ## Support
 
-For issues or questions:
-1. Check the test suite for expected behavior examples
-2. Review the inline code documentation
-3. Verify your Python and dependency versions match requirements
+For issues or questions:  
+1. Check the test suite for expected behavior examples  
+2. Review the inline code documentation  
+3. Verify your Python, Selenium, and ChromeDriver versions match requirements  
