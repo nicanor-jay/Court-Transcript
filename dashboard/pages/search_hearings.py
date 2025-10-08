@@ -1,6 +1,8 @@
+#pylint:disable=line-too-long, import-error
+"""Streamlit dashboard page for searching hearings. """
+import datetime
 import streamlit as st
 import pandas as pd
-import datetime
 from data_cache import get_data_from_db
 from rds_utils import get_db_connection
 
@@ -8,7 +10,8 @@ from rds_utils import get_db_connection
 st.set_page_config(page_title="Search Court Hearings", layout="wide")
 
 st.title("🔍 Search Through Court Hearings")
-st.markdown("Use the filters below to explore recent hearings stored in the Court Transcripts database.")
+st.markdown("Use the filters below to explore recent hearings \
+            stored in the Court Transcripts database.")
 
 conn = get_db_connection()
 data = get_data_from_db(conn)
@@ -20,7 +23,8 @@ data["hearing_date"] = pd.to_datetime(data["hearing_date"], errors="coerce")
 col1, col2, col3, col4 = st.columns([2, 2, 2, 2])
 
 with col1:
-    keyword = st.text_input("Keyword Filter", placeholder="Enter keyword in title or description...")
+    keyword = st.text_input("Keyword Filter", \
+                            placeholder="Enter keyword in title or description...")
 
 with col2:
     court_filter = st.selectbox(
