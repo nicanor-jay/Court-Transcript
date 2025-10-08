@@ -72,7 +72,7 @@ A `.env` file as described in the root level [README.md](../README.md)
 
 ### Usage
 
-To containerise the pipeline and upload to ECR run the following command from the root directory.
+To containerise the pipeline and upload to ECR, run the following command from the root directory.
 
 ```bash
 bash pipeline/build_push_dockerfile.sh
