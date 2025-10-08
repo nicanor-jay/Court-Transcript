@@ -96,5 +96,32 @@ def get_rulings_by_court_chart(data: pd.DataFrame):
         color=alt.Color('judgement_favour:N', title='Ruling Favour'),
         tooltip=['court_name', 'count()']
     ).properties(title="Recent Rulings across Different Courts")
-
     return chart
+
+
+def get_rulings_by_title(data: pd.DataFrame):
+    """Composite bar chart showing the disparity in rulings by title."""
+
+    data['title_name'] = data['title_name'].fillna('Unknown')
+    data['judgement_favour'] = data['judgement_favour'].fillna('Undisclosed')
+    chart = (
+        alt.Chart(data)
+        .mark_bar()
+        .encode(
+            x=alt.X("count():Q", title="Number of Hearings"),
+            y=alt.Y("title_name:N", sort='-x', title="Judge Title"),
+            color=alt.Color("judgement_favour:N", title="Ruling Favour"),
+            tooltip=[
+                alt.Tooltip("title_name:N", title="Title"),
+                alt.Tooltip("judgement_favour:N", title="Ruling Favour"),
+                alt.Tooltip("count():Q", title="Number of Hearings"),
+            ],
+        )
+        .properties(
+            title="Rulings by Judicial Title",
+            width=500,
+            height=300,
+        )
+    )
+    return chart
+

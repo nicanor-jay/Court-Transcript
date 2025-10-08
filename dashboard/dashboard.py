@@ -11,6 +11,7 @@ from charts import (
     get_recent_hearings_table,
     get_rulings_by_court_chart,
     get_overall_ruling_bias_chart,
+    get_rulings_by_title,
 )
 
 
@@ -37,8 +38,8 @@ def main():
         st.markdown("### Recent Rulings across Different Courts")
         st.altair_chart(get_rulings_by_court_chart(data), use_container_width=True)
 
-        st.markdown("### TBC (Placeholder for next visualisation)")
-        st.info("Future section for anomalies, topics, or summaries.")
+        st.markdown("### Rulings by Judicial Title")
+        st.altair_chart(get_rulings_by_title(data), use_container_width=True)
 
     with col_side:
         st.markdown("### Overall Ruling Bias")
