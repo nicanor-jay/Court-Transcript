@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS judge CASCADE;
 DROP TABLE IF EXISTS court CASCADE;
 DROP TABLE IF EXISTS judgement CASCADE;
 DROP TABLE IF EXISTS title CASCADE;
-
+DROP TABLE IF EXISTS subscriber CASCADE;
 -- Recreate schema
 
 CREATE TABLE title (
@@ -62,5 +62,5 @@ CREATE TABLE subscriber(
     subscriber_id BIGSERIAL PRIMARY KEY,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
-    email VARCHAR(50) 
+    email VARCHAR(50) UNIQUE
 );
