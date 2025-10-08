@@ -69,6 +69,11 @@ variable "ECS_CLUSTER" {
   type        = string
 }
 
+variable "OPENAI_API_KEY" {
+  description = "GPT-API key"
+  type        = string
+}
+
 variable "DASHBOARD_TASK_DEFINITION_NAME" {
   description = "Name for the dashboard's task definition resource"
   type        = string

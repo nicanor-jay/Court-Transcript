@@ -128,6 +128,7 @@ resource "aws_lambda_function" "courts-lambda" {
       DB_USERNAME=var.DB_USERNAME
       DB_PASSWORD=var.DB_PASSWORD
       DB_NAME=var.DB_NAME
+      OPENAI_API_KEY = var.OPENAI_API_KEY
     }
   }
   architectures = ["x86_64"]

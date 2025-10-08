@@ -6,6 +6,7 @@ import subprocess
 from typing import Optional
 from psycopg2.extensions import connection
 from judge_scraping.rds_utils import get_db_connection, query_rds
+from judge_scraping.judge_scraper import judge_main
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 
@@ -34,7 +35,7 @@ def get_judges_from_rds(conn: connection):
 def run_scraper():
     """Run the judge scraping script."""
     logging.info("Running scraper")
-    subprocess.run(["python3", "judge_scraping/judge_scraper.py"], check=True)
+    judge_main()
     logging.info("Completed scraping. ")
 
 
