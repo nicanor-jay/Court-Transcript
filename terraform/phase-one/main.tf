@@ -46,12 +46,6 @@ resource "aws_ecr_repository" "lambda-ecr" {
   image_tag_mutability = "MUTABLE"
 }
 
-# ECR to host the ECS Task
-resource "aws_ecr_repository" "ecs-ecr" {
-  name                 = var.ECR_FOR_ECS_NAME
-  image_tag_mutability = "MUTABLE"
-}
-
 # ECR to host the ECS Dashboard
 resource "aws_ecr_repository" "dashboard-ecr" {
   name                 = var.ECR_FOR_DASHBOARD_NAME

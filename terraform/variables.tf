@@ -63,11 +63,6 @@ variable "ECR_FOR_LAMBDA_NAME" {
   type = string
 }
 
-variable "ECR_FOR_ECS_NAME" {
-  description = "Name for the ECR hosting our ECS task"
-  type = string
-}
-
 variable "ECR_FOR_DASHBOARD_NAME" {
   description = "Name for the ECR hosting our dashboard image"
   type = string
@@ -91,6 +86,11 @@ variable "DASHBOARD_IMAGE_URI" {
   type        = string
 }
 
+variable "PIPELINE_IMAGE_URI" {
+  description = "URI for the pipeline image"
+  type        = string
+}
+
 variable "ECS_CLUSTER" {
   description = "ARN of ECS cluster to use for the dashboard ECS service"
   type        = string
@@ -108,5 +108,15 @@ variable "DASHBOARD_SECURITY_GROUP_NAME" {
 
 variable "DASHBOARD_ECS_SERVICE_NAME" {
   description = "Name for the dashboard's ECS service resource"
+  type        = string
+}
+
+variable "LAMBDA_EXEC_ROLE_NAME" {
+  description = "Name for the lambda's execution role"
+  type        = string
+}
+
+variable "PIPELINE_LAMBDA_NAME" {
+  description = "Name for the pipeline lambda"
   type        = string
 }
