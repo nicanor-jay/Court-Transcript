@@ -17,6 +17,7 @@ def get_total_hearing_count(_con: connection) -> dict:
     """
     return query_rds(_con, query)
 
+
 @st.cache_data(ttl=600)
 def get_data_from_db(_con: connection) -> pd.DataFrame:
     """Fetches joined data from hearing, judge, court, and judgement tables."""
