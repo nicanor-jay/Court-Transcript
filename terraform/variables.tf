@@ -63,8 +63,8 @@ variable "ECR_FOR_LAMBDA_NAME" {
   type = string
 }
 
-variable "ECR_FOR_ECS_NAME" {
-  description = "Name for the ECR hosting our ECS task"
+variable "ECR_FOR_EMAIL_NAME" {
+  description = "Name for the ECR hosting our email task"
   type = string
 }
 
