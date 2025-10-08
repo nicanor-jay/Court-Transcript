@@ -187,7 +187,8 @@ def scrape_page(driver, url: str) -> List[Dict]:
         rows = table.find_elements(By.CSS_SELECTOR, "tbody tr")
 
         for row in rows:
-            cells = [c.text.strip() for c in row.find_elements(By.TAG_NAME, "td")]
+            cells = [c.text.strip()
+                     for c in row.find_elements(By.TAG_NAME, "td")]
 
             if not cells or not cells[0]:
                 continue
@@ -237,7 +238,7 @@ def normalise_judge(judge: Dict) -> Dict:
     return judge
 
 
-def main():
+def judge_main():
     """Main entry point."""
     base_url = (
         "https://www.judiciary.uk/about-the-judiciary/who-are-the-judiciary/"
@@ -258,10 +259,13 @@ def main():
             EC.presence_of_element_located((By.TAG_NAME, "a"))
         )
 
-        link_elements = driver.find_elements(By.CSS_SELECTOR, 'a[href*="list-of-members"]')
-        links = [elem.get_attribute("href") for elem in link_elements if elem.get_attribute("href")]
+        link_elements = driver.find_elements(
+            By.CSS_SELECTOR, 'a[href*="list-of-members"]')
+        links = [elem.get_attribute(
+            "href") for elem in link_elements if elem.get_attribute("href")]
 
-        links = [f"https://www.judiciary.uk{l}" if l.startswith("/") else l for l in links]
+        links = [
+            f"https://www.judiciary.uk{l}" if l.startswith("/") else l for l in links]
 
         all_judges = []
         if links:
