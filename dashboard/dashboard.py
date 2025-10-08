@@ -1,25 +1,49 @@
-"""Entry dashboard page"""
+"""
+main.py
+Streamlit dashboard layout for court hearings data.
+"""
 
-import logging
 import streamlit as st
 from dotenv import load_dotenv
-from utils import setup_logging
 from rds_utils import get_db_connection
-from data_cache import get_total_hearing_count
-
-con = get_db_connection()
-load_dotenv()
-setup_logging()
-
-logging.info("Running dashboard.")
-st.title('Court Transcript Dashboard')
-
-col1, col2, col3 = st.columns(3)
+from charts import (
+    get_data_from_db,
+    get_recent_hearings_table,
+    get_rulings_by_court_chart,
+    get_overall_ruling_bias_chart,
+)
 
 
-with col1:
-    # Placeholder until RDS is live
-    st.metric("(Fake) Total Court Hearings", 100, border=True)
-with col2:
-    st.metric("(RDS) Total Court Hearings",
-              get_total_hearing_count(con)['total'], border=True)
+def main():
+    load_dotenv()
+    st.set_page_config(page_title="Court Hearings Dashboard", layout="wide")
+
+    # Connect to database
+    conn = get_db_connection()
+
+    # Load data
+    data = get_data_from_db(conn)
+
+    # Layout
+    st.title("Court Hearings Overview")
+
+    # Main content and sidebar layout
+    col_main, col_side = st.columns([3, 1])
+
+    with col_main:
+        st.markdown("### Last 3–5 Court Hearings Chronologically")
+        st.dataframe(get_recent_hearings_table(data), use_container_width=True)
+
+        st.markdown("### Recent Rulings across Different Courts")
+        st.altair_chart(get_rulings_by_court_chart(data), use_container_width=True)
+
+        st.markdown("### TBC (Placeholder for next visualisation)")
+        st.info("Future section for anomalies, topics, or summaries.")
+
+    with col_side:
+        st.markdown("### Overall Ruling Bias")
+        st.altair_chart(get_overall_ruling_bias_chart(data), use_container_width=True)
+
+
+if __name__ == "__main__":
+    main()
