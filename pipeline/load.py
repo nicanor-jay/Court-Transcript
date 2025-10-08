@@ -198,7 +198,7 @@ def insert_into_hearing(conn: connection, hearing: dict, metadata: dict) -> None
         logging.info('Skipping. No conclusive judgement found.')
         return
 
-    if hearing.get('court') is None:
+    if metadata.get('court') is None:
         logging.info('Skipping. No court name found.')
         return
 
