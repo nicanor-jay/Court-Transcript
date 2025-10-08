@@ -28,8 +28,8 @@ logging.basicConfig(level=logging.INFO,
 
 def reset_jsonl_file(filename: str) -> None:
     """Deletes the target files if they already exist."""
-    if os.path.exists(f"{filename}.jsonl"):
-        os.remove(f"{filename}.jsonl")
+    if os.path.exists(f"/tmp/{filename}.jsonl"):
+        os.remove(f"/tmp/{filename}.jsonl")
 
 
 def insert_scraped_judges() -> None:
@@ -66,7 +66,7 @@ def extract_meaningful_headers_and_content(transcripts: list[dict], filename: st
        inside the transcripts."""
     logging.info("Extracting meaningful headers.")
     meaningful_headers = summary.extract_meaningful_headers(
-        transcripts, f'{filename}.jsonl')
+        transcripts, f'/tmp/{filename}.jsonl')
 
     for i, items in enumerate(meaningful_headers.items()):
         citation, headers = items
@@ -87,7 +87,7 @@ def gpt_summarise_transcripts(conn: connection,
                               filename: str) -> None:
     """Feeds GPT-API headers and content, and it summarises it. Data is then pushed to the DB."""
     logging.info("Getting summaries from GPT-API")
-    summaries = summary.summarise(transcripts, f"{filename}.jsonl")
+    summaries = summary.summarise(transcripts, f"/tmp/{filename}.jsonl")
 
     for metadata in metadatas:
         logging.info(metadata)

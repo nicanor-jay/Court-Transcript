@@ -1,4 +1,4 @@
-#pylint: disable=use-dict-literal, too-many-branches, too-many-return-statements
+# pylint: disable=use-dict-literal, too-many-branches, too-many-return-statements
 """
 UK Judiciary Web Scraper - Judges Only
 Scrapes judiciary.uk and extracts *only* real judges.
@@ -35,7 +35,8 @@ TITLES = [
 POST_NOMINALS = ["KC", "QC", "CBE", "OBE", "MBE", "JP"]
 
 # Prefixes that indicate multiword surnames
-SURNAME_PREFIXES = ["van", "van der", "van den", "de", "de la", "du", "von", "von der"]
+SURNAME_PREFIXES = ["van", "van der", "van den",
+                    "de", "de la", "du", "von", "von der"]
 
 
 def parse_date(text: str) -> Optional[str]:
@@ -73,7 +74,8 @@ def parse_date(text: str) -> Optional[str]:
 
 def parse_name(full: str) -> Dict[str, Optional[str]]:
     """Split judge full name into components."""
-    result = dict(title=None, first_name=None, middle_name=None, last_name=None)
+    result = dict(title=None, first_name=None,
+                  middle_name=None, last_name=None)
     if not full:
         return result
 
@@ -171,8 +173,8 @@ def looks_like_judge(text: str) -> bool:
             if len(words) >= 1:
                 # Exclude common location words
                 location_words = {"country", "region", "area", "circuit", "division",
-                                "midlands", "north", "south", "east", "west", "city",
-                                "county", "district", "wales", "scotland", "england", "ireland"}
+                                  "midlands", "north", "south", "east", "west", "city",
+                                  "county", "district", "wales", "scotland", "england", "ireland"}
                 if all(w.lower() in location_words for w in words):
                     return False
             return True
@@ -195,7 +197,8 @@ def scrape_page(page, url: str) -> List[Dict]:
             if not looks_like_judge(full_name):
                 continue
 
-            date_val = next((parse_date(c) for c in cells[1:] if parse_date(c)), None)
+            date_val = next((parse_date(c)
+                            for c in cells[1:] if parse_date(c)), None)
             parsed = parse_name(full_name)
 
             judges.append({
@@ -234,7 +237,7 @@ def normalise_judge(judge: Dict) -> Dict:
     return judge
 
 
-def main():
+def judge_main():
     """Main script for file."""
     base_url = (
         "https://www.judiciary.uk/about-the-judiciary/who-are-the-judiciary/"
@@ -247,8 +250,9 @@ def main():
         page = browser.new_page()
         page.goto(base_url, wait_until="domcontentloaded", timeout=20000)
 
-        links = [a.get_attribute("href") for a in page.locator('a[href*="list-of-members"]').all()]
-        links = [f"https://www.judiciary.uk{l}" if \
+        links = [a.get_attribute("href") for a in page.locator(
+            'a[href*="list-of-members"]').all()]
+        links = [f"https://www.judiciary.uk{l}" if
                  l and l.startswith("/") else l for l in links if l]
 
         if links:
@@ -275,4 +279,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    judge_main()
