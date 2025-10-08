@@ -8,53 +8,7 @@ import altair as alt
 import pandas as pd
 import datetime
 from psycopg2 import connect
-
-
-def get_data_from_db(conn: connect) -> pd.DataFrame:
-    """Fetches joined data from hearing, judge, court, and judgement tables."""
-
-    with conn.cursor() as cur:
-        query = """
-            SELECT 
-                h.hearing_id,
-                h.hearing_citation,
-                h.hearing_title,
-                h.hearing_date,
-                h.hearing_description,
-                h.hearing_anomaly,
-                h.hearing_url,
-                j.judgement_favour,
-                c.court_name,
-                jd.judge_id,
-                jd.first_name,
-                jd.middle_name,
-                jd.last_name,
-                t.title_name,
-                jd.appointment_date
-            FROM hearing h
-            LEFT JOIN judgement j ON h.judgement_id = j.judgement_id
-            LEFT JOIN court c ON h.court_id = c.court_id
-            LEFT JOIN judge_hearing jh ON h.hearing_id = jh.hearing_id
-            LEFT JOIN judge jd ON jh.judge_id = jd.judge_id
-            LEFT JOIN title t ON jd.title_id = t.title_id;
-        """
-        cur.execute(query)
-        rows = cur.fetchall()
-        colnames = [desc[0] for desc in cur.description]
-    
-    df = pd.DataFrame(rows, columns=colnames)
-    df = df.drop_duplicates(subset=["hearing_id"]).reset_index(drop=True)
-    
-    # Convert datetime objects to strings for Streamlit display
-    for col in ['hearing_date', 'appointment_date']:
-        if col in df.columns:
-            if pd.api.types.is_datetime64_any_dtype(df[col]):
-                df[col] = df[col].astype(str)
-            elif df[col].apply(lambda x: isinstance(x, (pd.Timestamp, datetime.date, datetime.datetime))).any():
-                df[col] = df[col].astype(str)
-                 
-    return df
-
+from data_cache import get_data_from_db
 
 def get_overall_ruling_bias_chart(data: pd.DataFrame):
     """Donut chart showing favour (Claimant vs Defendant vs Undisclosed)."""
@@ -125,3 +79,53 @@ def get_rulings_by_title(data: pd.DataFrame):
     )
     return chart
 
+def get_anomalies_visualisation(data: pd.DataFrame):
+    """Visualisation showing frequency of anomalies per court over time."""
+
+    # Filter only meaningful anomalies (not 'None Found')
+    anomalies = data[
+        data["hearing_anomaly"]
+        .fillna("")
+        .apply(lambda x: x.strip().lower() not in ["none found"])
+    ].copy()
+
+    if anomalies.empty:
+        return alt.Chart(pd.DataFrame({"message": ["No significant anomalies detected."]})).mark_text(
+            align="center",
+            fontSize=13,
+            color="gray"
+        ).encode(text="message:N").properties(height=80)
+
+    # Convert to datetime and extract month
+    anomalies["hearing_date"] = pd.to_datetime(anomalies["hearing_date"], errors="coerce")
+    anomalies["month"] = anomalies["hearing_date"].dt.to_period("M").astype(str)
+
+    # Count anomalies per court per month
+    counts = (
+        anomalies.groupby(["court_name", "month"])
+        .size()
+        .reset_index(name="count")
+    )
+
+    # Heatmap
+    chart = (
+        alt.Chart(counts)
+        .mark_rect()
+        .encode(
+            x=alt.X("month:N", title="Month", sort="ascending"),
+            y=alt.Y("court_name:N", title="Court"),
+            color=alt.Color("count:Q", title="No. of Anomalies", scale=alt.Scale(scheme="orangered")),
+            tooltip=[
+                alt.Tooltip("court_name:N", title="Court"),
+                alt.Tooltip("month:N", title="Month"),
+                alt.Tooltip("count:Q", title="Anomalies"),
+            ],
+        )
+        .properties(
+            title="Court Anomalies Over Time",
+            width=300,
+            height=250,
+        )
+    )
+
+    return chart

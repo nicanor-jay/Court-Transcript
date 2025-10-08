@@ -1,17 +1,20 @@
 """
-main.py
 Streamlit dashboard layout for court hearings data.
 """
 
 import streamlit as st
 from dotenv import load_dotenv
 from rds_utils import get_db_connection
+from data_cache import (
+    get_data_from_db,
+)
 from charts import (
     get_data_from_db,
     get_recent_hearings_table,
     get_rulings_by_court_chart,
     get_overall_ruling_bias_chart,
     get_rulings_by_title,
+    get_anomalies_visualisation
 )
 
 
@@ -44,6 +47,9 @@ def main():
     with col_side:
         st.markdown("### Overall Ruling Bias")
         st.altair_chart(get_overall_ruling_bias_chart(data), use_container_width=True)
+
+        st.markdown("### Recent Court Anomalies")
+        st.altair_chart(get_anomalies_visualisation(data), use_container_width=True)
 
 
 if __name__ == "__main__":
