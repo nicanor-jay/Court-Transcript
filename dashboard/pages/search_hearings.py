@@ -4,23 +4,19 @@ import datetime
 from data_cache import get_data_from_db
 from rds_utils import get_db_connection
 
-
-# Page Configuration
+# Page Config
 st.set_page_config(page_title="Search Court Hearings", layout="wide")
 
 st.title("🔍 Search Through Court Hearings")
 st.markdown("Use the filters below to explore recent hearings stored in the Court Transcripts database.")
 
-
-# Load and cache data
 conn = get_db_connection()
 data = get_data_from_db(conn)
 
 # Ensure consistent date formats
 data["hearing_date"] = pd.to_datetime(data["hearing_date"], errors="coerce")
 
-
-# Sidebar / Top Filters
+# Sidebar / top Filters
 col1, col2, col3, col4 = st.columns([2, 2, 2, 2])
 
 with col1:
@@ -33,10 +29,26 @@ with col2:
     )
 
 with col3:
-    start_date, end_date = st.date_input(
+    # Handle empty data
+    if data["hearing_date"].dropna().empty:
+        default_start = default_end = datetime.date.today()
+    else:
+        default_start = data["hearing_date"].min().date()
+        default_end = data["hearing_date"].max().date()
+
+    # Provide single date if start==end, else tuple for range
+    default_value = default_start if default_start == default_end else (default_start, default_end)
+
+    date_selection = st.date_input(
         "Date Range",
-        value=(data["hearing_date"].min(), data["hearing_date"].max())
+        value=default_value
     )
+
+    # Normalise to start_date and end_date
+    if isinstance(date_selection, (tuple, list)):
+        start_date, end_date = date_selection
+    else:
+        start_date = end_date = date_selection
 
 with col4:
     ruling_filter = st.selectbox(
@@ -44,10 +56,9 @@ with col4:
         options=["All"] + sorted(data["judgement_favour"].fillna("Undisclosed").unique().tolist())
     )
 
-
-# Filter Logic
 filtered = data.copy()
 
+# Keyword filter
 if keyword:
     keyword_lower = keyword.lower()
     filtered = filtered[
@@ -55,54 +66,53 @@ if keyword:
         | filtered["hearing_description"].str.lower().str.contains(keyword_lower, na=False)
     ]
 
+# Court filter
 if court_filter != "All":
     filtered = filtered[filtered["court_name"] == court_filter]
 
+# Ruling filter
 if ruling_filter != "All":
     filtered = filtered[filtered["judgement_favour"].fillna("Undisclosed") == ruling_filter]
 
+# Date range filter
 if isinstance(start_date, datetime.date) and isinstance(end_date, datetime.date):
-    filtered = filtered[
-        (filtered["hearing_date"].dt.date >= start_date)
-        & (filtered["hearing_date"].dt.date <= end_date)
-    ]
+    if not filtered.empty:
+        filtered = filtered[
+            (filtered["hearing_date"].dt.date >= start_date)
+            & (filtered["hearing_date"].dt.date <= end_date)
+        ]
 
-
-# Results Display
+# Display
 st.markdown(f"### Showing {len(filtered)} matching hearing(s)")
 
 if filtered.empty:
     st.info("No hearings found matching your filters.")
 else:
     for _, row in filtered.iterrows():
-        with st.container(border=True):
-            col_a, col_b = st.columns([5, 1])
+        ruling = row["judgement_favour"] or "Undisclosed"
+        color = {
+            "Claimant": "#16a34a",
+            "Defendant": "#dc2626",
+            "Undisclosed": "#6b7280"
+        }.get(ruling, "#6b7280")
 
-            with col_a:
-                st.markdown(f"#### {row['hearing_title'] or 'Untitled Hearing'}")
-                st.markdown(
-                    f"**Court:** {row['court_name'] or 'Unknown'}  "
-                    f"| **Date:** {row['hearing_date'].date() if pd.notna(row['hearing_date']) else 'Unknown'}"
-                )
-                st.markdown(
-                    f"<div style='color: #666; font-size: 0.9em; margin-top: 0.5em;'>"
-                    f"{(row['hearing_description'] or '')[:300]}{'...' if row['hearing_description'] and len(row['hearing_description']) > 300 else ''}"
-                    f"</div>",
-                    unsafe_allow_html=True,
-                )
+        with st.container():
+            # Card layout
+            st.subheader(row['hearing_title'] or "Untitled Hearing")
+            st.caption(
+                f"Court: {row['court_name'] or 'Unknown'} | "
+                f"Date: {row['hearing_date'].date() if pd.notna(row['hearing_date']) else 'Unknown'} | "
+                f"Citation: {row['hearing_citation'] or 'N/A'}"
+            )
+            st.write(row['hearing_description'] or "No description available.")
 
-                if row.get("hearing_url"):
-                    st.markdown(f"[🔗 View Full Hearing]({row['hearing_url']})", unsafe_allow_html=True)
+            # ruling badge
+            st.markdown(
+                f"<span style='background-color:{color}; color:white; padding:4px 10px; border-radius:6px; font-weight:500;'>{ruling}</span>",
+                unsafe_allow_html=True
+            )
 
-            with col_b:
-                ruling = row["judgement_favour"] or "Undisclosed"
-                color = {
-                    "Claimant": "#16a34a",
-                    "Defendant": "#dc2626",
-                    "Undisclosed": "#6b7280"
-                }.get(ruling, "#6b7280")
-                st.markdown(
-                    f"<div style='background:{color}; color:white; padding:6px 12px; border-radius:8px; text-align:center;'>"
-                    f"{ruling}</div>",
-                    unsafe_allow_html=True
-                )
+            if row.get('hearing_url'):
+                st.markdown(f"[🔗 View Full Hearing]({row['hearing_url']})")
+
+            st.divider()  # separator between cards
