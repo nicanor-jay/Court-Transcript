@@ -1,8 +1,12 @@
 """This script generates an HTML email to send to subscribers."""
 
+import logging
 from datetime import datetime, timedelta
 from rds_utils import get_db_connection, query_rds
 from psycopg2.extensions import connection
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def get_yesterdays_hearings(conn: connection) -> list[dict]:
@@ -97,15 +101,15 @@ def handler(context=None, event=None):
     subscriber_emails = get_subscriber_list(conn)
     email = write_email(hearings)
 
-    print(subscriber_emails)
-    print(email)
-
     conn.close()
 
-    return {
+    res = {
         'subscriber_emails': subscriber_emails,
         'email': email
     }
+
+    logging.info("Returning %s from create_email.py.", res)
+    return res
 
 
 if __name__ == "__main__":
