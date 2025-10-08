@@ -6,7 +6,6 @@ from psycopg2 import connect
 from psycopg2.extensions import connection
 from psycopg2.extras import RealDictCursor
 from psycopg2 import Error
-import logging
 
 
 from judge_scraping.judge_scraper import parse_name
@@ -107,23 +106,13 @@ def check_judge_exists(conn: connection, judges: list) -> list[int]:
     if judges:
         for judge in judges:
             judge = parse_name(judge)
-            title_id = get_title_id(conn, judge['title'])
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                # query = """
-                # SELECT judge_id
-                # FROM judge
-                # WHERE title_id = %s
-                # AND LOWER(last_name) = LOWER(%s);
-                # """
-
-                # Dumbed down check
                 query = """
                 SELECT judge_id
                 FROM judge
                 WHERE LOWER(last_name) = LOWER(%s);
                 """
 
-                # cur.execute(query, (title_id, judge.get('last_name')))
                 cur.execute(query, (judge.get('last_name'),))
                 data = cur.fetchone()
                 if data:
@@ -164,7 +153,6 @@ def get_court_id(conn: connection, court_name: str) -> int:
         cur.execute(query, (court_name,))
         data = cur.fetchone()
         return data['court_id'] if data else None
-        # return cur.fetchone()['court_id']
 
 
 def insert_into_court(conn: connection, court: str) -> int:
@@ -175,7 +163,7 @@ def insert_into_court(conn: connection, court: str) -> int:
         INSERT INTO court (court_name)
         VALUES (%s)
         RETURNING court_id;
-        """  # may need to change id to court_id (find out after testing)
+        """
         cur.execute(query, (court,))
         conn.commit()
         return cur.fetchone()['court_id']
