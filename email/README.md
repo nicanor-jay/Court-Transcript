@@ -53,8 +53,18 @@ From within the directory.
 python create_email.py
 ```
 
-## Containerising the Pipeline
+## Containerising the email task
 
 ### Requirements
 
 A `.env` file as described in the root level [README.md](../README.md)
+
+### Usage
+
+To containerise the pipeline and upload to ECR, run the following command from the root directory.
+
+```bash
+bash email/build_push_dockerfile.sh
+```
+
+This will build, tag, & upload the containerised image to AWS ECR.
