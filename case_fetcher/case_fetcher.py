@@ -14,6 +14,9 @@ NAMESPACES = {
     "tna": "https://caselaw.nationalarchives.gov.uk"
 }
 
+out_dir = Path("/tmp/xml_cases")
+out_dir.mkdir(exist_ok=True)
+
 
 def setup_logging() -> None:
     """Configure logging output."""
@@ -82,7 +85,7 @@ def load_all_xml(entries: List[Tuple[str, str, Optional[str]]]) -> Dict[str, str
     return xml_dict
 
 
-def download_from_dict(xml_dict: Dict[str, str], out_dir: str) -> None:
+def download_from_dict(xml_dict: Dict[str, str]) -> None:
     """Write XMLs from xml_dict to disk."""
     for slug, xml_str in xml_dict.items():
         filepath = out_dir / f"{slug}.xml"
@@ -112,9 +115,7 @@ def main():
     logging.info(f"Loaded {len(xml_strings)} XMLs into memory")
 
     if args.download:
-        out_dir = Path("xml_cases")
-        out_dir.mkdir(exist_ok=True)
-        download_from_dict(xml_strings, out_dir)
+        download_from_dict(xml_strings)
 
 
 if __name__ == "__main__":
