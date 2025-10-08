@@ -48,7 +48,7 @@ resource "aws_ecr_repository" "lambda-ecr" {
 
 # ECR to host the email image
 resource "aws_ecr_repository" "email-ecr" {
-  name                 = var.ECR_FOR_EMAIl_NAME
+  name                 = var.ECR_FOR_EMAIL_NAME
   image_tag_mutability = "MUTABLE"
 }
 

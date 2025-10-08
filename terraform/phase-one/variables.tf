@@ -64,7 +64,7 @@ variable "ECR_FOR_LAMBDA_NAME" {
   type = string
 }
 
-variable "ECR_FOR_EMAIl_NAME" {
+variable "ECR_FOR_EMAIL_NAME" {
   description = "Name for the ECR hosting our email image"
   type = string
 }
