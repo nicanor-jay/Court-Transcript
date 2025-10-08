@@ -82,6 +82,7 @@ def get_judge_ruling_bias_chart(data: pd.DataFrame, judge_name: str = ""):
 
 
 def get_recent_hearings_table(data: pd.DataFrame):
+    """Gets a table of the most recent hearings. """
     recent = data.sort_values(by="hearing_date", ascending=False).head(5)
     table = recent[
         ["hearing_date", "court_name",
@@ -97,7 +98,6 @@ def get_recent_hearings_table(data: pd.DataFrame):
         }
     )
 
-    # REMOVED custom styling to use Streamlit's default DataFrame appearance.
     return table
 
 
