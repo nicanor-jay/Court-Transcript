@@ -37,10 +37,20 @@ def write_email(hearings: list[dict]) -> str:
 
     yesterdays_date = (datetime.now() - timedelta(days=1)).date()
 
+    plaintiff_count = sum([
+        1 for hearing in hearings if hearing['judgement_favour'] == 'Plaintiff'])
+    defendant_count = len(hearings) - plaintiff_count
+
     html = f"""<h2> Hearing Overview - {yesterdays_date}</h2>
     """
-    html += "<p>Thanks for reading this daily update. For more details, access the <a href='http://35.179.105.252:8501'/>dashboard</a>.</p>"
+    html += "<p>Thanks for reading this daily update. For more details, access the <a href='http://18.175.52.45:8501'>dashboard</a>.</p>"
     html += "<hr>"
+    html += f"<p>Total Cases: {len(hearings)}</p>"
+    html += f"<p>In Favour of Plaintiff: {plaintiff_count}</p>"
+    html += f"<p>In Favour of Defendant: {defendant_count}</p>"
+    html += "<hr>"
+
+    html += "<h2>Hearings</h2>"
 
     for hearing in hearings:
         html += "<div>"
