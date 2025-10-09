@@ -53,7 +53,8 @@ st.markdown(
 MAIN_LOGO = "images/BarristerBrief.png"
 SIDEBAR_LOGO = "images/courtlogo.png"
 
-st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
+st.logo(SIDEBAR_LOGO, size='large')
+st.sidebar.image(MAIN_LOGO)
 
 st.set_page_config(page_title="Judge Details", layout="wide")
 

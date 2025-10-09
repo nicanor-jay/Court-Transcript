@@ -57,7 +57,8 @@ st.markdown(
 MAIN_LOGO = "images/BarristerBrief.png"
 SIDEBAR_LOGO = "images/courtlogo.png"
 
-st.logo(MAIN_LOGO, icon_image=SIDEBAR_LOGO, size='large')
+st.logo(SIDEBAR_LOGO, size='large')
+st.sidebar.image(MAIN_LOGO)
 
 def main():
     """Main function to load and create dashboard. """
@@ -74,6 +75,7 @@ def main():
 
     # Layout
     st.title("Court Hearings Overview")
+    st.divider()
 
     # Main content and sidebar layout
     col_main, col_side = st.columns([3, 1])

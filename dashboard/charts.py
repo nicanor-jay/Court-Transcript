@@ -104,14 +104,20 @@ def get_recent_hearings_table(data: pd.DataFrame):
 
 
 def get_rulings_by_court_chart(data: pd.DataFrame):
-    """Stacked bar chart showing ruling by court."""
     data = data.copy()
     data["judgement_favour"] = data["judgement_favour"].fillna("Undisclosed")
     chart = (
         alt.Chart(data)
         .mark_bar()
         .encode(
-            y=alt.Y("court_name:N", title="Court"),
+            y=alt.Y(
+                "court_name:N",
+                title="",
+                axis=alt.Axis(
+                    labelLimit=600,
+                    labelOverlap=False
+                )
+            ),
             x=alt.X("count():Q", title="Number of Hearings"),
             color=alt.Color(
                 "judgement_favour:N",
@@ -121,6 +127,8 @@ def get_rulings_by_court_chart(data: pd.DataFrame):
             tooltip=["court_name", "count()"],
         )
         .properties(title="Recent Rulings across Different Courts")
+        .resolve_scale(y="independent")
+        .interactive()
     )
     return chart
 
@@ -136,7 +144,11 @@ def get_rulings_by_title(data: pd.DataFrame):
         .mark_bar()
         .encode(
             x=alt.X("count():Q", title="Number of Hearings"),
-            y=alt.Y("title_name:N", sort="-x", title="Judge Title"),
+            y=alt.Y("title_name:N", sort="-x", title="Judge Title",
+                axis=alt.Axis(
+                    labelLimit=600,
+                    labelOverlap=False
+                )),
             color=alt.Color(
                 "judgement_favour:N",
                 title="Ruling Favour",

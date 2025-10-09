@@ -50,7 +50,8 @@ st.markdown(
 MAIN_LOGO = "images/BarristerBrief.png"
 SIDEBAR_LOGO = "images/courtlogo.png"
 
-st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
+st.logo(SIDEBAR_LOGO, size='large')
+st.sidebar.image(MAIN_LOGO)
 
 def insert_subscriber(con: connection, first_name:str, last_name: str, email: str):
     """Function to insert subscribers into the RDS. """
@@ -92,8 +93,8 @@ def main():
 
     # Layout
     st.title("Sign Up For Barrister's Brief")
+    st.markdown("Enter your detail's below to receive daily court summaries!")
     st.divider()
-    st.subheader("Enter your detail's below to receive daily court summaries!")
 
     first_name = st.text_input("First Name")
     last_name = st.text_input("Last Name")

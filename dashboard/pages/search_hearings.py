@@ -46,7 +46,8 @@ st.markdown(
 MAIN_LOGO = "images/BarristerBrief.png"
 SIDEBAR_LOGO = "images/courtlogo.png"
 
-st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
+st.logo(SIDEBAR_LOGO, size='large')
+st.sidebar.image(MAIN_LOGO)
 
 # Page Config
 st.set_page_config(page_title="Search Court Hearings", layout="wide")
@@ -54,6 +55,7 @@ st.set_page_config(page_title="Search Court Hearings", layout="wide")
 st.title("Search Through Court Hearings")
 st.markdown("Use the filters below to explore recent hearings \
             stored in the Court Transcripts database.")
+st.divider()
 
 conn = get_db_connection()
 data = get_data_from_db(conn)
