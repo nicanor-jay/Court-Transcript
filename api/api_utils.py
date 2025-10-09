@@ -23,18 +23,6 @@ def get_db_connection() -> connection:
         raise ConnectionError(f"Connection to {ENV['DB_NAME']} failed") from e
 
 
-def merge_cases(set_1: list[dict], set_2: list[dict]) -> list[dict]:
-    """Merges two sets of cases while removing duplicates."""
-    all_cases = set_1 + set_2
-    seen_citations = set()
-    for idx, case in enumerate(all_cases):
-        if case["hearing_citation"] in seen_citations:
-            del all_cases[idx]
-        else:
-            seen_citations.add(case["hearing_citation"])
-    return all_cases
-
-
 def get_case_by_citation(conn: connection, citation: str) -> tuple[dict, int]:
     """Get a case by its citation."""
     query = """

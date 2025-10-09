@@ -5,8 +5,7 @@ from api_utils import (
     get_db_connection,
     get_case_by_citation,
     get_case_by_date_range,
-    get_case_by_verdict,
-    merge_cases
+    get_case_by_verdict
 )
 
 load_dotenv()
