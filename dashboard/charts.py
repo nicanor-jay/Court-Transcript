@@ -192,7 +192,7 @@ def get_anomalies_visualisation(data: pd.DataFrame):
 
     return chart
 
-def custom_colours(*args):
+def custom_colours(*args, **kwargs):
     """Quick function to create a custom solour scheme for the judges word map. """
     word = args[0].lower()
 

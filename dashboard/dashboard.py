@@ -57,7 +57,7 @@ st.markdown(
 MAIN_LOGO = "images/BarristerBrief.png"
 SIDEBAR_LOGO = "images/courtlogo.png"
 
-st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
+st.logo(MAIN_LOGO, icon_image=SIDEBAR_LOGO, size='large')
 
 def main():
     """Main function to load and create dashboard. """
