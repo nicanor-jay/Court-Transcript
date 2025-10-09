@@ -26,8 +26,11 @@ def get_db_connection() -> connection:
 def get_case_by_citation(conn: connection, citation: str) -> tuple[dict, int]:
     """Get a case by its citation."""
     query = """
-    SELECT *
-    FROM HEARING
+    SELECT
+        hearing_title, hearing_citation, hearing_date,
+        hearing_description, hearing_anomaly, judgement_favour,
+        court_name, hearing_url, judge_id
+    FROM hearing
     JOIN court USING (court_id)
     JOIN judgement USING (judgement_id)
     JOIN judge_hearing USING (hearing_id)
@@ -57,8 +60,11 @@ def get_case_by_date_range(
         return {"error": True, "reason": "end must on or before start"}, 400
 
     query = """
-    SELECT *
-    FROM HEARING
+    SELECT
+        hearing_title, hearing_citation, hearing_date,
+        hearing_description, hearing_anomaly, judgement_favour,
+        court_name, hearing_url, judge_id
+    FROM hearing
     JOIN court USING (court_id)
     JOIN judgement USING (judgement_id)
     JOIN judge_hearing USING (hearing_id)
@@ -82,8 +88,11 @@ def get_case_by_verdict(
         return {"error": True, "reason": "favour must be plaintiff or defendant"}, 400
     favour = favour.capitalize()
     query = """
-    SELECT *
-    FROM HEARING
+    SELECT
+        hearing_title, hearing_citation, hearing_date,
+        hearing_description, hearing_anomaly, judgement_favour,
+        court_name, hearing_url, judge_id
+    FROM hearing
     JOIN court USING (court_id)
     JOIN judgement USING (judgement_id)
     JOIN judge_hearing USING (hearing_id)
@@ -102,7 +111,6 @@ def get_judges(conn: connection) -> list[dict]:
     query = """
     SELECT *
     FROM judge
-    JOIN title USING (title_id)
     """
     with conn.cursor() as cur:
         cur.execute(query)
@@ -115,7 +123,6 @@ def get_judge(conn: connection, judge_id: int) -> dict:
     query = """
     SELECT *
     FROM judge
-    JOIN title USING (title_id)
     WHERE judge_id=%s
     """
     with conn.cursor() as cur:
@@ -127,8 +134,11 @@ def get_judge(conn: connection, judge_id: int) -> dict:
 def get_cases_sat_by_judge(conn: connection, judge_id) -> list[dict]:
     """Retrieves all cases that were sat by a given judge."""
     query = """
-    SELECT *
-    FROM HEARING
+    SELECT
+        hearing_title, hearing_citation, hearing_date,
+        hearing_description, hearing_anomaly, judgement_favour,
+        court_name, hearing_url, judge_id
+    FROM hearing
     JOIN court USING (court_id)
     JOIN judgement USING (judgement_id)
     JOIN judge_hearing USING (hearing_id)
