@@ -43,6 +43,11 @@ st.markdown(
 )
 # --- END CSS INJECTION ---
 
+MAIN_LOGO = "images/BarristerBrief.png"
+SIDEBAR_LOGO = "images/courtlogo.png"
+ 
+st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
+
 # Page Config
 st.set_page_config(page_title="Search Court Hearings", layout="wide")
 

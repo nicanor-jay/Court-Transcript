@@ -3,9 +3,14 @@
 import datetime
 import streamlit as st
 import pandas as pd
-from data_cache import get_data_from_db
+import matplotlib.pyplot as plt
+from data_cache import get_data_from_db, get_summaries_for_judge
 from rds_utils import get_db_connection
-from charts import get_judge_ruling_tendency_chart, get_overall_ruling_tendency_chart
+from charts import (
+    get_judge_ruling_tendency_chart, 
+    get_overall_ruling_tendency_chart, 
+    create_word_cloud
+)
 
 PAGE_FILENAME = "judge_details"
 
@@ -46,6 +51,10 @@ st.markdown(
 )
 # --- END CSS INJECTION ---
 
+MAIN_LOGO = "images/BarristerBrief.png"
+SIDEBAR_LOGO = "images/courtlogo.png"
+ 
+st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
 
 st.set_page_config(page_title="Judge Details", layout="wide")
 
@@ -109,6 +118,19 @@ with col2:
     st.markdown("**Overall Ruling Tendency (All Hearings)**")
     overall_chart = get_overall_ruling_tendency_chart(data)
     st.altair_chart(overall_chart, use_container_width=True)
+
+st.divider()
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.subheader("Judge's Case's Wordcloud")
+    st.markdown("**Judge's Case Wordcloud**")
+with col2:
+    text_data = get_summaries_for_judge(conn, judge_id)
+    judge_word_cloud = create_word_cloud(text_data)
+    image = judge_word_cloud.to_image()
+    st.image(image, use_container_width=1000)
+
 
 st.divider()
 

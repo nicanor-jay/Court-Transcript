@@ -16,7 +16,7 @@ from charts import (
     get_anomalies_visualisation
 )
 
-# --- CSS INJECTION FOR GOLD HEADERS & JUDGE DETAILS HIDDEN
+# CSS Injection
 GOLD_COLOR = "#b29758"
 SECONDARY_GOLD_COLOUR = "#a38c64"
 
@@ -47,11 +47,17 @@ st.markdown(
     [data-testid="stSidebarNavLink"][href$="/judge_details"] {{
         display: none;
     }}
+    
     </style>
     """,
     unsafe_allow_html=True
 )
-# --- END CSS INJECTION ---
+
+
+MAIN_LOGO = "images/BarristerBrief.png"
+SIDEBAR_LOGO = "images/courtlogo.png"
+ 
+st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
 
 def main():
     """Main function to load and create dashboard. """
