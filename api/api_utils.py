@@ -44,7 +44,8 @@ def get_case_by_citation(conn: connection, citation: str) -> tuple[dict, int]:
 def get_case_by_date_range(
         conn: connection,
         start: str,
-        end: str) -> tuple[list[dict], int] | tuple[dict, int]:
+        end: str
+) -> tuple[list[dict], int] | tuple[dict, int]:
     """Returns all hearings that were concluded between `start` and `end` (inclusive)"""
     try:
         start_dt = datetime.strptime(start, "%Y-%m-%d")
