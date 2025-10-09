@@ -5,3 +5,4 @@ altair
 pandas
 python-dotenv
 psycopg2-binary
+Wordcloud

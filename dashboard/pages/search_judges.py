@@ -41,10 +41,17 @@ st.markdown(
 )
 # --- END CSS INJECTION ---
 
+MAIN_LOGO = "images/BarristerBrief.png"
+SIDEBAR_LOGO = "images/courtlogo.png"
+
+st.logo(SIDEBAR_LOGO, size='large')
+st.sidebar.image(MAIN_LOGO)
+
 st.set_page_config(page_title="Search Judges", layout="wide")
 
 st.title("Search Judges")
 st.markdown("Use the filters below to explore judges in the Court Transcripts database.")
+st.divider()
 
 # Load hearing data
 conn = get_db_connection()
