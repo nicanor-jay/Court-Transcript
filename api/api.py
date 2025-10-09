@@ -7,7 +7,8 @@ from api_utils import (
     get_case_by_date_range,
     get_case_by_verdict,
     get_judges,
-    get_judge
+    get_judge,
+    get_cases_sat_by_judge
 )
 
 load_dotenv()
@@ -75,6 +76,12 @@ def route_get_all_judges():
 def route_get_judge(judge_id: int):
     """Return for fetching judge by ID."""
     return get_judge(conn, judge_id)
+
+
+@api.get("/judge/<int:judge_id>/case")
+def route_get_judge_cases(judge_id: int):
+    """Return all cases sat by a judge."""
+    return get_cases_sat_by_judge(conn, judge_id)
 
 
 if __name__ == "__main__":

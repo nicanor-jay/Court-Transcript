@@ -122,3 +122,21 @@ def get_judge(conn: connection, judge_id: int) -> dict:
         cur.execute(query, (judge_id,))
         results = cur.fetchone()
     return dict(results) if results else {}
+
+
+def get_cases_sat_by_judge(conn: connection, judge_id) -> list[dict]:
+    """Retrieves all cases that were sat by a given judge."""
+    query = """
+    SELECT *
+    FROM HEARING
+    JOIN court USING (court_id)
+    JOIN judgement USING (judgement_id)
+    JOIN judge_hearing USING (hearing_id)
+    JOIN judge USING (judge_id)
+    WHERE
+        judge_id=%s
+    """
+    with conn.cursor() as cur:
+        cur.execute(query, (judge_id,))
+        results = cur.fetchall()
+    return list(results) if results else []
