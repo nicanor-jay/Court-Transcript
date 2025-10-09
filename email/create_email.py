@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime, timedelta
-from rds_utils import get_db_connection, query_rds
+from aws_utils import get_db_connection, query_rds
 from psycopg2.extensions import connection
 
 logging.basicConfig(level=logging.INFO,
@@ -37,14 +37,20 @@ def write_email(hearings: list[dict]) -> str:
 
     yesterdays_date = (datetime.now() - timedelta(days=1)).date()
 
-    print(hearings[0])
+    plaintiff_count = sum([
+        1 for hearing in hearings if hearing['judgement_favour'] == 'Plaintiff'])
+    defendant_count = len(hearings) - plaintiff_count
 
-    html = f"""<h1>Barristers Brief - Daily Report</h1>
-
-<h2> Hearing Overview - {yesterdays_date}</h2>
+    html = f"""<h2> Hearing Overview - {yesterdays_date}</h2>
     """
-    html += "<p>Thanks for reading this daily update. For more details, access the <a href='http://35.179.105.252:8501'/>dashboard</a>.</p>"
+    html += "<p>Thanks for reading this daily update. For more details, access the <a href='http://18.175.52.45:8501'>dashboard</a>.</p>"
     html += "<hr>"
+    html += f"<p>Total Cases: {len(hearings)}</p>"
+    html += f"<p>In Favour of Plaintiff: {plaintiff_count}</p>"
+    html += f"<p>In Favour of Defendant: {defendant_count}</p>"
+    html += "<hr>"
+
+    html += "<h2>Hearings</h2>"
 
     for hearing in hearings:
         html += "<div>"
@@ -83,12 +89,13 @@ def get_subscriber_list(conn: connection) -> list[str]:
     return subscriber_list
 
 
-def handler(context=None, event=None):
-    """Handler function which runs on the lambda."""
+def get_subscribers_and_email():
+    """Gets subscribers email list and HTML email template."""
     conn = get_db_connection()
 
     hearings = get_yesterdays_hearings(conn)
 
+    logging.info("Getting subscribers and email template.")
     subscriber_emails = get_subscriber_list(conn)
     email = write_email(hearings)
 
@@ -99,8 +106,12 @@ def handler(context=None, event=None):
         'email': email
     }
 
-    logging.info("Returning %s from create_email.py.", res)
     return res
+
+
+def handler(context=None, event=None):
+    """Handler function which runs on the lambda."""
+    return get_subscribers_and_email()
 
 
 if __name__ == "__main__":

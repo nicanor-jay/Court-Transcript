@@ -6,12 +6,12 @@ from psycopg2.extensions import connection
 from psycopg2 import connect, Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-import pandas as pd
+import boto3
 
 
 def get_db_connection():
-    load_dotenv()
     """Gets the db connection and returns it."""
+    load_dotenv()
     try:
         con = connect(
             host=ENV["DB_HOST"],
@@ -35,3 +35,15 @@ def query_rds(con: connection, query: str) -> dict:
         cur.execute(query)
         data = cur.fetchall()
     return data
+
+
+def get_boto3_connection():
+    """Gets a connection to AWS via boto3"""
+    load_dotenv()
+    session = boto3.Session(
+        aws_access_key_id=ENV['ACCESS_KEY'],
+        aws_secret_access_key=ENV['SECRET_KEY'],
+        region_name=ENV['REGION']
+    )
+
+    return session
