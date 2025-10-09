@@ -50,14 +50,14 @@ pip install -r requirements.txt
 
 ### Running the script
 
-1. Verify your email with
+1. Verify the email you want to send the newsletter with by running
 ```bash
 python verify_email.py
 ```
 
 Running this will send an verification email to your `ORIGIN_EMAIL` as specified in your `.env`. You must verify before continuing.
 
-2. Once verified, and within the email directory. run
+2. Once verified, and within the email directory, run
 
 ```bash
 python send_email.py

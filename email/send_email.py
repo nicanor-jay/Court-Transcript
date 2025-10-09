@@ -37,10 +37,21 @@ def send_html_email(subscriber_list: list, email_html: str):
         Source=ENV['ORIGIN_EMAIL'],
     )
 
+    response_code = response['ResponseMetadata']['HTTPStatusCode']
+
+    if response_code != 200:
+        logging.error('Response code %s', )
+    else:
+        logging.info('Emails sent!')
+
 
 def handler(event=None, context=None):
     """Handler entry point"""
     load_dotenv()
+
+    if not ENV['ORIGIN_EMAIL']:
+        logging.critical("Missing ORIGIN_EMAIL key.")
+        return
 
     subscribers_email_dict = get_subscribers_and_email()
 
