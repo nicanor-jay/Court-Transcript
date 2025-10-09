@@ -4,7 +4,9 @@ from flask import Flask, request
 from api_utils import (
     get_db_connection,
     get_case_by_citation,
-    get_case_by_date_range
+    get_case_by_date_range,
+    get_case_by_verdict,
+    merge_cases
 )
 
 load_dotenv()
@@ -31,11 +33,12 @@ def route_get_case():
     citation = request.args.get("citation")
     start = request.args.get("start")
     end = request.args.get("end")
+    favour = request.args.get("favour")
 
     # Check parameters have been passed properly
-    if not any((citation, start, end)):
+    if not any((citation, start, end, favour)):
         return {"error": True, "reason": "no parameters given"}, 400
-    if citation and (start or end):
+    if citation and (start or end or favour):
         return {"error": True, "reason": "citation cannot be used other parameters"}, 400
     if (start and not end) or (end and not start):
         return {"error": True, "reason": "must provide start and end date together"}, 400
@@ -43,8 +46,21 @@ def route_get_case():
     if citation:
         return get_case_by_citation(conn, citation)
 
+    if start and end and favour:
+        date_cases, status = get_case_by_date_range(conn, start, end)
+        if status >= 400:
+            return date_cases, status
+        favour_cases, status = get_case_by_verdict(conn, favour)
+        if status >= 400:
+            return favour_cases, status
+        by_favour = list(filter(lambda case: case in favour_cases, date_cases))
+        return by_favour, 200
+
     if start and end:
         return get_case_by_date_range(conn, start, end)
+
+    if favour:
+        return get_case_by_verdict(conn, favour)
 
 
 if __name__ == "__main__":
