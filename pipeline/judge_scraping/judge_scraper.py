@@ -4,15 +4,18 @@ UK Judiciary Web Scraper - Judges Only (Simplified Selenium)
 Scrapes judiciary.uk and extracts only real judges.
 """
 
+from os import mkdir
 import json
 from datetime import datetime
 from typing import List, Dict, Optional
 import re
-from selenium import webdriver
+from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 TITLES = [
     "The Right Honourable Lord Justice",
@@ -249,8 +252,14 @@ def judge_main():
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.binary_location = "/opt/chrome/chrome-linux64/chromedriver"
 
-    driver = webdriver.Chrome(options=chrome_options)
+    service = Service(
+        executable_path="/opt/chrome-driver/chromedriver-linux64/chromedriver",
+        service_log_path="/tmp/chromedriver.log")
+    driver = Chrome(
+        service=service,
+        options=chrome_options)
 
     try:
         driver.get(base_url)

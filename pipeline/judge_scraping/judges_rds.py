@@ -2,7 +2,6 @@
 
 import json
 import logging
-import subprocess
 from typing import Optional
 from psycopg2.extensions import connection
 from judge_scraping.rds_utils import get_db_connection, query_rds
