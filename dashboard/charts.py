@@ -3,9 +3,11 @@ charts.py
 Functions to take in a DataFrame as argument and return Altair charts
 for usage in the Streamlit dashboard.
 """
-
+import random
 import altair as alt
 import pandas as pd
+from wordcloud import WordCloud  # Generate wordclouds
+
 
 
 # Custom color scale for 'judgement_favour' using user-provided colors.
@@ -19,7 +21,7 @@ ruling_color_scale = alt.Scale(
 )
 
 
-def get_overall_ruling_bias_chart(data: pd.DataFrame):
+def get_overall_ruling_tendency_chart(data: pd.DataFrame):
     """Donut chart showing favour (Plaintiff vs Defendant vs Undisclosed)."""
     data = data.copy()
     data["judgement_favour"] = data["judgement_favour"].fillna("Undisclosed")
@@ -39,14 +41,14 @@ def get_overall_ruling_bias_chart(data: pd.DataFrame):
             ),
             tooltip=["judgement_favour", "count"],
         )
-        .properties(width=250, height=250, title="Overall Ruling Bias")
+        .properties(width=250, height=250, title="Overall Ruling Tendency")
     )
 
     return chart
 
 
-def get_judge_ruling_bias_chart(data: pd.DataFrame, judge_name: str = ""):
-    """Donut chart showing an individual judge's ruling bias."""
+def get_judge_ruling_tendency_chart(data: pd.DataFrame, judge_name: str = ""):
+    """Donut chart showing an individual judge's ruling tendency."""
     if data.empty:
         return (
             alt.Chart(pd.DataFrame({"message": ["No hearings available for this judge."]}))
@@ -60,7 +62,7 @@ def get_judge_ruling_bias_chart(data: pd.DataFrame, judge_name: str = ""):
     counts = data["judgement_favour"].value_counts().reset_index()
     counts.columns = ["judgement_favour", "count"]
 
-    title = f"Ruling Bias for {judge_name}" if judge_name else "Judge Ruling Bias"
+    title = f"Ruling Tendency for {judge_name}" if judge_name else "Judge Ruling Tendency"
 
     chart = (
         alt.Chart(counts)
@@ -102,14 +104,20 @@ def get_recent_hearings_table(data: pd.DataFrame):
 
 
 def get_rulings_by_court_chart(data: pd.DataFrame):
-    """Stacked bar chart showing ruling by court."""
     data = data.copy()
     data["judgement_favour"] = data["judgement_favour"].fillna("Undisclosed")
     chart = (
         alt.Chart(data)
         .mark_bar()
         .encode(
-            y=alt.Y("court_name:N", title="Court"),
+            y=alt.Y(
+                "court_name:N",
+                title="",
+                axis=alt.Axis(
+                    labelLimit=600,
+                    labelOverlap=False
+                )
+            ),
             x=alt.X("count():Q", title="Number of Hearings"),
             color=alt.Color(
                 "judgement_favour:N",
@@ -119,6 +127,8 @@ def get_rulings_by_court_chart(data: pd.DataFrame):
             tooltip=["court_name", "count()"],
         )
         .properties(title="Recent Rulings across Different Courts")
+        .resolve_scale(y="independent")
+        .interactive()
     )
     return chart
 
@@ -134,7 +144,11 @@ def get_rulings_by_title(data: pd.DataFrame):
         .mark_bar()
         .encode(
             x=alt.X("count():Q", title="Number of Hearings"),
-            y=alt.Y("title_name:N", sort="-x", title="Judge Title"),
+            y=alt.Y("title_name:N", sort="-x", title="Judge Title",
+                axis=alt.Axis(
+                    labelLimit=600,
+                    labelOverlap=False
+                )),
             color=alt.Color(
                 "judgement_favour:N",
                 title="Ruling Favour",
@@ -189,3 +203,28 @@ def get_anomalies_visualisation(data: pd.DataFrame):
     )
 
     return chart
+
+def custom_colours(*args, **kwargs):
+    """Quick function to create a custom solour scheme for the judges word map. """
+    word = args[0].lower()
+
+    # Define palette inspired by the dashboard
+    golds = ["#b29758", "#a38c64", "#d4b06a", "#f0d890"]
+    highlights = ["#e0e0e0", "#cfcfcf", "#ffffff", "#027F8B"]
+    accents = ["#c7a15a", "#c4b37b", "#a59162"]
+
+    # Example of logic-based variation
+    if "data" in word or "court" in word:
+        return random.choice(golds)
+    if "law" in word or "rights" in word:
+        return random.choice(accents)
+    return random.choice(highlights)
+
+def create_word_cloud(text: str):
+    """Create a word cloud of the summaries for a judge."""
+
+    fog_machine = WordCloud(background_color='#212838',
+                            color_func=custom_colours,
+                            height=500,
+                            width=1000)
+    return fog_machine.generate(text)

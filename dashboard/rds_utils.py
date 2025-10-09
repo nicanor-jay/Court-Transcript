@@ -6,12 +6,11 @@ from psycopg2.extensions import connection
 from psycopg2 import connect, Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-import pandas as pd
 
 
 def get_db_connection():
+    """Gets database connection. """
     load_dotenv()
-    """Gets the db connection and returns it."""
     try:
         con = connect(
             host=ENV["DB_HOST"],
@@ -23,7 +22,7 @@ def get_db_connection():
         )
         logging.info("Connected to RDS.")
         return con
-    except Error as e:
+    except Error:
         # print(f"Error connecting to database: {e}")
         logging.critical("Error connecting to RDS")
         return None

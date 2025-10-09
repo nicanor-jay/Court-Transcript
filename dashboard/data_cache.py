@@ -64,3 +64,23 @@ def get_data_from_db(_con: connection) -> pd.DataFrame:
                 df[col] = df[col].astype(str)
 
     return df
+
+@st.cache_data(ttl=600)
+def get_summaries_for_judge(_conn: connection, judge_id: int) -> str:
+    """Return a list of court transcript summaries which were overseen by a specific judge."""
+
+    all_summary_text = ''
+    query = """SELECT hearing_description FROM judge j
+            JOIN judge_hearing jh
+	            USING (judge_id)
+            JOIN hearing h
+	            USING (hearing_id)
+            WHERE judge_id = %s;"""
+
+    with _conn.cursor() as cur:
+        cur.execute(query, (judge_id,))
+        summaries = cur.fetchall()
+
+    for summary in summaries:
+        all_summary_text += summary['hearing_description']
+    return all_summary_text
