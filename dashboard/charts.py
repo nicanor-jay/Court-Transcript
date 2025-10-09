@@ -6,10 +6,7 @@ for usage in the Streamlit dashboard.
 import random
 import altair as alt
 import pandas as pd
-from collections import Counter  # Count the frequency of distinct strings
-from wordcloud import WordCloud, ImageColorGenerator  # Generate wordclouds
-from PIL import Image  # Load images from files
-import numpy as np  # Convert images to numbers
+from wordcloud import WordCloud  # Generate wordclouds
 
 
 
@@ -195,7 +192,8 @@ def get_anomalies_visualisation(data: pd.DataFrame):
 
     return chart
 
-def custom_colours(*args, **kwargs):
+def custom_colours(*args):
+    """Quick function to create a custom solour scheme for the judges word map. """
     word = args[0].lower()
 
     # Define palette inspired by the dashboard
@@ -206,10 +204,9 @@ def custom_colours(*args, **kwargs):
     # Example of logic-based variation
     if "data" in word or "court" in word:
         return random.choice(golds)
-    elif "law" in word or "rights" in word:
+    if "law" in word or "rights" in word:
         return random.choice(accents)
-    else:
-        return random.choice(highlights)
+    return random.choice(highlights)
 
 def create_word_cloud(text: str):
     """Create a word cloud of the summaries for a judge."""
@@ -218,5 +215,4 @@ def create_word_cloud(text: str):
                             color_func=custom_colours,
                             height=500,
                             width=1000)
-    return(fog_machine.generate(text))
-    
+    return fog_machine.generate(text)

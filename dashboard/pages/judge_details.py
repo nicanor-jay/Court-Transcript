@@ -3,12 +3,11 @@
 import datetime
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 from data_cache import get_data_from_db, get_summaries_for_judge
 from rds_utils import get_db_connection
 from charts import (
-    get_judge_ruling_tendency_chart, 
-    get_overall_ruling_tendency_chart, 
+    get_judge_ruling_tendency_chart,
+    get_overall_ruling_tendency_chart,
     create_word_cloud
 )
 
@@ -53,7 +52,7 @@ st.markdown(
 
 MAIN_LOGO = "images/BarristerBrief.png"
 SIDEBAR_LOGO = "images/courtlogo.png"
- 
+
 st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
 
 st.set_page_config(page_title="Judge Details", layout="wide")

@@ -30,24 +30,24 @@ st.markdown(
     h3{{
         color: {SECONDARY_GOLD_COLOUR} !important;
     }}
-    
+
     /* FIX: Target the sidebar container and set the text color */
     [data-testid="stSidebar"] {{
         /* This applies to the elements inside the sidebar */
         color: {GOLD_COLOR} !important;
     }}
-    
+
     /* Optional: Ensure all text elements (labels, markdown) within the sidebar use the color */
     [data-testid="stSidebar"] * {{
         color: {GOLD_COLOR} !important;
     }}
-    
+
     /* NEW: Hide the judge_details.py link from the sidebar navigation */
     /* Streamlit converts pages/judge_details.py to the URL path /judge_details */
     [data-testid="stSidebarNavLink"][href$="/judge_details"] {{
         display: none;
     }}
-    
+
     </style>
     """,
     unsafe_allow_html=True
@@ -56,7 +56,7 @@ st.markdown(
 
 MAIN_LOGO = "images/BarristerBrief.png"
 SIDEBAR_LOGO = "images/courtlogo.png"
- 
+
 st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
 
 def main():
@@ -98,4 +98,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

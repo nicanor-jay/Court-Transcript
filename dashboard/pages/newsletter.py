@@ -1,3 +1,4 @@
+#pylint:disable=import-error
 """
 Streamlit dashboard layout for court hearings data.
 """
@@ -6,16 +7,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from psycopg2.extensions import connection
 from rds_utils import get_db_connection
-from data_cache import (
-    get_data_from_db,
-)
-from charts import (
-    get_recent_hearings_table,
-    get_rulings_by_court_chart,
-    get_overall_ruling_tendency_chart,
-    get_rulings_by_title,
-    get_anomalies_visualisation
-)
+
 
 # CSS Injection
 GOLD_COLOR = "#b29758"
@@ -31,24 +23,24 @@ st.markdown(
     h3{{
         color: {SECONDARY_GOLD_COLOUR} !important;
     }}
-    
+
     /* FIX: Target the sidebar container and set the text color */
     [data-testid="stSidebar"] {{
         /* This applies to the elements inside the sidebar */
         color: {GOLD_COLOR} !important;
     }}
-    
+
     /* Optional: Ensure all text elements (labels, markdown) within the sidebar use the color */
     [data-testid="stSidebar"] * {{
         color: {GOLD_COLOR} !important;
     }}
-    
+
     /* NEW: Hide the judge_details.py link from the sidebar navigation */
     /* Streamlit converts pages/judge_details.py to the URL path /judge_details */
     [data-testid="stSidebarNavLink"][href$="/judge_details"] {{
         display: none;
     }}
-    
+
     </style>
     """,
     unsafe_allow_html=True
@@ -57,7 +49,7 @@ st.markdown(
 
 MAIN_LOGO = "images/BarristerBrief.png"
 SIDEBAR_LOGO = "images/courtlogo.png"
- 
+
 st.logo(MAIN_LOGO, size='large', icon_image=SIDEBAR_LOGO)
 
 def insert_subscriber(con: connection, first_name:str, last_name: str, email: str):
@@ -72,6 +64,7 @@ def insert_subscriber(con: connection, first_name:str, last_name: str, email: st
         con.commit()
 
 def validate_name(name, field_name="Name"):
+    """Validates user input against name regex"""
     if not name:
         return False, f"{field_name} is required"
     if not re.match(r'^[A-Za-z\\\\s-]+$', name):
@@ -82,6 +75,7 @@ def validate_name(name, field_name="Name"):
 
 
 def validate_email(email):
+    """Validates user email against email regex. """
     if not email:
         return False, "Email is required."
     if not re.match(r"^[\w\.-]+@([\w-]+\.)+[\w-]{2,4}$", email):
@@ -101,9 +95,9 @@ def main():
     st.divider()
     st.subheader("Enter your detail's below to receive daily court summaries!")
 
-    first_name = st.text_input("First Name") 
+    first_name = st.text_input("First Name")
     last_name = st.text_input("Last Name")
-    email = st.text_input("Email",) 
+    email = st.text_input("Email",)
 
     if st.button("Enter"):
         valid_first, msg_first = validate_name(first_name, "First Name")
@@ -111,7 +105,8 @@ def main():
         valid_email, msg_email = validate_email(email)
 
         if all([valid_first, valid_last, valid_email]):
-            st.success(f"Thank You {first_name}! You have successfully signed up for Barrister's Brief")
+            st.success(f"Thank You {first_name}! \
+                       You have successfully signed up for Barrister's Brief")
             insert_subscriber(conn, first_name, last_name, email)
         else:
             if not valid_first:
@@ -123,4 +118,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
