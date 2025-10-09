@@ -41,7 +41,7 @@ def get_overall_ruling_tendency_chart(data: pd.DataFrame):
             ),
             tooltip=["judgement_favour", "count"],
         )
-        .properties(width=250, height=250, title="Overall Ruling Bias")
+        .properties(width=250, height=250, title="Overall Ruling Tendency")
     )
 
     return chart
@@ -62,7 +62,7 @@ def get_judge_ruling_tendency_chart(data: pd.DataFrame, judge_name: str = ""):
     counts = data["judgement_favour"].value_counts().reset_index()
     counts.columns = ["judgement_favour", "count"]
 
-    title = f"Ruling Bias for {judge_name}" if judge_name else "Judge Ruling Bias"
+    title = f"Ruling Tendency for {judge_name}" if judge_name else "Judge Ruling Tendency"
 
     chart = (
         alt.Chart(counts)

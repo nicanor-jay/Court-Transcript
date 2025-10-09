@@ -79,7 +79,7 @@ def main():
     col_main, col_side = st.columns([3, 1])
 
     with col_main:
-        st.markdown("### Last 3–5 Court Hearings Chronologically")
+        st.markdown("### Last 5 Court Hearings Chronologically")
         st.dataframe(get_recent_hearings_table(data), use_container_width=True)
 
         st.markdown("### Recent Rulings across Different Courts")
@@ -89,7 +89,7 @@ def main():
         st.altair_chart(get_rulings_by_title(data), use_container_width=True)
 
     with col_side:
-        st.markdown("### Overall Ruling Bias")
+        st.markdown("### Overall Ruling Tendency")
         st.altair_chart(get_overall_ruling_tendency_chart(data), use_container_width=True)
 
         st.markdown("### Recent Court Anomalies")

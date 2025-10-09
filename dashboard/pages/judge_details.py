@@ -105,7 +105,7 @@ col3.metric("Cases This Year", year_cases)
 
 st.divider()
 
-st.subheader("Ruling Bias Overview")
+st.subheader("Ruling Tendency Overview")
 
 col1, col2 = st.columns(2)
 with col1:
