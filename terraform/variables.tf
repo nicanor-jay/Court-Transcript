@@ -96,6 +96,11 @@ variable "PIPELINE_IMAGE_URI" {
   type        = string
 }
 
+variable "EMAIL_IMAGE_URI" {
+  description = "URI for the email image"
+  type        = string
+}
+
 variable "ECS_CLUSTER" {
   description = "ARN of ECS cluster to use for the dashboard ECS service"
   type        = string
@@ -128,5 +133,15 @@ variable "LAMBDA_EXEC_ROLE_NAME" {
 
 variable "PIPELINE_LAMBDA_NAME" {
   description = "Name for the pipeline lambda"
+  type        = string
+}
+
+variable "EMAIL_LAMBDA_NAME" {
+  description = "Name for the email services lambda"
+  type        = string
+}
+
+variable "ORIGIN_EMAIL" {
+  description = "Origin email"
   type        = string
 }
