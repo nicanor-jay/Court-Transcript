@@ -49,6 +49,9 @@ DASHBOARD_ECR_NAME={dashboard_ecr_name}
 EMAIL_ECR_NAME={email_ecr_name}
 
 OPENAI_API_KEY={}
+
+# SES Daily Email vars
+ORIGIN_EMAIL={daily_report_sender_email}
 ```
 
 Additionally, look at our [Terraform `README`](https://github.com/nicanor-jay/Court-Transcript/blob/main/terraform/README.md) and follow the instructions in there.

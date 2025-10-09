@@ -6,6 +6,6 @@ COPY email/requirements.txt .
 
 RUN pip3 install -r requirements.txt
 
-COPY email/create_email.py email/rds_utils.py ./
+COPY email/create_email.py email/aws_utils.py ./
 
 CMD [ "create_email.handler"]

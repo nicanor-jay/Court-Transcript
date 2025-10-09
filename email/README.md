@@ -7,7 +7,7 @@ function.
 ## Features
 
 - Downloads yesterdays court transcript hearings from the RDS
-- Downloads all subscribers in the subscriber table
+- Retrieves all subscribers in the subscriber table
 - Formulates a HTML email
 - Returns the HTML email & subscriber list for usage in our step function as a dict. e.g.
 
@@ -19,6 +19,7 @@ function.
 
 ```
 
+- Sends the email to the subscriber email list
 
 ## Installation
 
@@ -26,6 +27,7 @@ function.
 
 - Python 3.9 or higher
 - pip (Python package manager)
+- A root level `.env` file formatted as stated in the [project level readme](../README.md) (specifically, the `ORIGIN_EMAIL` Key).
 
 ### Setup
 
@@ -48,10 +50,21 @@ pip install -r requirements.txt
 
 ### Running the script
 
-From within the directory.
+1. Verify your email with
 ```bash
-python create_email.py
+python verify_email.py
 ```
+
+Running this will send an verification email to your `ORIGIN_EMAIL` as specified in your `.env`. You must verify before continuing.
+
+2. Once verified, and within the email directory. run
+
+```bash
+python send_email.py
+```
+
+To send daily report to all existing subscribers.
+
 
 ## Containerising the email task
 
