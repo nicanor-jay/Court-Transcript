@@ -5,7 +5,9 @@ from api_utils import (
     get_db_connection,
     get_case_by_citation,
     get_case_by_date_range,
-    get_case_by_verdict
+    get_case_by_verdict,
+    get_judges,
+    get_judge
 )
 
 load_dotenv()
@@ -61,6 +63,18 @@ def route_get_case():
 
     if favour:
         return get_case_by_verdict(conn, favour)
+
+
+@api.get("/judge")
+def route_get_all_judges():
+    """Route for fetching all judges."""
+    return get_judges(conn), 200
+
+
+@api.get("/judge/<int:judge_id>")
+def route_get_judge(judge_id: int):
+    """Return for fetching judge by ID."""
+    return get_judge(conn, judge_id)
 
 
 if __name__ == "__main__":

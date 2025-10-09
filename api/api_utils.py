@@ -95,3 +95,30 @@ def get_case_by_verdict(
         cur.execute(query, (favour,))
         results = cur.fetchall()
     return list(results), 200
+
+
+def get_judges(conn: connection) -> list[dict]:
+    """Retrieves full records of each judge in DB."""
+    query = """
+    SELECT *
+    FROM judge
+    JOIN title USING (title_id)
+    """
+    with conn.cursor() as cur:
+        cur.execute(query)
+        results = cur.fetchall()
+    return list(results)
+
+
+def get_judge(conn: connection, judge_id: int) -> dict:
+    """Retrieves a specific judge by their ID."""
+    query = """
+    SELECT *
+    FROM judge
+    JOIN title USING (title_id)
+    WHERE judge_id=%s
+    """
+    with conn.cursor() as cur:
+        cur.execute(query, (judge_id,))
+        results = cur.fetchone()
+    return dict(results) if results else {}
