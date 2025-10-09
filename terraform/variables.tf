@@ -140,3 +140,8 @@ variable "EMAIL_LAMBDA_NAME" {
   description = "Name for the email services lambda"
   type        = string
 }
+
+variable "ORIGIN_EMAIL" {
+  description = "Origin email"
+  type        = string
+}

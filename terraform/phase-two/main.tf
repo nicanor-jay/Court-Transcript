@@ -10,7 +10,7 @@ resource "aws_ecs_task_definition" "courts-dashboard-td" {
     {
         name = "dashboard"
         image = var.DASHBOARD_IMAGE_URI
-        memory = 128
+        memory = 1792
         environment = [
             {name = "ACCESS_KEY", value = var.ACCESS_KEY},
             {name = "SECRET_ACCESS_KEY", value = var.SECRET_ACCESS_KEY},
@@ -168,6 +168,7 @@ resource "aws_lambda_function" "courts-email-lambda" {
       DB_NAME=var.DB_NAME
       ACCESS_KEY = var.ACCESS_KEY
       SECRET_ACCESS_KEY = var.SECRET_ACCESS_KEY
+      ORIGIN_EMAIL = var.ORIGIN_EMAIL
     }
   }
   architectures = ["x86_64"]
