@@ -1,24 +1,15 @@
-from os import environ as ENV
-
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from psycopg2.errors import Error
 from dotenv import load_dotenv
 from flask import Flask, request
 
+from api_utils import (
+    get_db_connection,
+    get_case_by_citation,
+    get_case_by_date_range
+)
+
 load_dotenv()
 api = Flask(__name__)
-try:
-    conn = psycopg2.connect(
-        dbname=ENV["DB_NAME"],
-        host=ENV["DB_HOST"],
-        port=ENV["DB_PORT"],
-        user=ENV["DB_USERNAME"],
-        password=ENV["DB_PASSWORD"],
-        cursor_factory=RealDictCursor
-    )
-except Error as e:
-    raise ConnectionError(f"Connection to {ENV['DB_NAME']} failed") from e
+conn = get_db_connection()
 
 
 @api.get("/")
@@ -29,25 +20,32 @@ def route_main():
 
 @api.get("/case")
 def route_get_case():
-    """Get a case by its citation."""
-    citation = request.args.get("citation")
-    if citation is None:
-        return {"error": True, "reason": "citation must be provided"}
-    query = """
-    SELECT *
-    FROM HEARING
-    JOIN court USING (court_id)
-    JOIN judgement USING (judgement_id)
-    JOIN judge_hearing USING (hearing_id)
-    JOIN judge USING (judge_id)
-    WHERE hearing_citation=%s
     """
-    with conn.cursor() as cur:
-        cur.execute(query, (citation,))
-        results = cur.fetchone()
-    not_found = {"error": True, "reason": f"did not locate {citation}"}
-    return dict(results) if results else not_found
+    Route for fetching cases.
+
+    - Can request a specific case using its Neutral Citation Number (NCN).
+    - Can batch request cases using a date range.
+
+    Citation cannot be used with any other parameter.
+    """
+    citation = request.args.get("citation")
+    start = request.args.get("start")
+    end = request.args.get("end")
+
+    # Check parameters have been passed properly
+    if not any((citation, start, end)):
+        return {"error": True, "reason": "no parameters given"}, 400
+    if citation and (start or end):
+        return {"error": True, "reason": "citation cannot be used other parameters"}, 400
+    if (start and not end) or (end and not start):
+        return {"error": True, "reason": "must provide start and end date together"}, 400
+
+    if citation:
+        return get_case_by_citation(conn, citation)
+
+    if start and end:
+        return get_case_by_date_range(conn, start, end)
 
 
 if __name__ == "__main__":
-    api.run(port=5000)
+    api.run(port=8000)
