@@ -44,7 +44,7 @@ find . -type f -name "requirements.txt" | sed -e 's/^/-r /' | xargs pip install
 ### Running the Scraper
 
 
-From the root directory, run
+From the `root` directory, run
 ```bash
 python -m pipeline.etl
 ```
@@ -67,10 +67,10 @@ A `.env` file as described in the root level [README.md](../README.md)
 
 ### Usage
 
-To containerise the pipeline and upload to ECR, run the following command from the root directory.
+To containerise the pipeline and upload to ECR, run the following command from the pipeline directory.
 
 ```bash
-bash pipeline/build_push_dockerfile.sh
+bash build_push_dockerfile.sh
 ```
 
 This will build, tag, & upload the containerised image to AWS ECR.

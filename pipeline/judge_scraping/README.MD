@@ -216,7 +216,7 @@ To add support for new name patterns:
 
 ## Notes
 
-- The scraper uses **Selenium with ChromeDriver** (instead of Playwright).  
+- The scraper uses **Selenium with ChromeDriver**.  
 - It filters out non-judicial entries (regions, circuits, etc.).  
 - Website structure changes may require updates to the scraper.  
 - Always review scraped data for accuracy before use.  

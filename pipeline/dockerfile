@@ -9,11 +9,28 @@ RUN dnf install -y atk cups-libs gtk3 libXcomposite alsa-lib \
     libXtst pango at-spi2-atk libXt xorg-x11-server-Xvfb \
     xorg-x11-xauth dbus-glib dbus-glib-devel nss mesa-libgbm jq unzip
 
-# Copy and run the chrome installer script
-COPY ./chrome-installer.sh ./chrome-installer.sh
-RUN chmod +x ./chrome-installer.sh
-RUN ./chrome-installer.sh
-RUN rm ./chrome-installer.sh
+# Run chrome installer script
+RUN set -e \
+ \
+latest_stable_json="https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" \
+# Retrieve JSON data using curl
+json_data=$(curl -s "$latest_stable_json") \
+ \
+latest_chrome_linux_download_url="$(echo "$json_data" | jq -r ".channels.Stable.downloads.chrome[0].url")" \
+latest_chrome_driver_linux_download_url="$(echo "$json_data" | jq -r ".channels.Stable.downloads.chromedriver[0].url")" \
+ \
+download_path_chrome_linux="opt/chrome-headless-shell-linux.zip" \
+download_path_chrome_driver_linux="opt/chrome-driver-linux.zip" \
+ \
+mkdir -p "/opt/chrome" \
+curl -Lo $download_path_chrome_linux $latest_chrome_linux_download_url \
+unzip -q $download_path_chrome_linux -d "/opt/chrome" \
+rm -rf $download_path_chrome_linux \
+ \
+mkdir -p "/opt/chrome-driver" \
+curl -Lo $download_path_chrome_driver_linux $latest_chrome_driver_linux_download_url \
+unzip -q $download_path_chrome_driver_linux -d "/opt/chrome-driver" \
+rm -rf $download_path_chrome_driver_linux
 
 # Grab requirement file and install
 COPY requirements.txt  .
