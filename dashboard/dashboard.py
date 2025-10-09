@@ -11,7 +11,7 @@ from data_cache import (
 from charts import (
     get_recent_hearings_table,
     get_rulings_by_court_chart,
-    get_overall_ruling_bias_chart,
+    get_overall_ruling_tendency_chart,
     get_rulings_by_title,
     get_anomalies_visualisation
 )
@@ -84,7 +84,7 @@ def main():
 
     with col_side:
         st.markdown("### Overall Ruling Bias")
-        st.altair_chart(get_overall_ruling_bias_chart(data), use_container_width=True)
+        st.altair_chart(get_overall_ruling_tendency_chart(data), use_container_width=True)
 
         st.markdown("### Recent Court Anomalies")
         st.altair_chart(get_anomalies_visualisation(data), use_container_width=True)

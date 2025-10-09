@@ -5,7 +5,7 @@ import streamlit as st
 import pandas as pd
 from data_cache import get_data_from_db
 from rds_utils import get_db_connection
-from charts import get_judge_ruling_bias_chart, get_overall_ruling_bias_chart
+from charts import get_judge_ruling_tendency_chart, get_overall_ruling_tendency_chart
 
 PAGE_FILENAME = "judge_details"
 
@@ -101,13 +101,13 @@ st.subheader("Ruling Bias Overview")
 
 col1, col2 = st.columns(2)
 with col1:
-    st.markdown("**Judge’s Ruling Bias**")
-    bias_chart = get_judge_ruling_bias_chart(judge_hearings, FULL_NAME)
-    st.altair_chart(bias_chart, use_container_width=True)
+    st.markdown("**Judge’s Ruling Tendency**")
+    tendency_chart = get_judge_ruling_tendency_chart(judge_hearings, FULL_NAME)
+    st.altair_chart(tendency_chart, use_container_width=True)
 
 with col2:
-    st.markdown("**Overall Ruling Bias (All Hearings)**")
-    overall_chart = get_overall_ruling_bias_chart(data)
+    st.markdown("**Overall Ruling Tendency (All Hearings)**")
+    overall_chart = get_overall_ruling_tendency_chart(data)
     st.altair_chart(overall_chart, use_container_width=True)
 
 st.divider()

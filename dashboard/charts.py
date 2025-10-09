@@ -19,7 +19,7 @@ ruling_color_scale = alt.Scale(
 )
 
 
-def get_overall_ruling_bias_chart(data: pd.DataFrame):
+def get_overall_ruling_tendency_chart(data: pd.DataFrame):
     """Donut chart showing favour (Plaintiff vs Defendant vs Undisclosed)."""
     data = data.copy()
     data["judgement_favour"] = data["judgement_favour"].fillna("Undisclosed")
@@ -45,8 +45,8 @@ def get_overall_ruling_bias_chart(data: pd.DataFrame):
     return chart
 
 
-def get_judge_ruling_bias_chart(data: pd.DataFrame, judge_name: str = ""):
-    """Donut chart showing an individual judge's ruling bias."""
+def get_judge_ruling_tendency_chart(data: pd.DataFrame, judge_name: str = ""):
+    """Donut chart showing an individual judge's ruling tendency."""
     if data.empty:
         return (
             alt.Chart(pd.DataFrame({"message": ["No hearings available for this judge."]}))
