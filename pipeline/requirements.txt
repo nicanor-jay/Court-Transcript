@@ -4,7 +4,7 @@ psycopg2-binary
 python-dotenv
 
 # Scraping
-selenium==4.9.1
+selenium==4.6
 
 # Dashboard / Data handling
 matplotlib

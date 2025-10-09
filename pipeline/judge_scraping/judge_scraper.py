@@ -9,11 +9,12 @@ import json
 from datetime import datetime
 from typing import List, Dict, Optional
 import re
+from tempfile import mkdtemp
+
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 
@@ -249,14 +250,23 @@ def judge_main():
     )
 
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.binary_location = "/opt/chrome/chrome-linux64/chromedriver"
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-dev-tools")
+    chrome_options.add_argument("--no-zygote")
+    chrome_options.add_argument("--single-process")
+    chrome_options.add_argument(f"--user-data-dir={mkdtemp()}")
+    chrome_options.add_argument(f"--data-path={mkdtemp()}")
+    chrome_options.add_argument(f"--disk-cache-dir={mkdtemp()}")
+    chrome_options.add_argument("--remote-debugging-pipe")
+    chrome_options.add_argument("--verbose")
+    chrome_options.add_argument("--log-path=/tmp")
+    chrome_options.binary_location = "/opt/chrome/chrome-linux64/chrome"
 
     service = Service(
-        executable_path="/opt/chrome-driver/chromedriver-linux64/chromedriver",
-        service_log_path="/tmp/chromedriver.log")
+        executable_path="/opt/chrome-driver/chromedriver-linux64/chromedriver")
     driver = Chrome(
         service=service,
         options=chrome_options)
@@ -290,11 +300,11 @@ def judge_main():
     add_title_ids(all_judges, titles)
     normalised_judges = [normalise_judge(j) for j in all_judges]
 
-    with open("titles_data.json", "w", encoding="utf-8") as f:
+    with open("/tmp/titles_data.json", "w", encoding="utf-8") as f:
         json.dump(titles, f, indent=2, ensure_ascii=False)
     print(f"Extracted {len(titles)} unique titles -> titles_data.json")
 
-    with open("judges_data.json", "w", encoding="utf-8") as f:
+    with open("/tmp/judges_data.json", "w", encoding="utf-8") as f:
         json.dump(normalised_judges, f, indent=2, ensure_ascii=False)
     print(f"Extracted {len(normalised_judges)} judges -> judges_data.json")
 

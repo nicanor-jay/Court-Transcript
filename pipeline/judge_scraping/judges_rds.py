@@ -40,7 +40,7 @@ def run_scraper():
 
 def load_scraped_judges():
     """Load judges from JSON file. """
-    with open("judges_data.json", "r", encoding="utf-8") as f:
+    with open("/tmp/judges_data.json", "r", encoding="utf-8") as f:
         judges = json.load(f)
     logging.info("Loaded %s judges from scraper.", len(judges))
     return judges
