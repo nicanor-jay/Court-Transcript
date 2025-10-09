@@ -26,6 +26,7 @@ def route_get_case():
 
     - Can request a specific case using its Neutral Citation Number (NCN).
     - Can batch request cases using a date range.
+    - Can filter by case favour (verdict).
 
     Citation cannot be used with any other parameter.
     """
