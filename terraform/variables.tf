@@ -185,3 +185,18 @@ variable "PIPELINE_SCHEDULER_NAME" {
   description = "Name for the pipeline's scheduler"
   type        = string
 }
+
+variable "EMAIL_SCHEDULER_ROLE_NAME" {
+  description = "Name for the email scheduler's role"
+  type        = string
+}
+
+variable "EMAIL_SCHEDULER_POLICY_NAME" {
+  description = "Name for the email scheduler's policy"
+  type        = string
+}
+
+variable "EMAIL_SCHEDULER_NAME" {
+  description = "Name for the email scheduler"
+  type        = string
+}
