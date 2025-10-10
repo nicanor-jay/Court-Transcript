@@ -76,7 +76,7 @@ Once the above three steps are completed, you can run the [`phase-two`](terrafor
 
 ## 📐 Architecture diagram
 
-<img width="400px" src="images/architecture-diagram.png">
+<img width="600px" src="images/architecture-diagram.png">
 
 After the initial scraping of historical data has been done, daily data is pulled into our RDS periodically to stay up to date. We've then used the GPT-API to summarise the different court transcripts and transform them into a more friendly format that is easier to consume and understand. This data can be explored in our Streamlit dashboard.
 
