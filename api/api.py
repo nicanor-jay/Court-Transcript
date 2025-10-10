@@ -87,4 +87,4 @@ def route_get_judge_cases(judge_id: int):
 
 
 if __name__ == "__main__":
-    api.run(port=7000)
+    api.run(host="0.0.0.0", port=5000)
