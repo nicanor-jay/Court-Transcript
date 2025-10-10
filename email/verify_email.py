@@ -11,7 +11,7 @@ def verify_email_identity():
     """Sends an email to the given Email Address to verify for SES email sending."""
     ses_client = boto3.client("ses",
                               aws_access_key_id=ENV['ACCESS_KEY'],
-                              aws_secret_access_key=ENV['SECRET_KEY'],
+                              aws_secret_access_key=ENV['SECRET_ACCESS_KEY'],
                               region_name=ENV['REGION'])
     response = ses_client.verify_email_identity(
         EmailAddress=ENV['ORIGIN_EMAIL']

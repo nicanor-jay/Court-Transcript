@@ -42,7 +42,7 @@ def get_boto3_connection():
     load_dotenv()
     session = boto3.Session(
         aws_access_key_id=ENV['ACCESS_KEY'],
-        aws_secret_access_key=ENV['SECRET_KEY'],
+        aws_secret_access_key=ENV['SECRET_ACCESS_KEY'],
         region_name=ENV['REGION']
     )
 
