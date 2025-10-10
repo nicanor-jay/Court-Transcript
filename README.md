@@ -30,7 +30,7 @@ The solution? A data pipeline to automate the enhancement, discoverability and a
 
 ## 🛠️ Setup
 
-Add a `.env` file in the root directory formatted as follows:
+Add a `.env` file in each necessary directory formatted as follows:
 ```ini
 ACCESS_KEY={your_aws_key}
 SECRET_ACCESS_KEY={your_aws_secret_key}
@@ -56,7 +56,7 @@ ORIGIN_EMAIL={daily_report_sender_email}
 
 Additionally, look at our [Terraform `README`](https://github.com/nicanor-jay/Court-Transcript/blob/main/terraform/README.md) and follow the instructions in there.
 
-### 👾 Terraform
+### 👾 How To Run
 
 All our AWS resources can be set up using our Terraform modules.
 
@@ -64,15 +64,23 @@ All our AWS resources can be set up using our Terraform modules.
 
 Run the [`phase-one`](terraform/README.md) module to create the initial, non-dependant AWS resources.
 
+#### Running Reset DB
+
+Run the [`bash script`](database/setup_reset.sh) to set up the initial PostgreSQL DB
+
+#### The Four Bash Docker Scripts
+
+Then using the `build_push_dockerfile.sh` inside [`pipeline`](pipeline/build_push_dockerfile.sh), [`email`](email/build_push_dockerfile.sh), [`dashboard`](dashboard/build_push_dockerfile.sh), create the nessecary docker files and upload to the ECR using:
+
+```
+bash build_push_dockerfile.sh
+```
+
 #### Phase Two
 
-This phase is dependant on the following steps having been completed:
+This phase is dependant on the previous steps having been completed.
+Once these are completed, you can run the [`phase-two`](terraform/README.md) module to create the rest of the resources, and the project set up is complete.
 
-- Pipeline container being uploaded to ECR.
-- ECS Task container being uploaded to ECR.
-- Dashboard container being uploaded to ECR. 
-
-Once the above three steps are completed, you can run the [`phase-two`](terraform/README.md) module to create the rest of the resources.
 
 ## 📐 Architecture diagram
 
@@ -99,3 +107,5 @@ We've kept in mind many different aspects mentioned in the court transcripts - f
 - `court`: stores the different court names (High Court, Court of Appeal, etc)
 
 - `subscriber`: stores all the subscribers information for the daily email newsletter
+
+
