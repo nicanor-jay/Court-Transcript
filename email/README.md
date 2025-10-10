@@ -27,7 +27,7 @@ function.
 
 - Python 3.9 or higher
 - pip (Python package manager)
-- A root level `.env` file formatted as stated in the [project level readme](../README.md) (specifically, the `ORIGIN_EMAIL` Key).
+- A directory level `.env` file formatted as stated in the [project level readme](../README.md) (specifically, the `ORIGIN_EMAIL` Key).
 
 ### Setup
 

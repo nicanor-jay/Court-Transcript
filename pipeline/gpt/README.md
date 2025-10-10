@@ -43,7 +43,7 @@ The `summarise` method will take a list of dicts and return a `{identifier: {tra
 }
 ```
 
-Make sure you have a .env file containing your openai api key for the script to run.
+Make sure you have a .env file containing your openai api key for the script to run (as described in the root level README.md)
 
 ```
 OPENAI_API_KEY=
