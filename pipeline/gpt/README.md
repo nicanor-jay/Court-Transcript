@@ -28,11 +28,11 @@ This script is intended to be imported as a module by other scripts (it has no "
 from summary import extract_meaningful_headers, summarise
 ```
 
-The `extract_meaningful_headers` method will take a *list of dicts, may change once webscraping functionality implemented* and return a `{identifier:[headers]}` dictionary where:
+The `extract_meaningful_headers` method will take a list of dicts and return a `{identifier:[headers]}` dictionary where:
 - `identifier` is the unique identifier for a specific court transcript
 - `[headers]` is a list of all the meaningful headers from the transcript
 
-The `summarise` method will take a *list of dicts, may change once webscraping functionality implemented* and return a `{identifier: {transcript_summary}}` dictionary where:
+The `summarise` method will take a list of dicts and return a `{identifier: {transcript_summary}}` dictionary where:
 - `identifier` is the unique identifier for a specific court transcript
 - `{transcript_summary}` is a dictionary storing the summary data which will be in the form:
 ```
