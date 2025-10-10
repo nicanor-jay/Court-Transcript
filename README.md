@@ -70,7 +70,7 @@ Run the [`bash script`](database/setup_reset.sh) to set up the initial PostgreSQ
 
 #### The Four Bash Docker Scripts
 
-Then using the `build_push_dockerfile.sh` inside [`pipeline`](pipeline/build_push_dockerfile.sh), [`email`](email/build_push_dockerfile.sh), [`dashboard`](dashboard/build_push_dockerfile.sh), create the nessecary docker files and upload to the ECR using:
+Then using the `build_push_dockerfile.sh` inside [`pipeline`](pipeline/build_push_dockerfile.sh), [`email`](email/build_push_dockerfile.sh), [`dashboard`](dashboard/build_push_dockerfile.sh) and [`api`](api/build_push_dockerfile.sh), create the necessary docker files and upload to the ECR using:
 
 ```
 bash build_push_dockerfile.sh
