@@ -60,7 +60,7 @@ st.set_page_config(page_title="Judge Details", layout="wide")
 
 if st.button("⬅ Back to Search Judges"):
     # Use the filename (without extension) of the target page
-    st.switch_page("pages/search_judges.py")
+    st.switch_page("pages/Search_Judges.py")
 
 if "selected_judge_id" not in st.session_state:
     st.error("No judge selected. Please return to the Search Judges page.")

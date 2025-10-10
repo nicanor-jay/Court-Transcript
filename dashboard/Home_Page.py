@@ -74,7 +74,7 @@ def main():
     data = get_data_from_db(conn)
 
     # Layout
-    st.title("Court Hearings Overview")
+    st.title("Barrister Brief")
     st.divider()
 
     # Main content and sidebar layout
