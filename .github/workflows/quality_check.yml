@@ -51,9 +51,13 @@ jobs:
           find . -type f -name "requirements.txt" | sed -e 's/^/-r /' | xargs pip install
 
       - name: Run the tests
+        env: 
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           pytest .
 
       - name: Run coverage
+        env: 
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           pytest --cov-fail-under=60

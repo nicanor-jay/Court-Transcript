@@ -4,10 +4,9 @@
 
 import pytest
 import json
-import io
-from unittest.mock import mock_open, patch, MagicMock
+from unittest.mock import mock_open, patch
 
-from summary import create_query_messages, create_batch_request, insert_request, upload_batch_file, run_batch_requests
+from summary import create_query_messages, create_batch_request, insert_request
 
 def test_create_query_messages_valid_prompt_type():
     """Check that a query message has string prompts stored in the content keys"""
