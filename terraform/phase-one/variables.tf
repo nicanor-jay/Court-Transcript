@@ -73,3 +73,8 @@ variable "ECR_FOR_DASHBOARD_NAME" {
   description = "Name for the ECR hosting our dashboard image"
   type = string
 }
+
+variable "ECR_FOR_API_NAME" {
+  description = "Name for the ECR hosting our API image"
+  type = string
+}

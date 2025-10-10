@@ -69,6 +69,11 @@ variable "EMAIL_IMAGE_URI" {
   type        = string
 }
 
+variable "API_IMAGE_URI" {
+  description = "URI for the API image"
+  type        = string
+}
+
 variable "ECS_CLUSTER" {
   description = "ARN of ECS cluster to use for the dashboard ECS service"
   type        = string
@@ -91,6 +96,21 @@ variable "DASHBOARD_SECURITY_GROUP_NAME" {
 
 variable "DASHBOARD_ECS_SERVICE_NAME" {
   description = "Name for the dashboard's ECS service resource"
+  type        = string
+}
+
+variable "API_TASK_DEFINITION_NAME" {
+  description = "Name for the API's task definition resource"
+  type        = string
+}
+
+variable "API_SECURITY_GROUP_NAME" {
+  description = "Name for the API's security group resource"
+  type        = string
+}
+
+variable "API_ECS_SERVICE_NAME" {
+  description = "Name for the API's ECS service resource"
   type        = string
 }
 

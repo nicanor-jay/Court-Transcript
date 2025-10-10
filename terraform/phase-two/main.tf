@@ -69,6 +69,75 @@ resource "aws_ecs_service" "courts-dashboard-service" {
   }
 }
 
+# ECS task definition (API)
+resource "aws_ecs_task_definition" "courts-api-td" {
+  family = var.API_TASK_DEFINITION_NAME
+  requires_compatibilities = ["FARGATE"]
+  network_mode = "awsvpc"
+  cpu = 1024
+  memory = 2048
+  execution_role_arn = "arn:aws:iam::129033205317:role/ecsTaskExecutionRole"
+  container_definitions = jsonencode([
+    {
+        name = "dashboard"
+        image = var.API_IMAGE_URI
+        memory = 1792
+        environment = [
+            {name = "DB_PORT", value = var.DB_PORT},
+            {name = "DB_HOST", value = var.DB_HOST},
+            {name = "DB_USERNAME", value = var.DB_USERNAME},
+            {name = "DB_PASSWORD", value = var.DB_PASSWORD},
+            {name = "DB_NAME", value = var.DB_NAME}
+        ],
+        logConfiguration = {
+            logDriver = "awslogs"
+            options = {
+                "awslogs-group" = "/ecs/"
+                "awslogs-region" = var.REGION
+                "awslogs-stream-prefix" = "ecs"
+                "awslogs-create-group" = "true"
+            }
+        }
+    }
+
+  ])
+}
+
+# Security group (API)
+resource "aws_security_group" "courts-api-security-group" {
+    name = var.API_SECURITY_GROUP_NAME
+    description = "Allow "
+    vpc_id = var.VPC_ID
+
+    ingress {
+        description = "Allow API traffic on port 5000"
+        from_port = 5000
+        to_port = 5000
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    egress {
+        from_port        = 0
+        to_port          = 0
+        protocol         = "-1"
+        cidr_blocks      = ["0.0.0.0/0"]
+    }
+}
+
+# ECS service (API)
+resource "aws_ecs_service" "courts-api-service" {
+  name = var.API_ECS_SERVICE_NAME
+  cluster = var.ECS_CLUSTER
+  task_definition = aws_ecs_task_definition.courts-api-td.arn
+  desired_count = 1
+  launch_type = "FARGATE"
+  network_configuration {
+    subnets = var.SUBNET_IDS
+    security_groups = [aws_security_group.courts-api-security-group.id]
+    assign_public_ip = true
+  }
+}
+
 ## LAMBDA, ROLE AND CLOUDWATCH
 
 # Role for lambda
@@ -168,6 +237,7 @@ resource "aws_lambda_function" "courts-email-lambda" {
       DB_NAME=var.DB_NAME
       ACCESS_KEY = var.ACCESS_KEY
       SECRET_ACCESS_KEY = var.SECRET_ACCESS_KEY
+      REGION = var.REGION
       ORIGIN_EMAIL = var.ORIGIN_EMAIL
     }
   }
