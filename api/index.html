@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <header>
-        <title>Barister Brief API</title>
+        <title>Barrister Brief API</title>
         <style>
             .google-sans-code-bb {
                 font-family: "Google Sans Code", monospace;
@@ -20,7 +20,7 @@
         </style>
     </header>
     <body>
-        <h3 class="google-sans-code-bb">Barister Brief API</h3>
+        <h3 class="google-sans-code-bb">Barrister Brief API</h3>
         <p>This API features endpoints which allows for programmatic access to our data.</p>
         <p>Endpoints are described below.</p>
         <table>
@@ -31,10 +31,10 @@
             <tr>
                 <td class="google-sans-code-bb">"/case"</td>
                 <td>
-                    Must be called with at least one of:
+                    Must be called with at least one of the following query parameters:
                     <ul>
                         <li><span class="google-sans-code-bb">citation</span> - fetch a specific hearing (not usuable with other options)</li>
-                        <li><span class="google-sans-code-bb">start</span> & <span class="google-sans-code-bb">end</span> - a date range (must provide both)</li>
+                        <li><span class="google-sans-code-bb">start</span> & <span class="google-sans-code-bb">end</span> - a date range in YYYY-MM-DD format (must provide both)</li>
                         <li><span class="google-sans-code-bb">favour</span> - filter by verdict favour (must be <span class="google-sans-code-bb">plaintiff</span> or <span class="google-sans-code-bb">defendent</span>)</li>
                     </ul>
                 </td>
