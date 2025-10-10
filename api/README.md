@@ -1,11 +1,14 @@
 ## API
 
 ### Contents
-1. [Running locally](#running-the-api-locally)
-2. [As a Docker container](#running-as-a-docker-container)
-3. [Pushing to an ECR](#pushing-to-an-aws-ecr)
+1. [Prerequisites](#prerequisites)
+2. [Running locally](#running-the-api-locally)
+3. [As a Docker container](#running-as-a-docker-container)
+4. [Pushing to an ECR](#pushing-to-an-aws-ecr)
 
 This module contains code for an API service that exposes programmatic access to the Barrister Brief database.
+
+### Prerequisites
 
 In order to be able to properly use any part of this module, you must first have a `.env` file within this directory, with the following details/credentials:
 
@@ -41,7 +44,7 @@ Lastly, run the API:
 $ python api.py
 ```
 
-This will run the API at `0.0.0.0` on port `5000`.
+This will run the API at `0.0.0.0` on port `5000`. The root path `/` will display an index page with details of the available endpoints.
 
 ### Running as a Docker container
 
