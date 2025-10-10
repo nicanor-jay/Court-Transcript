@@ -145,3 +145,18 @@ variable "ORIGIN_EMAIL" {
   description = "Origin email"
   type        = string
 }
+
+variable "PIPELINE_SCHEDULER_ROLE_NAME" {
+  description = "Name for the pipeline's scheduler's role"
+  type        = string
+}
+
+variable "PIPELINE_SCHEDULER_POLICY_NAME" {
+  description = "Name for the pipeline's scheduler's policy"
+  type        = string
+}
+
+variable "PIPELINE_SCHEDULER_NAME" {
+  description = "Name for the pipeline's scheduler"
+  type        = string
+}
