@@ -57,3 +57,9 @@ resource "aws_ecr_repository" "dashboard-ecr" {
   name                 = var.ECR_FOR_DASHBOARD_NAME
   image_tag_mutability = "MUTABLE"
 }
+
+# ECR to host the API
+resource "aws_ecr_repository" "api-ecr" {
+  name                 = var.ECR_FOR_API_NAME
+  image_tag_mutability = "MUTABLE"
+}
