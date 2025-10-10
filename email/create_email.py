@@ -43,7 +43,7 @@ def write_email(hearings: list[dict]) -> str:
 
     html = f"""
     <html>
-        <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #212838; color: #ead9d6";>
+        <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #212838; color: #ead9d6; padding: 30px;">
         <h2 style="color: #b29758;"> Hearing Overview - {yesterdays_date}</h2>
         <div>Thanks for reading this daily update. For more details, access the <a href='http://18.175.52.45:8501' style="color: #238fb5;">dashboard</a>.</div>
         
@@ -66,12 +66,16 @@ def write_email(hearings: list[dict]) -> str:
         if hearing['hearing_anomaly'] != 'None Found':
             html += f"<p>Anomaly: {hearing['hearing_anomaly']}</p>"
         html += f"""
-            <p>URL: <a href ='{hearing['hearing_url']}'>{hearing['hearing_url']} style="color: #238fb5;"</a></p>
+            <p>URL: <a href ='{hearing['hearing_url']}' style="color: #238fb5;">{hearing['hearing_url']}</a></p>
             <hr>
-
         </div>
-        <p>From, Objection Handling</p>
         """
+
+    html += """
+    <p>From, Objection Handling</p>
+    </body>
+    </html>
+    """
 
     return html
 
