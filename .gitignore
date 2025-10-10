@@ -102,5 +102,3 @@ terraform.tfstate.backup
 *.coverage
 *.jsonl
 report*.html
-
-*.png
