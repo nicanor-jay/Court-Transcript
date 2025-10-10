@@ -44,10 +44,7 @@ def write_email(hearings: list[dict]) -> str:
     html = f"""
     <html>
         <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #212838; color: #ead9d6";>
-        <img src="images/courtlogo.png" alt="Team logo" style="float: left; width: 80px; height: 80px;">
-        <h2 style="color: #b29758; position: relative; top: 18px; left: 10px;"> Hearing Overview - {yesterdays_date}</h2>
-        <br>
-        <br>
+        <h2 style="color: #b29758;"> Hearing Overview - {yesterdays_date}</h2>
         <div>Thanks for reading this daily update. For more details, access the <a href='http://18.175.52.45:8501' style="color: #238fb5;">dashboard</a>.</div>
         
         <hr>
