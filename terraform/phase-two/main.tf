@@ -245,7 +245,7 @@ resource "aws_lambda_function" "courts-email-lambda" {
 }
 
 
-## SCHEDULER AND ROLE
+## PIPELINE SCHEDULER AND ROLE
 resource "aws_iam_role" "pipeline_scheduler_role" {
   name = var.PIPELINE_SCHEDULER_ROLE_NAME
   assume_role_policy = jsonencode({
@@ -295,5 +295,59 @@ resource "aws_scheduler_schedule" "pipeline_scheduler" {
   target {
     arn = aws_lambda_function.courts-pipeline-lambda.arn
     role_arn = aws_iam_role.pipeline_scheduler_role.arn
+  }
+}
+
+
+## EMAIL SCHEDULER AND ROLE
+resource "aws_iam_role" "email_scheduler_role" {
+  name = var.EMAIL_SCHEDULER_ROLE_NAME
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+        {
+          Action = "sts:AssumeRole"
+          Principal = {
+            Service = "scheduler.amazonaws.com"
+          },
+          Effect = "Allow"
+        }
+   ]
+  })
+}
+resource "aws_iam_policy" "email_scheduler_policy" {
+  name = var.EMAIL_SCHEDULER_POLICY_NAME
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Action" : [
+          "lambda:InvokeFunction"
+        ],
+        Effect   = "Allow"
+        Resource = aws_lambda_function.courts-email-lambda.arn
+      },
+    ]
+  })
+}
+resource "aws_iam_role_policy_attachment" "email_scheduler_policy_attachment" {
+  role       = aws_iam_role.email_scheduler_role.name
+  policy_arn = aws_iam_policy.email_scheduler_policy.arn
+}
+
+# Email scheduler
+resource "aws_scheduler_schedule" "email_scheduler" {
+  name = var.EMAIL_SCHEDULER_NAME
+  group_name = "default"
+  schedule_expression = "cron(0 12 * * ? *)"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  target {
+    arn = aws_lambda_function.courts-email-lambda.arn
+    role_arn = aws_iam_role.email_scheduler_role.arn
   }
 }
