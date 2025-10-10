@@ -18,6 +18,16 @@ This RDS utility script holds all functions used to connect and send queries to 
 ### `utils.py`
 This utility script holds helper functions, such as a function to setup the logging used for the dashboard code.
 
+### `.streamlit/config.toml`
+Holds the custom colour themes for the streamlit app
+
+## Folders
+### `pages/`
+This folder holds the necessary scripts to run the sidebar and multi-page view 
+
+### `images/`
+This folder holds the necessary images for logos for the streamlit webpage
+
 ## Requirements
 1. A root level `.env` file formatted as stated in the [project level readme](../README.md).
 
