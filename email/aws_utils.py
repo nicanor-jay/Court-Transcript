@@ -6,10 +6,11 @@ from psycopg2.extensions import connection
 from psycopg2 import connect, Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
+import boto3
 
 
 def get_db_connection():
-    """Gets database connection. """
+    """Gets the db connection and returns it."""
     load_dotenv()
     try:
         con = connect(
@@ -22,7 +23,7 @@ def get_db_connection():
         )
         logging.info("Connected to RDS.")
         return con
-    except Error:
+    except Error as e:
         # print(f"Error connecting to database: {e}")
         logging.critical("Error connecting to RDS")
         return None
@@ -33,4 +34,16 @@ def query_rds(con: connection, query: str) -> dict:
     with con.cursor() as cur:
         cur.execute(query)
         data = cur.fetchall()
-    return data[0]
+    return data
+
+
+def get_boto3_connection():
+    """Gets a connection to AWS via boto3"""
+    load_dotenv()
+    session = boto3.Session(
+        aws_access_key_id=ENV['ACCESS_KEY'],
+        aws_secret_access_key=ENV['SECRET_KEY'],
+        region_name=ENV['REGION']
+    )
+
+    return session

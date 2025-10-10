@@ -2,10 +2,10 @@
 
 import json
 import logging
-import subprocess
 from typing import Optional
 from psycopg2.extensions import connection
 from judge_scraping.rds_utils import get_db_connection, query_rds
+from judge_scraping.judge_scraper import judge_main
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 
@@ -34,13 +34,13 @@ def get_judges_from_rds(conn: connection):
 def run_scraper():
     """Run the judge scraping script."""
     logging.info("Running scraper")
-    subprocess.run(["python3", "judge_scraping/judge_scraper.py"], check=True)
+    judge_main()
     logging.info("Completed scraping. ")
 
 
 def load_scraped_judges():
     """Load judges from JSON file. """
-    with open("judges_data.json", "r", encoding="utf-8") as f:
+    with open("/tmp/judges_data.json", "r", encoding="utf-8") as f:
         judges = json.load(f)
     logging.info("Loaded %s judges from scraper.", len(judges))
     return judges

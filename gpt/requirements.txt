@@ -1,6 +1,0 @@
-openai
-pylint
-pytest
-pytest-mock
-pytest-cov
-python-dotenv

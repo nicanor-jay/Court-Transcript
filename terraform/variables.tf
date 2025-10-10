@@ -63,8 +63,8 @@ variable "ECR_FOR_LAMBDA_NAME" {
   type = string
 }
 
-variable "ECR_FOR_ECS_NAME" {
-  description = "Name for the ECR hosting our ECS task"
+variable "ECR_FOR_EMAIL_NAME" {
+  description = "Name for the ECR hosting our email task"
   type = string
 }
 
@@ -91,8 +91,23 @@ variable "DASHBOARD_IMAGE_URI" {
   type        = string
 }
 
+variable "PIPELINE_IMAGE_URI" {
+  description = "URI for the pipeline image"
+  type        = string
+}
+
+variable "EMAIL_IMAGE_URI" {
+  description = "URI for the email image"
+  type        = string
+}
+
 variable "ECS_CLUSTER" {
   description = "ARN of ECS cluster to use for the dashboard ECS service"
+  type        = string
+}
+
+variable "OPENAI_API_KEY" {
+  description = "GPT-API key"
   type        = string
 }
 
@@ -108,5 +123,25 @@ variable "DASHBOARD_SECURITY_GROUP_NAME" {
 
 variable "DASHBOARD_ECS_SERVICE_NAME" {
   description = "Name for the dashboard's ECS service resource"
+  type        = string
+}
+
+variable "LAMBDA_EXEC_ROLE_NAME" {
+  description = "Name for the lambda's execution role"
+  type        = string
+}
+
+variable "PIPELINE_LAMBDA_NAME" {
+  description = "Name for the pipeline lambda"
+  type        = string
+}
+
+variable "EMAIL_LAMBDA_NAME" {
+  description = "Name for the email services lambda"
+  type        = string
+}
+
+variable "ORIGIN_EMAIL" {
+  description = "Origin email"
   type        = string
 }

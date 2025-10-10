@@ -10,7 +10,7 @@ resource "aws_ecs_task_definition" "courts-dashboard-td" {
     {
         name = "dashboard"
         image = var.DASHBOARD_IMAGE_URI
-        memory = 128
+        memory = 1792
         environment = [
             {name = "ACCESS_KEY", value = var.ACCESS_KEY},
             {name = "SECRET_ACCESS_KEY", value = var.SECRET_ACCESS_KEY},
@@ -67,4 +67,109 @@ resource "aws_ecs_service" "courts-dashboard-service" {
     security_groups = [aws_security_group.courts_dashboard_security_group.id]
     assign_public_ip = true
   }
+}
+
+## LAMBDA, ROLE AND CLOUDWATCH
+
+# Role for lambda
+resource "aws_iam_role" "lambda_exec_role" {
+ name = var.LAMBDA_EXEC_ROLE_NAME
+  assume_role_policy = jsonencode({
+   Version = "2012-10-17",
+   Statement = [
+     {
+       Action = "sts:AssumeRole",
+       Principal = {
+         Service = [
+          "lambda.amazonaws.com"
+         ]
+       },
+       Effect = "Allow"
+     }
+   ]
+  })
+}
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+ role       = aws_iam_role.lambda_exec_role.name
+ policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# Pipeline cloudwatch log group
+resource "aws_cloudwatch_log_group" "pipeline_lambda_cloudwatch" {
+  name              = "/aws/lambda/${var.PIPELINE_LAMBDA_NAME}"
+  retention_in_days = 14
+
+  tags = {
+    Environment = "production"
+    Application = "pipeline-lambda"
+  }
+}
+# Pipeline Lambda
+resource "aws_lambda_function" "courts-pipeline-lambda" {
+  function_name = var.PIPELINE_LAMBDA_NAME
+  role          = aws_iam_role.lambda_exec_role.arn
+  package_type  = "Image"
+  image_uri     = var.PIPELINE_IMAGE_URI
+  memory_size = 512
+  timeout     = 900
+  logging_config {
+    log_format            = "JSON"
+    application_log_level = "INFO"
+    system_log_level      = "WARN"
+  }
+
+  depends_on = [aws_cloudwatch_log_group.pipeline_lambda_cloudwatch]
+
+  environment {
+    variables = {
+      DB_HOST=var.DB_HOST
+      DB_PORT=var.DB_PORT
+      DB_USERNAME=var.DB_USERNAME
+      DB_PASSWORD=var.DB_PASSWORD
+      DB_NAME=var.DB_NAME
+      OPENAI_API_KEY = var.OPENAI_API_KEY
+    }
+  }
+  architectures = ["x86_64"]
+}
+
+# Email service cloudwatch log group
+resource "aws_cloudwatch_log_group" "email_lambda_cloudwatch" {
+  name              = "/aws/lambda/${var.EMAIL_LAMBDA_NAME}"
+  retention_in_days = 14
+
+  tags = {
+    Environment = "production"
+    Application = "email-lambda"
+  }
+}
+# Email Lambda
+resource "aws_lambda_function" "courts-email-lambda" {
+  function_name = var.EMAIL_LAMBDA_NAME
+  role          = aws_iam_role.lambda_exec_role.arn
+  package_type  = "Image"
+  image_uri     = var.EMAIL_IMAGE_URI
+  memory_size = 512
+  timeout     = 300
+  logging_config {
+    log_format            = "JSON"
+    application_log_level = "INFO"
+    system_log_level      = "WARN"
+  }
+
+  depends_on = [aws_cloudwatch_log_group.email_lambda_cloudwatch]
+
+  environment {
+    variables = {
+      DB_HOST=var.DB_HOST
+      DB_PORT=var.DB_PORT
+      DB_USERNAME=var.DB_USERNAME
+      DB_PASSWORD=var.DB_PASSWORD
+      DB_NAME=var.DB_NAME
+      ACCESS_KEY = var.ACCESS_KEY
+      SECRET_ACCESS_KEY = var.SECRET_ACCESS_KEY
+      ORIGIN_EMAIL = var.ORIGIN_EMAIL
+    }
+  }
+  architectures = ["x86_64"]
 }

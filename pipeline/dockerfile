@@ -1,68 +1,25 @@
-FROM public.ecr.aws/lambda/python:3.13
+FROM public.ecr.aws/lambda/python:3.12
 
 # Set lambda root as working directory
 WORKDIR ${LAMBDA_TASK_ROOT}
 
-# Grab requirement files
-COPY ./case_fetcher/requirements.txt ./case_fetcher/
-COPY ./gpt/requirements.txt ./gpt/
-COPY ./judge_scraping/requirements.txt ./judge_scraping/
-COPY ./xml_extraction/requirements.txt ./xml_extraction/
-COPY ./pipeline/requirements.txt ./pipeline/
+# Install chrome dependencies
+RUN dnf install -y atk cups-libs gtk3 libXcomposite alsa-lib \
+    libXcursor libXdamage libXext libXi libXrandr libXScrnSaver \
+    libXtst pango at-spi2-atk libXt xorg-x11-server-Xvfb \
+    xorg-x11-xauth dbus-glib dbus-glib-devel nss mesa-libgbm jq unzip
 
-# Install all requirements
-RUN dnf install -y findutils
-RUN find . -type f -name "requirements.txt" | sed -e 's/^/-r /' | xargs pip install
+# Run chrome installer script
+COPY chrome-installer.sh .
+RUN bash ./chrome-installer.sh
 
-# Install playwright chromium
-RUN playwright install chromium
+RUN PATH=/opt/chrome-driver:$PATH
 
-# This is needed due to playwright's dependencies
-# It installs a bunch of shared library files that
-# are missing from the image OS (Rocky Linux)
-RUN dnf install -y alsa-lib \
-at-spi2-atk \
-at-spi2-core \
-atk \
-bash \
-cairo \
-cups-libs \
-dbus-libs \
-expat \
-flac-libs \
-gdk-pixbuf2 \
-glib2 \
-glibc \
-gtk3 \
-libX11 \
-libXcomposite \
-libXdamage \
-libXext \
-libXfixes \
-libXrandr \
-libXtst \
-libcanberra-gtk3 \
-libdrm \
-libgcc \
-libstdc++ \
-libxcb \
-libxkbcommon \
-libxshmfence \
-libxslt \
-mesa-libgbm \
-nspr \
-nss \
-nss-util \
-pango \
-policycoreutils \
-policycoreutils-python-utils \
-zlib
+# Grab requirement file and install
+COPY requirements.txt  .
+RUN  pip3 install -r requirements.txt
 
 # Copy everything else
-COPY ./case_fetcher ./case_fetcher/
-COPY ./gpt ./gpt/
-COPY ./judge_scraping ./judge_scraping/
-COPY ./xml_extraction ./xml_extraction/
-COPY ./pipeline ./pipeline/
+COPY . .
 
-CMD [ "pipeline.etl.handler" ]
+CMD [ "etl.handler" ]

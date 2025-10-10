@@ -35,7 +35,6 @@ DB_SUBNET_GROUP_NAME = "name_for_db_subnet_group_resource"
 RDS_SECURITY_GROUP_NAME = "name_for_rds_security_group_resource"
 COURTS_RDS_NAME = "name_for_rds_resource"
 ECR_FOR_LAMBDA_NAME = "name_for_lambda_ecr"
-ECR_FOR_ECS_NAME = "name_for_ecs_ecr"
 ECR_FOR_DASHBOARD_NAME = "name_for_dashboard_ecr"
 
 # Phase two
@@ -43,10 +42,14 @@ DB_PORT = "your_db_port"
 DB_HOST = "your_rds_endpoint"
 DASHBOARD_IMAGE_URI = "your_dashboard_image_uri"
 ECS_CLUSTER = "your-ecs-cluster"
+PIPELINE_IMAGE_URI = "your_pipeline_image_uri"
+
 
 DASHBOARD_TASK_DEFINITION_NAME = "name_for_dashboard_task_definition_resource"
 DASHBOARD_SECURITY_GROUP_NAME = "name_for_dashboard_security_group_resource"
 DASHBOARD_ECS_SERVICE_NAME = "name_for_dashboard_ecs_service_resource"
+LAMBDA_EXEC_ROLE_NAME = "name_for_lambda_exec_role_resource"
+PIPELINE_LAMBDA_NAME = "name_for_pipeline_lambda_resource"
 ```
 
 ## 🚀 How to run
