@@ -19,7 +19,9 @@ conn = get_db_connection()
 @api.get("/")
 def route_main():
     """Return a simple greeting message."""
-    return "Hello there."
+    with open("index.html", encoding="utf-8") as f:
+        html = f.read()
+    return html
 
 
 @api.get("/case")
