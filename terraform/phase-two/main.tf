@@ -111,7 +111,7 @@ resource "aws_lambda_function" "courts-pipeline-lambda" {
   package_type  = "Image"
   image_uri     = var.PIPELINE_IMAGE_URI
   memory_size = 512
-  timeout     = 300
+  timeout     = 900
   logging_config {
     log_format            = "JSON"
     application_log_level = "INFO"

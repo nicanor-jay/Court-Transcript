@@ -20,7 +20,7 @@ from psycopg2.extensions import connection
 from judge_scraping import judges_rds
 from xml_extraction import get_unique_xml, parse_xml, metadata_xml
 from gpt import summary
-from pipeline import load
+import load
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -114,7 +114,7 @@ def run_etl(number_of_transcripts: int = 20) -> None:
     reset_jsonl_file(SUMMARY_INPUT)
 
     # Scraping + updating judges
-    # insert_scraped_judges()
+    insert_scraped_judges()
 
     # Extracting and dealing with XMLs
     logging.info("Getting unique XMLs")
