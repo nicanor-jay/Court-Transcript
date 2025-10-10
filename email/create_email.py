@@ -41,29 +41,40 @@ def write_email(hearings: list[dict]) -> str:
         1 for hearing in hearings if hearing['judgement_favour'] == 'Plaintiff'])
     defendant_count = len(hearings) - plaintiff_count
 
-    html = f"""<h2> Hearing Overview - {yesterdays_date}</h2>
-    """
-    html += "<p>Thanks for reading this daily update. For more details, access the <a href='http://18.175.52.45:8501'>dashboard</a>.</p>"
-    html += "<hr>"
-    html += f"<p>Total Cases: {len(hearings)}</p>"
-    html += f"<p>In Favour of Plaintiff: {plaintiff_count}</p>"
-    html += f"<p>In Favour of Defendant: {defendant_count}</p>"
-    html += "<hr>"
+    html = f"""
+    <html>
+        <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #212838; color: #ead9d6";>
+        <img src="images/courtlogo.png" alt="Team logo" style="float: left; width: 80px; height: 80px;">
+        <h2 style="color: #b29758; position: relative; top: 18px; left: 10px;"> Hearing Overview - {yesterdays_date}</h2>
+        <br>
+        <br>
+        <div>Thanks for reading this daily update. For more details, access the <a href='http://18.175.52.45:8501' style="color: #238fb5;">dashboard</a>.</div>
+        
+        <hr>
+        <p>Total Cases: {len(hearings)}</p>
+        <p>In Favour of Plaintiff: {plaintiff_count}</p>
+        <p>In Favour of Defendant: {defendant_count}</p>
+        <hr>
 
-    html += "<h2>Hearings</h2>"
+        <h2 style="color: #b29758;">Hearings</h2>
+    """
 
     for hearing in hearings:
-        html += "<div>"
-        html += f"<h4>{hearing['hearing_citation']} - {hearing['hearing_title']}</h4>"
-        html += f"<p>Ruled in favour of <b>{hearing['judgement_favour']}</b></p>"
-        html += f"<p>{hearing['hearing_description']}</p>"
+        html += f"""
+        <div>
+            <h4>{hearing['hearing_citation']} - {hearing['hearing_title']}</h4>
+            <p>Ruled in favour of <b>{hearing['judgement_favour']}</b></p>
+            <p>{hearing['hearing_description']}</p>
+        """
         if hearing['hearing_anomaly'] != 'None Found':
             html += f"<p>Anomaly: {hearing['hearing_anomaly']}</p>"
-        html += f"<p>URL: <a href ='{hearing['hearing_url']}'>{hearing['hearing_url']}</a></p>"
-        html += "<hr>"
+        html += f"""
+            <p>URL: <a href ='{hearing['hearing_url']}'>{hearing['hearing_url']} style="color: #238fb5;"</a></p>
+            <hr>
 
-        html += "</div>"
-    html += "<p>From, Objection Handling</p>"
+        </div>
+        <p>From, Objection Handling</p>
+        """
 
     return html
 

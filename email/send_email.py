@@ -31,7 +31,7 @@ def send_html_email(subscriber_list: list, email_html: str):
             },
             "Subject": {
                 "Charset": CHARSET,
-                "Data": "Barrister's Brief Daily Report",
+                "Data": "Barrister Brief Daily Report",
             },
         },
         Source=ENV['ORIGIN_EMAIL'],
