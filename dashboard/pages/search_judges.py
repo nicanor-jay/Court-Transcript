@@ -32,7 +32,7 @@ st.markdown(
 
     /* NEW: Hide the judge_details.py link from the sidebar navigation */
     /* Streamlit converts pages/judge_details.py to the URL path /judge_details */
-    [data-testid="stSidebarNavLink"][href$="/judge_details"] {{
+    [data-testid="stSidebarNavLink"][href$="/Judge_Details"] {{
         display: none;
     }}
     </style>
@@ -117,4 +117,4 @@ else:
             with cols[1]:
                 if st.button("View Details", key=f"judge_{row.id}_{idx}"):
                     st.session_state["selected_judge_id"] = row["id"]
-                    st.switch_page("pages/judge_details.py")
+                    st.switch_page("pages/Judge_Details.py")

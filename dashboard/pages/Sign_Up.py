@@ -37,7 +37,7 @@ st.markdown(
 
     /* NEW: Hide the judge_details.py link from the sidebar navigation */
     /* Streamlit converts pages/judge_details.py to the URL path /judge_details */
-    [data-testid="stSidebarNavLink"][href$="/judge_details"] {{
+    [data-testid="stSidebarNavLink"][href$="/Judge_Details"] {{
         display: none;
     }}
 
@@ -92,7 +92,7 @@ def main():
     conn = get_db_connection()
 
     # Layout
-    st.title("Sign Up For Barrister's Brief")
+    st.title("Sign Up For Barrister Brief")
     st.markdown("Enter your detail's below to receive daily court summaries!")
     st.divider()
 
@@ -107,7 +107,7 @@ def main():
 
         if all([valid_first, valid_last, valid_email]):
             st.success(f"Thank You {first_name}! \
-                       You have successfully signed up for Barrister's Brief")
+                       You have successfully signed up for Barrister Brief")
             insert_subscriber(conn, first_name, last_name, email)
         else:
             if not valid_first:

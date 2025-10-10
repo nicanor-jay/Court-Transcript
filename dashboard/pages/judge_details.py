@@ -11,7 +11,7 @@ from charts import (
     create_word_cloud
 )
 
-PAGE_FILENAME = "judge_details"
+PAGE_FILENAME = "Judge_Details"
 
 # --- CSS INJECTION FOR GOLD HEADERS & JUDGE DETAILS HIDDEN
 GOLD_COLOR = "#b29758"
@@ -41,7 +41,7 @@ st.markdown(
 
     /* NEW: Hide the judge_details.py link from the sidebar navigation */
     /* Streamlit converts pages/judge_details.py to the URL path /judge_details */
-    [data-testid="stSidebarNavLink"][href$="/judge_details"] {{
+    [data-testid="stSidebarNavLink"][href$="/Judge_Details"] {{
         display: none;
     }}
     </style>
@@ -60,7 +60,7 @@ st.set_page_config(page_title="Judge Details", layout="wide")
 
 if st.button("⬅ Back to Search Judges"):
     # Use the filename (without extension) of the target page
-    st.switch_page("pages/search_judges.py")
+    st.switch_page("pages/Search_Judges.py")
 
 if "selected_judge_id" not in st.session_state:
     st.error("No judge selected. Please return to the Search Judges page.")

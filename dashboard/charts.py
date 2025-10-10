@@ -104,6 +104,7 @@ def get_recent_hearings_table(data: pd.DataFrame):
 
 
 def get_rulings_by_court_chart(data: pd.DataFrame):
+    """Gets ruling decisions by court. """
     data = data.copy()
     data["judgement_favour"] = data["judgement_favour"].fillna("Undisclosed")
     chart = (

@@ -34,7 +34,7 @@ st.markdown(
 
     /* NEW: Hide the judge_details.py link from the sidebar navigation */
     /* Streamlit converts pages/judge_details.py to the URL path /judge_details */
-    [data-testid="stSidebarNavLink"][href$="/judge_details"] {{
+    [data-testid="stSidebarNavLink"][href$="/Judge_Details"] {{
         display: none;
     }}
     </style>
