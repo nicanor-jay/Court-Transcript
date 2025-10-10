@@ -157,7 +157,7 @@ def get_batch_meaningful_headers(batch_id: str) -> dict:
 
     # show token usage for requests in the batch
     token_summary, total_batch_tokens = get_batch_token_usage(batch_id)
-    logging.info(f"Token usage per request:")
+    logging.info("Token usage per request:")
     for item in token_summary:
         logging.info(f"{item['custom_id']} Request Token Usage: {item}")
     logging.info(f"Total batch tokens used: {total_batch_tokens}")
@@ -186,7 +186,7 @@ def get_batch_summaries(batch_id: str) -> dict:
     
     # show token usage for requests in the batch
     token_summary, total_batch_tokens = get_batch_token_usage(batch_id)
-    logging.info(f"Token usage per request:")
+    logging.info("Token usage per request:")
     for item in token_summary:
         logging.info(f"{item['custom_id']} Request Token Usage: {item}")
     logging.info(f"Total batch tokens used: {total_batch_tokens}")
