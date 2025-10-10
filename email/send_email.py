@@ -14,7 +14,7 @@ def send_html_email(subscriber_list: list, email_html: str):
     """Sends the daily email to the subscribers."""
     ses_client = boto3.client("ses",
                               aws_access_key_id=ENV['ACCESS_KEY'],
-                              aws_secret_access_key=ENV['SECRET_KEY'],
+                              aws_secret_access_key=ENV['SECRET_ACCESS_KEY'],
                               region_name=ENV['REGION'])
     CHARSET = "UTF-8"
 
