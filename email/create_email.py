@@ -115,7 +115,8 @@ def get_subscribers_and_email():
 
     res = {
         'subscriber_emails': subscriber_emails,
-        'email': email
+        'email': email,
+        'num_hearings': len(hearings)
     }
 
     return res
