@@ -102,12 +102,15 @@ def wait_for_batch(batch_id: str, poll_interval: int = 20, timeout: int = 300):
         batch = openai.batches.retrieve(batch_id)
 
         status = batch.status
-        print(f"[Batch {batch_id}] Status: {status} (waited {waited}s)")
+        logging.info(
+            "[Batch %s] Status: %s (waited %ss)",
+            batch_id, status, waited)
 
         if status == "completed":
             return batch
         elif status in ["failed", "cancelled", "expired"]:
-            raise RuntimeError(f"Batch {batch_id} ended with status: {status}")
+            error_msg = f"Batch {batch_id} ended with status: {status}\nReason: {batch.message}"
+            raise RuntimeError(error_msg)
 
         time.sleep(poll_interval)
         waited += poll_interval
@@ -123,8 +126,9 @@ def get_batch_token_usage(batch_id: str):
     output_file_id = batch.output_file_id
 
     if not output_file_id:
-        print(
-            f"No output file yet for batch {batch_id}. Current status: {batch.status}")
+        logging.info(
+            "No output file yet for batch %s. Current status: %s",
+            batch_id, batch.status)
         return None
 
     # Download output file
@@ -183,7 +187,7 @@ def get_batch_summaries(batch_id: str) -> dict:
     if not batch.output_file_id:
         raise ValueError(
             "Batch not finished processing yet or no output file detected.")
-    
+
     # show token usage for requests in the batch
     token_summary, total_batch_tokens = get_batch_token_usage(batch_id)
     logging.info("Token usage per request:")
