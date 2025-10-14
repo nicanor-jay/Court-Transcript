@@ -59,7 +59,6 @@ st.sidebar.image(MAIN_LOGO)
 st.set_page_config(page_title="Judge Details", layout="wide")
 
 if st.button("⬅ Back to Search Judges"):
-    # Use the filename (without extension) of the target page
     st.switch_page("pages/Search_Judges.py")
 
 if "selected_judge_id" not in st.session_state:
@@ -106,11 +105,55 @@ col3.metric("Cases This Year", year_cases)
 
 st.divider()
 
+# STATISTICS PANEL
+st.subheader("Judge Statistics")
+
+# Calculate ruling favour breakdown
+judge_hearings_copy = judge_hearings.copy()
+judge_hearings_copy["judgement_favour"] = judge_hearings_copy["judgement_favour"].fillna("Undisclosed")
+ruling_counts = judge_hearings_copy["judgement_favour"].value_counts().to_dict()
+
+plaintiff_count = ruling_counts.get("Plaintiff", 0)
+defendant_count = ruling_counts.get("Defendant", 0)
+undisclosed_count = ruling_counts.get("Undisclosed", 0)
+
+# Calculate percentages
+plaintiff_pct = (plaintiff_count / total_cases * 100) if total_cases > 0 else 0
+defendant_pct = (defendant_count / total_cases * 100) if total_cases > 0 else 0
+undisclosed_pct = (undisclosed_count / total_cases * 100) if total_cases > 0 else 0
+
+# Display metrics
+stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+
+with stat_col1:
+    st.metric("Total Cases", total_cases)
+
+with stat_col2:
+    st.metric("Plaintiff Favoured", f"{plaintiff_count} ({plaintiff_pct:.1f}%)")
+
+with stat_col3:
+    st.metric("Defendant Favoured", f"{defendant_count} ({defendant_pct:.1f}%)")
+
+with stat_col4:
+    st.metric("Undisclosed", f"{undisclosed_count} ({undisclosed_pct:.1f}%)")
+
+# Most common courts
+courts = judge_hearings_copy["court_name"].value_counts().head(5)
+
+st.markdown("**Most Common Courts:**")
+if not courts.empty:
+    courts_text = ", ".join([f"{court} ({count})" for court, count in courts.items()])
+    st.write(courts_text)
+else:
+    st.write("No court data available.")
+
+st.divider()
+
 st.subheader("Ruling Tendency Overview")
 
 col1, col2 = st.columns(2)
 with col1:
-    st.markdown("**Judge’s Ruling Tendency**")
+    st.markdown("**Judge's Ruling Tendency**")
     tendency_chart = get_judge_ruling_tendency_chart(judge_hearings, FULL_NAME)
     st.altair_chart(tendency_chart, use_container_width=True)
 
