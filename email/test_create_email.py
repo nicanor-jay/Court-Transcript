@@ -15,4 +15,4 @@ def test_write_email():
          'judgement_favour': 'Plaintiff'}
     ]
 
-    assert len(write_email(hearing)) > 0
+    assert len(write_email(hearing, "test_url:8501")) > 0

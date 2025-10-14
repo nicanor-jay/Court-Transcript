@@ -50,10 +50,14 @@ def handler(event=None, context=None):
     load_dotenv()
 
     if not ENV['ORIGIN_EMAIL']:
-        logging.critical("Missing ORIGIN_EMAIL key.")
+        logging.critical("Missing ORIGIN_EMAIL env var.")
         return
 
-    subscribers_email_dict = get_subscribers_and_email()
+    if not ENV['DASHBOARD_URL']:
+        logging.critical("Missing DASHBOARD_URL env var.")
+        return
+
+    subscribers_email_dict = get_subscribers_and_email(ENV['DASHBOARD_URL'])
 
     subscribers = subscribers_email_dict['subscriber_emails']
     email = subscribers_email_dict['email']

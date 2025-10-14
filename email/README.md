@@ -57,7 +57,9 @@ python verify_email.py
 
 Running this will send an verification email to your `ORIGIN_EMAIL` as specified in your `.env`. You must verify before continuing.
 
-2. Once verified, and within the email directory, run
+2. Ensure that the dashboard is up and running, with `DASHBOARD_URL` having its URL as the value.
+
+3. Once verified, within the email directory, & with the dashboard up and running, run
 
 ```bash
 python send_email.py

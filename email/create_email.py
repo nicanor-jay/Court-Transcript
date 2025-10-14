@@ -1,6 +1,7 @@
 """This script generates an HTML email to send to subscribers."""
 
 import logging
+from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from aws_utils import get_db_connection, query_rds
 from psycopg2.extensions import connection
@@ -32,7 +33,7 @@ def get_yesterdays_hearings(conn: connection) -> list[dict]:
     return hearings
 
 
-def write_email(hearings: list[dict]) -> str:
+def write_email(hearings: list[dict], dashboard_url: str) -> str:
     """Function to write todays comprehensive newsletter."""
 
     yesterdays_date = (datetime.now() - timedelta(days=1)).date()
@@ -45,7 +46,7 @@ def write_email(hearings: list[dict]) -> str:
     <html>
         <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #212838; color: #ead9d6; padding: 30px;">
         <h2 style="color: #b29758;"> Hearing Overview - {yesterdays_date}</h2>
-        <div>Thanks for reading this daily update. For more details, access the <a href='http://18.175.52.45:8501' style="color: #238fb5;">dashboard</a>.</div>
+        <div>Thanks for reading this daily update. For more details, access the <a href='{dashboard_url}' style="color: #238fb5;">dashboard</a>.</div>
         
         <hr>
         <p>Total Cases: {len(hearings)}</p>
@@ -101,7 +102,7 @@ def get_subscriber_list(conn: connection) -> list[str]:
     return subscriber_list
 
 
-def get_subscribers_and_email():
+def get_subscribers_and_email(dashboard_url: str):
     """Gets subscribers email list and HTML email template."""
     conn = get_db_connection()
 
@@ -109,7 +110,7 @@ def get_subscribers_and_email():
 
     logging.info("Getting subscribers and email template.")
     subscriber_emails = get_subscriber_list(conn)
-    email = write_email(hearings)
+    email = write_email(hearings, dashboard_url)
 
     conn.close()
 
@@ -120,12 +121,3 @@ def get_subscribers_and_email():
     }
 
     return res
-
-
-def handler(context=None, event=None):
-    """Handler function which runs on the lambda."""
-    return get_subscribers_and_email()
-
-
-if __name__ == "__main__":
-    handler()
