@@ -134,6 +134,11 @@ variable "ORIGIN_EMAIL" {
   type        = string
 }
 
+variable "DASHBOARD_URL" {
+  description = "Dashboard URL"
+  type        = string
+}
+
 variable "PIPELINE_SCHEDULER_ROLE_NAME" {
   description = "Name for the pipeline's scheduler's role"
   type        = string

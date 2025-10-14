@@ -239,6 +239,7 @@ resource "aws_lambda_function" "courts-email-lambda" {
       SECRET_ACCESS_KEY = var.SECRET_ACCESS_KEY
       REGION = var.REGION
       ORIGIN_EMAIL = var.ORIGIN_EMAIL
+      DASHBOARD_URL = var.DASHBOARD_URL
     }
   }
   architectures = ["x86_64"]
