@@ -57,6 +57,9 @@ def parse_transcripts(unique_xmls: list[str]) -> list[dict]:
         if headings_dict is None:
             continue
         citation = metadata_xml.get_metadata(xml)["citation"]
+        if citation is None:
+            # Exclude XML with missing citation
+            continue
         transcripts.append({citation: headings_dict})
     return transcripts
 
@@ -122,6 +125,8 @@ def run_etl(number_of_transcripts: int = 20) -> None:
         conn, number=number_of_transcripts)
     logging.info("%s unique transcripts found", len(unique_xmls))
     metadatas = extract_and_parse_xml(unique_xmls)
+    # Filter XMLs without citation from metadata list
+    metadatas = [data for data in metadatas if data["citation"] is not None]
     transcripts = parse_transcripts(unique_xmls)
     transcripts = extract_meaningful_headers_and_content(
         transcripts, MEANINGFUL_HEADERS_INPUT)
