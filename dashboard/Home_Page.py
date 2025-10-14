@@ -16,6 +16,7 @@ from charts import (
     get_anomalies_visualisation
 )
 
+
 # CSS Injection
 GOLD_COLOR = "#b29758"
 SECONDARY_GOLD_COLOUR = "#a38c64"

@@ -69,8 +69,13 @@ judges_df["name"] = (
     judges_df["last_name"].fillna("")
 ).str.replace(r"\s+", " ", regex=True).str.strip()
 
+# Count cases per judge
+case_counts = data.groupby("judge_id").size().reset_index(name="case_count")
+judges_df = judges_df.merge(case_counts, on="judge_id", how="left")
+judges_df["case_count"] = judges_df["case_count"].fillna(0).astype(int)
+
 # Keep only necessary columns
-judges_df = judges_df[["judge_id", "name", "title_name", "court_name"]].rename(
+judges_df = judges_df[["judge_id", "name", "title_name", "court_name", "case_count"]].rename(
     columns={"judge_id": "id", "title_name": "title"}
 )
 
@@ -80,7 +85,7 @@ judges_df["title"] = judges_df["title"].fillna("Unknown")
 judges_df["court_name"] = judges_df["court_name"].fillna("Unknown")
 
 # Filters
-col1, col2, col3 = st.columns([3, 2, 2])
+col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
 with col1:
     name_filter = st.text_input("Judge Name", placeholder="Enter judge name...")
 with col2:
@@ -89,6 +94,8 @@ with col2:
 with col3:
     court_filter = st.selectbox("Court", ["All"] + \
                                 sorted(judges_df["court_name"].unique().tolist()))
+with col4:
+    sort_order = st.selectbox("Sort by Cases", ["None", "Ascending", "Descending"])
 
 # Apply filters
 filtered = judges_df.copy()
@@ -100,6 +107,12 @@ if title_filter != "All":
 if court_filter != "All":
     filtered = filtered[filtered["court_name"] == court_filter]
 
+# Apply sorting
+if sort_order == "Ascending":
+    filtered = filtered.sort_values("case_count", ascending=True)
+elif sort_order == "Descending":
+    filtered = filtered.sort_values("case_count", ascending=False)
+
 filtered = filtered.drop_duplicates(subset="id").reset_index(drop=True)
 
 # Display results
@@ -110,11 +123,13 @@ if filtered.empty:
 else:
     for idx, row in filtered.iterrows():
         with st.container():
-            cols = st.columns([4, 1])
+            cols = st.columns([4, 1, 1])
             with cols[0]:
                 st.subheader(row["name"])
                 st.caption(f"{row['title']} | {row['court_name']}")
             with cols[1]:
+                st.metric("Cases", row["case_count"])
+            with cols[2]:
                 if st.button("View Details", key=f"judge_{row.id}_{idx}"):
                     st.session_state["selected_judge_id"] = row["id"]
                     st.switch_page("pages/Judge_Details.py")
