@@ -57,9 +57,14 @@ def handler(event=None, context=None):
 
     subscribers = subscribers_email_dict['subscriber_emails']
     email = subscribers_email_dict['email']
+    num_hearings = subscribers_email_dict['num_hearings']
 
     if len(subscribers) < 1:
         logging.info("No subscribers found. Aborting")
+        return
+
+    if num_hearings < 1:
+        logging.info("No hearings found. Aborting")
         return
 
     logging.info("Sending email to %s subscribers.", len(subscribers))
